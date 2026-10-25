@@ -134,6 +134,7 @@ b{font-weight:700}
 table{border-collapse:collapse;width:100%;font-size:14px;min-width:460px}
 .tblwrap.fit table{min-width:0;font-size:13px}.tblwrap.fit th,.tblwrap.fit td{padding:7px 6px}
 .tblwrap.fit td:first-child{white-space:nowrap}
+.symgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.sym{border:1px solid var(--line);border-radius:12px;padding:8px;background:var(--surface);display:flex;flex-direction:column;gap:2px;min-width:0}.sym svg{width:100%;height:auto;background:var(--surface2);border-radius:8px;margin-bottom:4px}.sym b{font-size:14px}.sym small{font-size:11px;color:var(--muted)}.sym .dgen{font-size:12.5px}
 th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
 th{background:var(--surface2);font-size:12px;color:var(--muted);font-weight:800}
 tr:last-child td{border-bottom:0}
@@ -1066,7 +1067,7 @@ const TOC=[
  {n:'제3편',h:'센서별',d:'측정 대상마다 한 장씩',items:[['gas','가스센서'],['mag','자기센서'],['speed','속도센서·금속탐지기'],['accel','가속도·진동센서'],['gyro','자이로센서'],['ultra','초음파센서'],['temp','온도센서'],['press','압력센서'],['flow','유량·레벨센서'],['prox','근접·광센서']]},
  {n:'제4편',h:'현업 연결',d:'센서 데이터의 큰 그림',items:[['plant','공장 데이터 흐름 — PLC·SCADA·MES'],['pdm','예지보전']]}
 ];
-const APX=[['A','공식 모음','form'],['B','용어 사전','term'],['C','단위 읽는 법','unit'],['D','계산기 키','key']];
+const APX=[['A','공식 모음','form'],['B','용어 사전','term'],['C','단위 읽는 법','unit'],['D','회로 기호','sym'],['E','계산기 키','key']];
 function vHome(){
   TT.textContent='센서 핵심노트';
   const mark=LS.get('last',null);const mp=mark&&PAGES[mark.id];
@@ -1105,11 +1106,13 @@ function vHome(){
 
 /* 사전 */
 function vDict(arg){TT.textContent='사전';const seg=(arg&&arg.seg)||LS.get('dseg','term');LS.set('dseg',seg);
-  const segs=[['term','용어'],['unit','단위'],['form','공식'],['key','계산기 키']];
+  const segs=[['term','용어'],['unit','단위'],['form','공식'],['sym','기호'],['key','계산기']];
   let body='';
   if(seg==='term'){body=`<div class="dlist">${Object.entries(TERM).sort((a,b)=>a[1].ko.localeCompare(b[1].ko,'ko')).map(([k,T])=>`<button class="drow" data-t2="${k}"><b>${T.ko}</b><small>${T.en}</small><span class="dgen">${T.gen}</span></button>`).join('')}</div>`}
   if(seg==='unit'){const groups=[['길이',['nm','um','mm','cm','m','km','ft','inch']],['넓이·부피',['um2','mm2','cm2','m2','cm3','L','m3']],['질량',['ug','mg','g','kg']],['비율',['dec','pct','ppm','ppb']],['자기장',['uT','mT','G','T']],['각도·각속도',['deg','rad','dps','rads','dph']],['전기',['V','ohm','F','uF','nF','pF','Fm']],['주파수·시간',['s','Hz','kHz','MHz']],['힘·기타',['N','mps','Nm','Vdps','mVdps','nd']],['음향·압전',['ms','us','dB','Wm2','Nm2','Ncm2','Pa','MPa','rayl','Mrayl','inps','kgm3','degC','pmV','pCN','pC','nC','pm']]];
     body=groups.map(([g,ks2])=>`<div class="dg"><div class="eyebrow">${g}</div><div class="dlist">${ks2.map(k=>`<button class="drow urow" data-u2="${k}"><span class="mono us">${UNIT[k].s}</span><span><b>${UNIT[k].r}</b><span class="dgen">${UNIT[k].mean}</span></span></button>`).join('')}</div></div>`).join('')}
+  if(seg==='unit'){const used=new Set([...body.matchAll(/data-u2="(\w+)"/g)].map(m=>m[1]));const rest=Object.keys(UNIT).filter(k=>!used.has(k));if(rest.length)body+=`<div class="dg"><div class="eyebrow">그 밖의 단위</div><div class="dlist">${rest.map(k=>`<button class="drow urow" data-u2="${k}"><span class="mono us">${UNIT[k].s}</span><span><b>${UNIT[k].r}</b><span class="dgen">${UNIT[k].mean}</span></span></button>`).join('')}</div></div>`}
+  if(seg==='sym'){body=`<p class="small muted">회로·센서 그림에 나오는 기호 [AI 보충] · 저항은 나라마다 네모(IEC)와 지그재그(ANSI) 두 가지</p>`+symGrid()}
   if(seg==='form'){body=FORM.map(f=>`<div class="card fcard"><div class="eyebrow">${f.name}</div><div class="eqn">${f.eq}<small>"${f.read}"</small></div>
     ${f.syms.length?`<div class="syms">${f.syms.map(([s,m,uk])=>`<span class="s">${s}</span><span>${m}${uk?' · '+u(uk):''}</span>`).join('')}</div>`:''}
     <button class="ghost" data-goto="${f.page}" data-i="${f.sec}">본문에서 보기 ›</button></div>`).join('')}

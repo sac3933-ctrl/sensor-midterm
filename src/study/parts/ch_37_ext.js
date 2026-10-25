@@ -190,7 +190,7 @@ PAGES.temp={title:'온도센서',part:'제3편 7장',secs:[
    <ul class="clean"><li>[[cjc|냉접점 보상]] 필수 · 보상도선 사용</li><li>넓은 범위(K형 약 −200~1250 °C)·튼튼·빠름 / 출력 μV 수준·잡음 주의</li></ul>`,
   easy:'두 금속의 온도차가 아주 작은 전압을 만들어요. 기준점 온도를 따로 재서 더해요.'},
  {k:'비교',h:'무엇을 고를까',b:`<div class="tblwrap fit"><table><tr><th></th><th>RTD</th><th>서미스터</th><th>열전대</th></tr><tr><td>범위</td><td class="small">−200~600 °C</td><td class="small">−50~150 °C</td><td class="small">−200~1250 °C+</td></tr><tr><td>정확도</td><td class="small">높음</td><td class="small">좁은 범위서 높음</td><td class="small">보통</td></tr><tr><td>선형성</td><td class="small">좋음</td><td class="small">나쁨</td><td class="small">보통</td></tr><tr><td>출력</td><td class="small">저항</td><td class="small">저항(큰 변화)</td><td class="small">μV 전압</td></tr></table></div>
-   <p class="small">비접촉: 적외선 온도계(방사율 설정) · IC 센서(예: 10 mV/°C 선형 출력). 범위는 대략값 [AI 보충].</p><button class="ghost" data-goto="gas" data-i="7">↗ 슈테판-볼츠만·방사율</button>`,
+   <p class="small">비접촉: 적외선 온도계(방사율 설정) · IC 센서(예: 10 mV/°C 선형 출력). 범위는 대략값 [AI 보충].</p>${symGrid(['thm','tc'])}<button class="ghost" data-goto="gas" data-i="7">↗ 슈테판-볼츠만·방사율</button>`,
   easy:'정밀하면 RTD, 싸고 민감하면 서미스터, 아주 뜨거우면 열전대.'},
  {k:'응답',h:'응답시간과 시정수',b:`<div class="eqn">T(t) = T_f + (T_i − T_f)e^(−t/τ)<small>[[timeconst|시정수]] τ · 1τ 63.2 % · 5τ 99.3 %</small></div><p class="small">보호관(써모웰)이 두껍고 유속이 느릴수록 τ↑. [현업] 반응기 온도 제어 지연의 원인.</p><button class="ghost" data-goto="char" data-i="5">↗ 응답시간 t₉₀</button>`,
   easy:'센서도 데워지는 데 시간이 걸려서, 바로 정확한 값을 내지 못해요.'},
@@ -247,7 +247,7 @@ PAGES.prox={title:'근접·광전센서',part:'제3편 10장',secs:[
   easy:'카탈로그 거리의 80 % 안에서, 금속 종류에 따라 더 가깝게.'},
  {k:'광전',h:'광전 센서',b:`<div class="f4"><div><div class="h">투과형</div>송·수광기 마주 봄 · 가장 멀리 · 불투명체</div><div><div class="h">회귀반사형</div>반사판 · 한쪽만 배선 · 투명체 주의</div><div><div class="h">확산반사형</div>물체 반사 · 색·광택 영향 · BGS로 배경 무시</div></div><p>[[photoelec|광전 센서]]: 수 m~수십 m 감지.</p><button class="ghost" data-goto="optic" data-i="4">↗ 광학 원리</button>`,
   easy:'빛이 가려지거나 튕겨 오는 걸로 물건을 알아요.'},
- {k:'배선',h:'출력과 배선',b:`${FIG.npnFig()}<ul class="clean"><li>[[npnpnp|NPN·PNP]] · NO(평상시 열림)·NC(평상시 닫힘)</li><li>2선식(부하 직렬), 3선식(+V·0V·출력), IO-Link(디지털 통신+진단)</li></ul><p class="small"><b>[현업]</b> 유럽 설비는 PNP, 아시아 설비는 NPN이 많았음 — PLC 입력 카드와 꼭 맞추기 (추정·지역차).</p>`,
+ {k:'배선',h:'출력과 배선',b:`${FIG.npnFig()}${symGrid(['npn','pnp','sw'])}<ul class="clean"><li>[[npnpnp|NPN·PNP]] · NO(평상시 열림)·NC(평상시 닫힘)</li><li>2선식(부하 직렬), 3선식(+V·0V·출력), IO-Link(디지털 통신+진단)</li></ul><p class="small"><b>[현업]</b> 유럽 설비는 PNP, 아시아 설비는 NPN이 많았음 — PLC 입력 카드와 꼭 맞추기 (추정·지역차).</p>`,
   easy:'센서 출력 방식과 PLC 입력 방식이 짝이 맞아야 신호가 들어가요.'},
  {k:'문제',h:'',b:'__PROBS__'},
  {k:'외울 것',h:'이것만은 외우기',b:`<ol class="clean"><li>유도형 = 금속(와전류) · 정전용량형 = 모든 물체 · 광전형 = 빛</li><li>Sa ≤ 0.81·Sn × 재질 계수 · 히스테리시스로 채터링 방지</li><li>NPN 싱크 / PNP 소스 · 갈 +V, 청 0V, 흑 출력</li></ol><button class="primary" data-goto="cards">카드로 외우기</button>`}

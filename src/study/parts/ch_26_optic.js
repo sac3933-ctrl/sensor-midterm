@@ -92,7 +92,7 @@ PAGES.optic={title:'광학 센서',part:'제2편 6장',secs:[
   easy:'문턱보다 센 빛 알갱이만 전자를 튀어 오르게 해서 전류를 만들어요.'},
  {k:'종류',h:'광센서 종류',b:`<div class="tblwrap fit"><table><tr><th>종류</th><th>원리 → 출력</th><th>특징</th></tr>
    <tr><td>[[ldr|포토레지스터]]</td><td class="small">빛 → 저항↓</td><td class="small">싸다, 느리다</td></tr><tr><td>[[photodiode|포토다이오드]]</td><td class="small">빛 → 전류</td><td class="small">빠르고 선형</td></tr>
-   <tr><td>포토트랜지스터</td><td class="small">빛 → 증폭된 전류</td><td class="small">감도↑ 속도↓</td></tr><tr><td>CCD·CMOS</td><td class="small">픽셀 배열 → 영상</td><td class="small">카메라·비전 검사</td></tr><tr><td>[[thermalir|열형 IR]]</td><td class="small">열 → 전압·저항</td><td class="small">비접촉 온도·PIR</td></tr></table></div>`,
+   <tr><td>포토트랜지스터</td><td class="small">빛 → 증폭된 전류</td><td class="small">감도↑ 속도↓</td></tr><tr><td>CCD·CMOS</td><td class="small">픽셀 배열 → 영상</td><td class="small">카메라·비전 검사</td></tr><tr><td>[[thermalir|열형 IR]]</td><td class="small">열 → 전압·저항</td><td class="small">비접촉 온도·PIR</td></tr></table></div>${symGrid(['ldr','led','pd'])}`,
   easy:'빛을 저항·전류·영상·열 중 무엇으로 바꾸느냐로 나눠요.'},
  {k:'포토다이오드',h:'포토다이오드와 TIA',b:`${FIG.tiaFig()}<div class="eqn">I_ph = ℛ·P,  |V_out| = I_ph·R_f<small>[[responsivity|감응도]] {{AW}} · [[tia|TIA]]</small></div>
    <ul class="clean"><li>광도전 모드(역바이어스): 빠름·선형, 암전류↑</li><li>광기전 모드(0 V): 잡음↓, 느림</li></ul>`,

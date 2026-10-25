@@ -184,6 +184,8 @@ PAGES.elec={title:'전기 기초 — 전압·전류·저항',part:'제0편 4장'
    <div><div class="h">[[inductor|코일]] L {{H}}</div><div class="ln">V = L·dI/dt,  X_L = ωL</div><div class="rd">DC 통과 · 고주파 차단</div></div></div>
    <div class="eqn">Z = R + jX,  |Z| = √(R² + X²)<small>[[impedance|임피던스]] · 코일 +j, 커패시터 −j</small></div>`,
   easy:'콘덴서와 코일은 주파수에 따라 막는 정도가 달라요. 서로 반대 성질이라 부호도 반대예요.'},
+ {k:'회로 기호',h:'회로 기호 읽기',b:`<p>그림 속 기호를 읽을 줄 알면 회로가 "문장"처럼 보여요. 자주 나오는 것만 먼저:</p>${symGrid(['dc','gnd','res','resz','cap','ind','diode','opamp'])}<button class="primary" data-goto="dict:sym">기호 전체 보기 (사전 › 기호)</button>`,
+  easy:'기호는 부품의 생김새를 단순하게 그린 그림이에요. 콘덴서는 판 두 장, 코일은 감은 줄, 다이오드는 한쪽만 열리는 문(화살표)이에요.'},
  {k:'문제',h:'',b:'__PROBS__'},
  {k:'외울 것',h:'이것만은 외우기',b:`<ol class="clean"><li>V = IR · P = VI = I²R = V²/R</li><li>R = ρL/A — 길면↑, 굵으면↓</li><li>ω = 2πf · X_L = ωL · X_C = 1/(ωC) · |Z| = √(R²+X²)</li></ol>
    <details class="qa"><summary>주파수가 올라가면 콘덴서와 코일은?</summary><div>콘덴서 X_C↓ (잘 통과), 코일 X_L↑ (잘 막음).</div></details>
