@@ -23,6 +23,7 @@
 - [x] 회로 기호 사전(ch_01a_sym.js: 사전›기호, 부록 D, 0편 4장·광학·온도·근접에 일부)
 - [x] 화면 모드 설정(기본 다크): 헤더 ☾ 버튼 순환 + 홈 「설정」 카드, LS skn-theme, THEME 객체
 - [x] SI 접두어 24개 전체(접기) + 단위 연습 time 그룹(ms~fs, kB~PB)·mag에 nT·fT·fc에 GHz·THz
+- [x] 연습 중 「📋 단위표」 시트(cheatSheet): 현재 범위 단위 + 접두어 + 규칙, 문제 상태 유지
 - [x] 배포: sensor-midterm 루트 = 새 앱(PWA, 캐시 sensor-note-vN), /midterm/ = 옛 문제집
 - 재배포: python3 build.py → python3 pwa_build.py → sensor-midterm에서 commit/push
 - 테스트: scratchpad tch.js(장·생성기), stf.js(홈·사전·연습·검색) — srv는 8765 포트

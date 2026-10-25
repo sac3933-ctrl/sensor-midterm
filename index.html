@@ -1215,8 +1215,8 @@ function vCalc(topic){
   <section class="card"><div class="eyebrow">주제</div><div class="cats">${Object.entries(TOPICS).map(([k,t])=>`<button class="cat" data-tp="${k}" aria-pressed="${k===tp}">${t.name}</button>`).join('')}</div>
    <div class="eyebrow">종류</div><div class="cats">${[['all','전부'],['유사','유사'],['응용','응용']].map(([k,l])=>`<button class="cat" data-kd="${k}" aria-pressed="${k===kindSel}">${l}</button>`).join('')}</div></section>
   <div class="slot" data-g="${CS.g}">${probHTML(CS.p,false)}</div>
-  <button class="primary" id="nextC">다음 문제 ›</button><p class="small muted" style="text-align:center">이번에 푼 문제 ${CS.n}개</p>`;
-  wirePM();wireProb(V);
+  <div class="btnrow"><button class="ghost" id="cheat">📋 단위표·접두어</button><button class="primary" id="nextC" style="flex:1">다음 문제 ›</button></div><p class="small muted" style="text-align:center">이번에 푼 문제 ${CS.n}개</p>`;
+  wirePM();wireProb(V);V.querySelector('#cheat').onclick=()=>cheatSheet(null);
   V.querySelectorAll('[data-tp]').forEach(b=>b.onclick=()=>{CS=null;LS.set('ctopic',b.dataset.tp);vCalc(b.dataset.tp);wireCommon(V)});
   V.querySelectorAll('[data-kd]').forEach(b=>b.onclick=()=>{LS.set('ckind',b.dataset.kd);CS=null;vCalc(tp);wireCommon(V)});
   V.querySelector('#nextC').onclick=()=>{CS.n++;CS.p=null;vCalc(tp);wireCommon(V);window.scrollTo(0,0)};
@@ -4654,10 +4654,10 @@ function vUnits(arg){TT.textContent='연습';
     <p>${US.ok===US.n?'전부 맞았어요. 내일은 2군(넓이·각도·피트)도 섞어 보세요.':'틀린 종류는 다음에 더 자주 나와요.'}</p>
     <button class="primary" id="more">계속 풀기</button></section>`;V.querySelector('#more').onclick=()=>{US={n:0,done:0,ok:0,p:null};vUnits()};return}
   V.innerHTML=segPractice('unit')+`<section class="card"><div class="eyebrow">범위 고르기 · 1군 먼저</div><div class="cats">${Object.entries(DIM).map(([k,d])=>`<button class="cat" data-c="${k}" aria-pressed="${sel.has(k)}">${d.lv}군 · ${d.name}</button>`).join('')}</div></section>
-  <section class="card"><div style="display:flex;justify-content:space-between;align-items:center"><span class="chip">${DIM[p.dim].name}</span><span class="score">${US.n?`${US.done+1} / ${US.n}`:`맞음 ${US.ok} · 푼 문제 ${US.done}`}</span></div>
+  <section class="card"><div style="display:flex;justify-content:space-between;align-items:center"><span class="chip">${DIM[p.dim].name}</span><button class="iconbtn" id="cheat" aria-label="단위표 보기">📋 단위표</button><span class="score">${US.n?`${US.done+1} / ${US.n}`:`맞음 ${US.ok} · 푼 문제 ${US.done}`}</span></div>
    <div class="uq">${esc(p.q)}</div><div class="uqr">${esc(p.qr)}</div>
    <div class="opts">${US.opts.map((o,i)=>`<button class="opt" data-o="${i}">${esc(o)}</button>`).join('')}</div>
-   <div id="after" hidden></div></section>`;wirePM();
+   <div id="after" hidden></div></section>`;wirePM();V.querySelector('#cheat').onclick=()=>cheatSheet(p.dim);
   V.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{const k=b.dataset.c;if(sel.has(k)){if(sel.size>1)sel.delete(k)}else sel.add(k);LS.set('ucats',[...sel]);US.p=null;vUnits();wireCommon(V)});
   V.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{if(US.picked!=null)return;US.picked=+b.dataset.o;const okI=US.opts.indexOf(p.ans);const ok=US.picked===okI;
     V.querySelectorAll('[data-o]').forEach((x,i)=>{x.disabled=true;if(i===okI)x.classList.add('ok');else if(i===US.picked)x.classList.add('ng')});
@@ -4679,6 +4679,21 @@ function vUnits(arg){TT.textContent='연습';
 const SH=document.getElementById('sheetHost');
 function openSheet(html,after){SH.innerHTML=`<div class="scrim" data-close></div><div class="sheet" role="dialog" aria-modal="true"><div class="sheet-in"><div class="grab"></div>${html}<button class="ghost" data-close>닫기</button></div></div>`;
   SH.querySelectorAll('[data-close]').forEach(b=>b.onclick=closeSheet);document.addEventListener('keydown',escClose);if(after)after(SH)}
+/* 연습 중 보는 단위표 (문제 상태 유지) */
+function cheatSheet(dimKey){
+  const PF=[['T','테라','12'],['G','기가','9'],['M','메가','6'],['k','킬로','3'],['—','기본','0'],['c','센티','−2'],['m','밀리','−3'],['μ','마이크로','−6'],['n','나노','−9'],['p','피코','−12'],['f','펨토','−15']];
+  let dim='';
+  if(dimKey&&DIM[dimKey]){const D=DIM[dimKey];
+    if(D.np){const N=NP[dimKey];dim=N.groups.map(g=>`<div class="ladder">${Object.entries(g.u).map(([k,ops])=>`<div class="rung"><span class="p" style="font-size:15px">${UNIT[k].s}</span><span class="ex" style="grid-column:2/5">${ops.length?`1 ${UNIT[k].s} = ${ops.map(([o,v])=>o+' '+v).join(' ')} → ${g.base}`:'기준 단위 '+g.base}</span></div>`).join('')}</div>`).join('')}
+    else{const sets=[['u',D.u],['u2',D.u2]].filter(x=>x[1]);dim=sets.map(([nm,set])=>{const base=({area:nm==='u2'?'m³':'m²',fc:nm==='u2'?'F':'Hz',time:nm==='u2'?'B':'s'})[dimKey]||D.base;
+      return `<div class="ladder">${Object.entries(set).sort((a,b)=>b[1]-a[1]).map(([k,e])=>`<div class="rung${e===0?' base':''}"><span class="p" style="font-size:15px">${UNIT[k].s}</span><span class="small">${UNIT[k].r}</span><span class="e">10${sup(e)}</span><span class="ex">${e===0?'기준 '+base:`1 ${UNIT[k].s} = 10${sup(e)} ${base}`}</span></div>`).join('')}</div>`}).join('<div style="height:8px"></div>')}}
+  openSheet(`<div><h3>단위표</h3><div class="en">문제는 그대로 있어요 · 닫으면 이어서 풀어요</div></div>
+   ${dim?`<div class="eyebrow">지금 범위 · ${DIM[dimKey].name}</div>${dim}`:''}
+   <div class="eyebrow" style="margin-top:12px">접두어 사다리</div><div class="ladder">${PF.map(r=>`<div class="rung${r[0]==='—'?' base':''}"><span class="p">${r[0]}</span><span>${r[1]}</span><span class="e">10${sup(+r[2].replace('−','-'))}</span><span class="ex">${r[0]==='—'?'m · g · Hz · F · T':''}</span></div>`).join('')}</div>
+   <div class="rel" style="margin-top:10px"><b>규칙 3개</b><br>① 큰 단위 → 작은 단위면 숫자가 커진다<br>② 지수 빼기: (바꾸기 전) − (바꾼 뒤) → 10의 그 승을 곱한다<br>③ 제곱·세제곱 단위는 지수도 2배·3배</div>
+   <div class="rel mono" style="margin-top:8px">1 % = 10⁴ ppm · 1 ppm = 10³ ppb · 1 G = 10⁻⁴ T · 1 ft = 0.3048 m · 180° = π rad</div>
+   <button class="ghost" data-goto="unitbasic" data-close>↗ 0편 1장 전체 보기</button>`,h=>wireCommon(h));
+}
 function closeSheet(){SH.innerHTML='';document.removeEventListener('keydown',escClose)}
 function escClose(e){if(e.key==='Escape')closeSheet()}
 function termSheet(k){const T=TERM[k];if(!T)return;
