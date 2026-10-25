@@ -1087,7 +1087,7 @@ const THEME={get(){return LS.get('theme','dark')},set(t){LS.set('theme',t);this.
   document.querySelectorAll('[data-theme-set]').forEach(x=>x.setAttribute('aria-selected',String(x.dataset.themeSet===t)))}};
 function wireCommon(root){
   root.querySelectorAll('[data-theme-set]').forEach(b=>b.onclick=()=>THEME.set(b.dataset.themeSet));
-  root.querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>{const g=b.dataset.goto;if(PAGES[g])go('page',{id:g,i:+(b.dataset.i||0)});else if(g.startsWith('dict:'))go('dict',{seg:g.slice(5)});else if(g==='units')go('practice',{mode:'unit'});else if(g==='calc')go('practice',{mode:'calc',topic:b.dataset.topic});else go(g)});
+  root.querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>{const g=b.dataset.goto;if(PAGES[g])go('page',{id:g,i:+(b.dataset.i||0)});else if(g.startsWith('dict:'))go('dict',{seg:g.slice(5)});else if(g==='units')go('practice',{mode:'unit'});else if(g==='pfx'){PD=null;go('practice',{mode:'pfx'})}else if(g==='calc')go('practice',{mode:'calc',topic:b.dataset.topic});else go(g)});
 }
 
 /* 목차 */
@@ -1187,10 +1187,10 @@ function vPage(arg){const P=PAGES[arg.id];const i=Math.min(arg.i||0,P.secs.lengt
 }
 
 /* 연습: 단위 변환 / 계산 문제 */
-function segPractice(mode){return `<div class="seg" role="tablist"><button role="tab" aria-selected="${mode==='unit'}" data-pm="unit">단위 변환</button><button role="tab" aria-selected="${mode==='calc'}" data-pm="calc">계산 문제</button></div>`}
+function segPractice(mode){return `<div class="seg" role="tablist"><button role="tab" aria-selected="${mode==='unit'}" data-pm="unit">단위 변환</button><button role="tab" aria-selected="${mode==='calc'}" data-pm="calc">계산 문제</button><button role="tab" aria-selected="${mode==='pfx'}" data-pm="pfx">접두어 드릴</button></div>`}
 function wirePM(){V.querySelectorAll('[data-pm]').forEach(b=>b.onclick=()=>go('practice',{mode:b.dataset.pm},false))}
 function vPractice(arg){const mode=(arg&&arg.mode)||LS.get('pmode','unit');LS.set('pmode',mode);TT.textContent='연습';
-  if(mode==='unit')vUnits();else vCalc(arg&&arg.topic)}
+  if(mode==='unit')vUnits();else if(mode==='pfx')vPfx();else vCalc(arg&&arg.topic)}
 let CS=null;
 function vCalc(topic){
   const tp=topic||LS.get('ctopic','gyro');LS.set('ctopic',tp);

@@ -25,6 +25,7 @@
 - [x] SI 접두어 24개 전체(접기) + 단위 연습 time 그룹(ms~fs, kB~PB)·mag에 nT·fT·fc에 GHz·THz
 - [x] 연습 중 「📋 단위표」 시트(cheatSheet): 현재 범위 단위 + 접두어 + 규칙, 문제 상태 유지
 - [x] 연습 5문제 세트: 단위 변환(진행 점·결과표·5문제 더·틀린 범위만), 계산 문제(세트 카운터·요약)
+- [x] 접두어 드릴(ch_01b_pfxdrill.js): 연습 탭 3번째 세그먼트, 10문제 라운드, 약한 접두어 가중, 기록 phist · 0편 1장 「외우는 법」(손가락 그림 FIG.hands)
 - [x] 배포: sensor-midterm 루트 = 새 앱(PWA, 캐시 sensor-note-vN), /midterm/ = 옛 문제집
 - 재배포: python3 build.py → python3 pwa_build.py → sensor-midterm에서 commit/push
 - 테스트: scratchpad tch.js(장·생성기), stf.js(홈·사전·연습·검색) — srv는 8765 포트
