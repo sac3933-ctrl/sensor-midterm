@@ -151,6 +151,8 @@ b{font-weight:700}
 table{border-collapse:collapse;width:100%;font-size:14px;min-width:460px}
 .tblwrap.fit table{min-width:0;font-size:13px}.tblwrap.fit th,.tblwrap.fit td{padding:7px 6px}
 .tblwrap.fit td:first-child{white-space:nowrap}
+.dots{display:inline-flex;gap:4px;vertical-align:middle;margin-right:6px}.dots i{width:10px;height:10px;border-radius:50%;border:1.5px solid var(--line);display:inline-block}.dots i.ok{background:var(--good);border-color:var(--good)}.dots i.ng{background:var(--bad);border-color:var(--bad)}.dots i.now{border-color:var(--accent);box-shadow:inset 0 0 0 2px var(--accent-soft)}
+.setlog{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:8px 0}.setlog .row{display:grid;grid-template-columns:24px 1fr auto 20px;gap:8px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line);font-size:14px}.setlog .row:last-child{border-bottom:0}.setlog .no{color:var(--muted);font-size:12px}.setlog .q{min-width:0;overflow-wrap:anywhere}.setlog .a{color:var(--muted);font-size:13px}.setlog .ok .mk{color:var(--good);font-weight:800}.setlog .ng .mk{color:var(--bad);font-weight:800}
 .symgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.sym{border:1px solid var(--line);border-radius:12px;padding:8px;background:var(--surface);display:flex;flex-direction:column;gap:2px;min-width:0}.sym svg{width:100%;height:auto;background:var(--surface2);border-radius:8px;margin-bottom:4px}.sym b{font-size:14px}.sym small{font-size:11px;color:var(--muted)}.sym .dgen{font-size:12.5px}
 th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
 th{background:var(--surface2);font-size:12px;color:var(--muted);font-weight:800}
@@ -1211,13 +1213,14 @@ let CS=null;
 function vCalc(topic){
   const tp=topic||LS.get('ctopic','gyro');LS.set('ctopic',tp);
   const kindSel=LS.get('ckind','all');
-  if(!CS||CS.tp!==tp||CS.kind!==kindSel){CS={tp,kind:kindSel,n:0,p:null}}
-  if(!CS.p){let gs=TOPICS[tp].g;const kindOf=g=>BASICG.has(g)?'유사':'응용';if(kindSel!=='all')gs=gs.filter(g=>kindOf(g)===kindSel);CS.g=pick(gs);CS.p=GEN[CS.g](false)}
+  if(!CS||CS.tp!==tp||CS.kind!==kindSel){CS={tp,kind:kindSel,n:0,p:null,log:[]}}
+  if(CS.n>=5&&!CS.p){V.innerHTML=`${segPractice('calc')}<section class="card"><div class="eyebrow">${TOPICS[tp].name} · 5문제 세트 끝</div><div class="setlog">${CS.log.map((l,i)=>`<div class="row"><span class="no">${i+1}</span><span class="q">${esc(l)}</span></div>`).join('')}</div><p class="small muted">풀이를 안 보고 답이 나왔으면 다음 세트, 막혔으면 같은 유형이 다시 나오니 한 번 더.</p><div class="btnrow"><button class="primary" id="more5" style="flex:1">같은 주제 5문제 더 ›</button><button class="ghost" id="pickT">다른 주제</button></div></section>`;wirePM();V.querySelector('#more5').onclick=()=>{CS={tp,kind:kindSel,n:0,p:null,log:[]};vCalc(tp);wireCommon(V);window.scrollTo(0,0)};V.querySelector('#pickT').onclick=()=>{CS={tp,kind:kindSel,n:0,p:null,log:[]};vCalc(tp);wireCommon(V);window.scrollTo(0,0)};return}
+  if(!CS.p){let gs=TOPICS[tp].g;const kindOf=g=>BASICG.has(g)?'유사':'응용';if(kindSel!=='all')gs=gs.filter(g=>kindOf(g)===kindSel);const lastG=CS.g;CS.g=gs.length>1&&lastG?pick(gs.filter(g=>g!==lastG)):pick(gs);CS.p=GEN[CS.g](false);CS.log.push(CS.p.title)}
   V.innerHTML=`${segPractice('calc')}
   <section class="card"><div class="eyebrow">주제</div><div class="cats">${Object.entries(TOPICS).map(([k,t])=>`<button class="cat" data-tp="${k}" aria-pressed="${k===tp}">${t.name}</button>`).join('')}</div>
    <div class="eyebrow">종류</div><div class="cats">${[['all','전부'],['유사','유사'],['응용','응용']].map(([k,l])=>`<button class="cat" data-kd="${k}" aria-pressed="${k===kindSel}">${l}</button>`).join('')}</div></section>
   <div class="slot" data-g="${CS.g}">${probHTML(CS.p,false)}</div>
-  <div class="btnrow"><button class="ghost" id="cheat">📋 단위표·접두어</button><button class="primary" id="nextC" style="flex:1">다음 문제 ›</button></div><p class="small muted" style="text-align:center">이번에 푼 문제 ${CS.n}개</p>`;
+  <div class="btnrow"><button class="ghost" id="cheat">📋 단위표·접두어</button><button class="primary" id="nextC" style="flex:1">${CS.n>=4?'세트 끝내기 ›':`다음 문제 (${CS.n+2} / 5) ›`}</button></div><p class="small muted" style="text-align:center">이번 세트 ${CS.n+1} / 5 · <span class="dots">${Array.from({length:5},(_,i)=>`<i class="${i<CS.n?'ok':i===CS.n?'now':''}"></i>`).join('')}</span></p>`;
   wirePM();wireProb(V);V.querySelector('#cheat').onclick=()=>cheatSheet(null);
   V.querySelectorAll('[data-tp]').forEach(b=>b.onclick=()=>{CS=null;LS.set('ctopic',b.dataset.tp);vCalc(b.dataset.tp);wireCommon(V)});
   V.querySelectorAll('[data-kd]').forEach(b=>b.onclick=()=>{LS.set('ckind',b.dataset.kd);CS=null;vCalc(tp);wireCommon(V)});
@@ -4646,33 +4649,43 @@ function toast(t){const d=document.createElement('div');d.className='toast';d.te
 let US=null;
 function vUnits(arg){TT.textContent='연습';
   const sel=new Set(LS.get('ucats',['len','mass','ratio','mag']));
-  if(!US||(arg&&arg.n&&(!US.fixed||US.done>=US.n))){US={n:arg&&arg.n?arg.n:0,done:0,ok:0,fixed:!!(arg&&arg.n),p:null,picked:null}}
-  if(!US.p){const ust=LS.get('ustat',{});const cs=[...sel];
-    // 약한 범주에 가중치
-    const wts=cs.map(k=>1+((ust[k]&&ust[k].ng)||0)*2/(((ust[k]&&ust[k].ok)||0)+1));let r=Math.random()*wts.reduce((a,b)=>a+b,0);let ck=cs[0];for(let i=0;i<cs.length;i++){r-=wts[i];if(r<=0){ck=cs[i];break}}
-    US.p=genUnit(ck);US.opts=options(US.p);US.picked=null}
+  const SET=5;
+  if(!US||(arg&&arg.n&&US.done>=US.n)){US={n:arg&&arg.n?arg.n:SET,done:0,ok:0,p:null,picked:null,log:[],queue:[]}}
+  if(!US.p){const ust=LS.get('ustat',{});const cs=[...sel];let ck;
+    if(US.queue&&US.queue.length)ck=US.queue.shift();
+    else{// 약한 범주에 가중치 · 같은 범위가 연달아 나오지 않게
+      const wts=cs.map(k=>1+((ust[k]&&ust[k].ng)||0)*2/(((ust[k]&&ust[k].ok)||0)+1));let r=Math.random()*wts.reduce((a,b)=>a+b,0);ck=cs[0];for(let i=0;i<cs.length;i++){r-=wts[i];if(r<=0){ck=cs[i];break}}
+      const last=US.log.length?US.log[US.log.length-1].dim:null;if(cs.length>1&&ck===last)ck=pick(cs.filter(x=>x!==last))}
+    let tries=0;do{US.p=genUnit(ck);tries++}while(US.log.some(l=>l.q===US.p.q)&&tries<20); // 같은 세트 안에서 같은 문제 X
+    US.opts=options(US.p);US.picked=null}
   const p=US.p;
-  if(US.n&&US.done>=US.n){LS.set('udone',today());V.innerHTML=`<section class="card"><div class="eyebrow">오늘의 단위 ${US.n}문제 끝</div><h2 style="font-size:24px">${US.ok} / ${US.n} 맞음</h2>
-    <p>${US.ok===US.n?'전부 맞았어요. 내일은 2군(넓이·각도·피트)도 섞어 보세요.':'틀린 종류는 다음에 더 자주 나와요.'}</p>
-    <button class="primary" id="more">계속 풀기</button></section>`;V.querySelector('#more').onclick=()=>{US={n:0,done:0,ok:0,p:null};vUnits()};return}
-  V.innerHTML=segPractice('unit')+`<section class="card"><div class="eyebrow">범위 고르기 · 1군 먼저</div><div class="cats">${Object.entries(DIM).map(([k,d])=>`<button class="cat" data-c="${k}" aria-pressed="${sel.has(k)}">${d.lv}군 · ${d.name}</button>`).join('')}</div></section>
-  <section class="card"><div style="display:flex;justify-content:space-between;align-items:center"><span class="chip">${DIM[p.dim].name}</span><button class="iconbtn" id="cheat" aria-label="단위표 보기">📋 단위표</button><span class="score">${US.n?`${US.done+1} / ${US.n}`:`맞음 ${US.ok} · 푼 문제 ${US.done}`}</span></div>
+  const dots=()=>`<span class="dots">${Array.from({length:US.n},(_,i)=>{const l=US.log[i];return `<i class="${l?(l.ok?'ok':'ng'):(i===US.done?'now':'')}"></i>`}).join('')}</span>`;
+  if(US.n&&US.done>=US.n){LS.set('udone',today());const wrong=US.log.filter(l=>!l.ok);
+    V.innerHTML=segPractice('unit')+`<section class="card"><div class="eyebrow">단위 변환 ${US.n}문제 끝</div><h2 style="font-size:24px;margin:4px 0 8px">${US.ok} / ${US.n} 맞음 ${dots()}</h2>
+    <div class="setlog">${US.log.map((l,i)=>`<div class="row ${l.ok?'ok':'ng'}"><span class="no">${i+1}</span><span class="mono q">${esc(l.q)}</span><span class="mono a">${esc(l.ans)}</span><span class="mk">${l.ok?'✓':'✗'}</span></div>`).join('')}</div>
+    <p class="small muted">${US.ok===US.n?'전부 맞았어요. 다른 범위도 섞어 보세요.':'틀린 범위는 다음 세트에 더 자주 나와요.'}</p>
+    <div class="btnrow"><button class="primary" id="more" style="flex:1">5문제 더 ›</button>${wrong.length?`<button class="ghost" id="redo">틀린 범위만 5문제</button>`:''}</div></section>`;wirePM();
+    V.querySelector('#more').onclick=()=>{US={n:SET,done:0,ok:0,p:null,log:[],queue:[]};vUnits();wireCommon(V);window.scrollTo(0,0)};
+    const rd=V.querySelector('#redo');if(rd)rd.onclick=()=>{const q=[];while(q.length<SET)q.push(wrong[q.length%wrong.length].dim);US={n:SET,done:0,ok:0,p:null,log:[],queue:q};vUnits();wireCommon(V);window.scrollTo(0,0)};return}
+  V.innerHTML=segPractice('unit')+`<section class="card"><div class="eyebrow">범위 고르기 · 1군 먼저 · 범위를 바꾸면 새 세트</div><div class="cats">${Object.entries(DIM).map(([k,d])=>`<button class="cat" data-c="${k}" aria-pressed="${sel.has(k)}">${d.lv}군 · ${d.name}</button>`).join('')}</div></section>
+  <section class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span class="chip">${DIM[p.dim].name}</span><button class="iconbtn" id="cheat" aria-label="단위표 보기">📋 단위표</button><span class="score">${dots()} ${US.done+1} / ${US.n}</span></div>
    <div class="uq">${esc(p.q)}</div><div class="uqr">${esc(p.qr)}</div>
    <div class="opts">${US.opts.map((o,i)=>`<button class="opt" data-o="${i}">${esc(o)}</button>`).join('')}</div>
    <div id="after" hidden></div></section>`;wirePM();V.querySelector('#cheat').onclick=()=>cheatSheet(p.dim);
-  V.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{const k=b.dataset.c;if(sel.has(k)){if(sel.size>1)sel.delete(k)}else sel.add(k);LS.set('ucats',[...sel]);US.p=null;vUnits();wireCommon(V)});
+  V.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{const k=b.dataset.c;if(sel.has(k)){if(sel.size>1)sel.delete(k)}else sel.add(k);LS.set('ucats',[...sel]);US=null;vUnits();wireCommon(V)});
   V.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{if(US.picked!=null)return;US.picked=+b.dataset.o;const okI=US.opts.indexOf(p.ans);const ok=US.picked===okI;
     V.querySelectorAll('[data-o]').forEach((x,i)=>{x.disabled=true;if(i===okI)x.classList.add('ok');else if(i===US.picked)x.classList.add('ng')});
     const st=LS.get('ustat',{});st[p.dim]=st[p.dim]||{ok:0,ng:0};st[p.dim][ok?'ok':'ng']++;LS.set('ustat',st);markStudy();
     if(!ok){const wl=LS.get('uwrong',[]);wl.unshift(p.key);LS.set('uwrong',wl.slice(0,30))}
-    US.done++;if(ok)US.ok++;
+    US.done++;if(ok)US.ok++;US.log.push({q:p.q,ans:p.ans,mine:US.opts[US.picked],ok,dim:p.dim,key:p.key});
+    V.querySelector('.score').innerHTML=`${dots()} ${US.done} / ${US.n}`;
     const af=V.querySelector('#after');af.hidden=false;
     af.innerHTML=`<p class="verdict ${ok?'ok':'ng'}">${ok?'맞았어요':'아쉬워요 — 풀이를 따라가 보세요'}</p>
      <div class="ans"><span class="lb">정답</span><span class="v">${esc(p.ans)}</span><span class="rd">읽기: ${esc(p.ansRead)}</span></div>
      <div class="stepbox">${p.steps.map((s,i)=>`<div class="st"><div class="h"><i>${i+1}</i>${s.h}</div><div class="b">${s.b}</div></div>`).join('')}</div>
      <div class="btnrow"><button class="tbtn" data-tg="calc">🔢 계산기</button><button class="tbtn" data-tg="easy">쉽게</button></div>
      <div data-tp="calc" hidden>${p.calc}</div><div class="panel easy" data-tp="easy" hidden><span class="lb">쉽게 보기</span><div>${p.easy}</div></div>
-     <button class="primary" id="nextQ">다음 문제 ›</button>`;
+     <button class="primary" id="nextQ">${US.done>=US.n?'결과 보기 ›':`다음 문제 (${US.done+1} / ${US.n}) ›`}</button>`;
     wireToggles(af);af.querySelector('#nextQ').onclick=()=>{US.p=null;vUnits();wireCommon(V);window.scrollTo(0,0)};
     if(!ok)af.scrollIntoView({behavior:'smooth',block:'start'})});
 }
