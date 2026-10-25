@@ -411,7 +411,7 @@ const UNIT={
  m:{s:'m',r:'미터',mean:'길이의 기본 단위'}, cm:{s:'cm',r:'센티미터',mean:'1 cm = 10⁻² m (100분의 1 m)'}, mm:{s:'mm',r:'밀리미터',mean:'1 mm = 10⁻³ m'},
  um:{s:'μm',r:'마이크로미터',mean:'1 μm = 10⁻⁶ m · 머리카락 굵기 ≈ 70 μm · MEMS 빗살 폭 5 μm'},
  nm:{s:'nm',r:'나노미터',mean:'1 nm = 10⁻⁹ m · 자이로 감지 변위 수 nm'}, km:{s:'km',r:'킬로미터',mean:'1 km = 10³ m'},
- kg:{s:'kg',r:'킬로그램',mean:'질량의 SI 기본 단위'}, g:{s:'g',r:'그램',mean:'1 g = 10⁻³ kg'}, mg:{s:'mg',r:'밀리그램',mean:'1 mg = 10⁻⁶ kg'}, ug:{s:'μg',r:'마이크로그램',mean:'1 μg = 10⁻⁹ kg'},
+ kg:{s:'kg',r:'킬로그램',mean:'질량의 SI 기본 단위 — 유일하게 접두어(k)가 이미 붙은 기본 단위. 공식에는 kg'}, g:{s:'g',r:'그램',mean:'1 g = 10⁻³ kg · 접두어 사다리(mg, μg)는 g에 붙음'}, mg:{s:'mg',r:'밀리그램',mean:'1 mg = 10⁻³ g = 10⁻⁶ kg'}, ug:{s:'μg',r:'마이크로그램',mean:'1 μg = 10⁻⁶ g = 10⁻⁹ kg (g→kg로 3칸 더)'},
  T:{s:'T',r:'테슬라',mean:'자기장(자속밀도)의 SI 단위'}, mT:{s:'mT',r:'밀리테슬라',mean:'1 mT = 10⁻³ T'}, uT:{s:'μT',r:'마이크로테슬라',mean:'1 μT = 10⁻⁶ T · 지구 자기장 ≈ 50 μT'},
  G:{s:'G',r:'가우스',mean:'1 G = 10⁻⁴ T (옛 단위, 아직 많이 씀). 지구 자기장 ≈ 0.5 G'},
  dec:{s:'(소수)',r:'그냥 숫자',mean:'비율을 그냥 숫자로 쓴 것. 1 = 100 %'}, pct:{s:'%',r:'퍼센트',mean:'100분의 1 = 10⁻²'},
@@ -878,7 +878,8 @@ PAGES.unitbasic={title:'단위·접두어·읽는 법',part:'제0편 1장',secs:
   <details class="qa"><summary>3칸 규칙의 예외 3개 (h · da · d)</summary><div class="lad"><div class="ladder">${[
    ['h','헥토','10²','hPa · 기압 1013 hPa'],['da','데카','10¹','dam (거의 안 씀)'],['d','데시','10⁻¹','dB 데시벨 = 10분의 1 벨 · dL']
   ].map(r=>`<div class="rung"><span class="p">${r[0]}</span><span>${r[1]}</span><span class="e">${r[2]}</span><span class="ex">${r[3]}</span></div>`).join('')}</div><p class="small muted">1000배씩 뛰는 규칙에서 벗어난 셋. 센서에서는 dB(데시벨)와 hPa가 자주 나와요.</p></div></details>
-  ${FIG.zoom()}<p class="small muted">⚠ m은 두 가지: 앞에 붙으면 <b>밀리</b>(mm), 혼자 있으면 <b>미터</b>(m). μ는 "뮤"라고 읽고 마이크로. 대문자 M(메가)·소문자 m(밀리), 대문자 T(테라 또는 테슬라)·소문자 t(톤)도 구분!</p>`,
+  ${FIG.zoom()}<p class="small muted">⚠ m은 두 가지: 앞에 붙으면 <b>밀리</b>(mm), 혼자 있으면 <b>미터</b>(m). μ는 "뮤"라고 읽고 마이크로. 대문자 M(메가)·소문자 m(밀리), 대문자 T(테라 또는 테슬라)·소문자 t(톤)도 구분!</p>
+  <div class="warnbox"><b>질량만 예외:</b> 기준 단위가 kg라서 접두어 k가 이미 붙어 있어요. mg·μg 같은 접두어는 g에 붙으니, <b>g 기준으로 사다리를 탄 뒤 kg로 갈 때 ÷ 1000</b>. 예: 5 μg = 5 × 10⁻⁶ g = 5 × 10⁻⁹ kg.</div>`,
   easy:'킬로는 1000배, 밀리는 1000분의 1, 마이크로는 100만분의 1, 나노는 10억분의 1이에요. 3칸씩(1000배씩) 내려가요. 위로는 테라·페타·엑사…, 아래로는 펨토·아토… 하고 계속 이어져요.'},
  {k:'규칙 3개',h:'단위 변환 규칙 3개',b:`<div class="rules">
    <div class="rule"><i>1</i><div><b>큰 단위 → 작은 단위면 숫자가 커진다.</b><div class="rd">1 m = 1000 mm. 작은 자로 재면 눈금 수가 많아지니까</div></div></div>
@@ -905,6 +906,7 @@ const CARDS=[
  {id:'u7',tag:'단위',f:'1 ft는 몇 m? 1 in는 몇 cm?',a:'1 ft = 0.3048 m · 1 in = 2.54 cm',r:'피트 · 인치',e:'1 ft ≈ 30 cm, 1 ft = 12 in'},
  {id:'u8',tag:'단위',f:'180°는 몇 rad? 1°는?',a:'π rad · 1° = π/180 ≈ 0.01745 rad',r:'라디안',e:'공식에 각도를 넣을 땐 rad로'},
  {id:'u9',tag:'단위',f:'1 °/s는 몇 °/hr?',a:'3600 °/hr',r:'도 퍼 아워',e:'1시간 = 3600초'},
+ {id:'u13',tag:'단위',f:'1 μg는 몇 kg? (왜 10⁻⁶이 아닌가)',a:'10⁻⁹ kg',r:'μ(10⁻⁶)는 g에 붙고, g → kg가 10⁻³ 한 번 더',e:'질량만 기준 단위(kg)에 접두어가 이미 있어요.'},
  {id:'u10',tag:'단위',f:'G 위로 큰 접두어 순서 (10¹²~10²⁴)',a:'T 테라 · P 페타 · E 엑사 · Z 제타 · Y 요타',r:'3칸(1000배)씩',e:'TB → PB → EB'},
  {id:'u11',tag:'단위',f:'p 아래로 작은 접두어 순서 (10⁻¹⁵~10⁻²⁴)',a:'f 펨토 · a 아토 · z 젭토 · y 욕토',r:'',e:'fT = SQUID 자기장, fs = 초고속 레이저'},
  {id:'u12',tag:'단위',f:'dB와 hPa의 접두어는?',a:'d 데시 = 10⁻¹ · h 헥토 = 10²',r:'3칸 규칙의 예외',e:'데시벨 = 10분의 1 벨'},
@@ -949,7 +951,7 @@ const NP={
   vals:{m:[1,2,3,5,10],cm:[10,30,50,100,254],ft:[3,5,6,10,12,30,100],inch:[1,2,6,12,24]}}
 };
 const EASY={len:'1 m 막대를 작은 자로 재면 눈금이 많아져요. 단위가 작아지면 숫자는 커지고, 단위가 커지면 숫자는 작아져요.',
- mass:'1 kg = 1000 g. 설탕 1 kg 봉지를 g 저울로 달면 1000이 나와요.',
+ mass:'질량만 특별해요: 공식의 기준은 kg인데 접두어(m, μ)는 g에 붙어요. 그래서 먼저 g 기준으로 사다리를 타고(1 mg = 10⁻³ g), 마지막에 ÷1000 해서 kg로 가요. μg → kg는 10⁻⁶ × 10⁻³ = 10⁻⁹.',
  ratio:'%는 100개 중 몇 개, ppm은 100만 개 중 몇 개예요. 계산할 땐 그냥 소수로 바꿔요.',
  mag:'테슬라는 아주 큰 단위예요. 냉장고 자석이 약 0.01 T(=10 mT, 100 G) 정도예요.',
  area:'가로·세로가 둘 다 작아지니까 10⁻²가 두 번 곱해져서 10⁻⁴이 돼요.',
@@ -988,7 +990,7 @@ function genUnit(dimKey){
   const dir=k>0?`${ua.s}가 ${ub.s}보다 <b>10${sup(k)}배 큰</b> 단위 → 작은 단위로 가니 <b>숫자가 커져야</b> 해요`:`${ua.s}가 ${ub.s}보다 <b>작은</b> 단위 → 큰 단위로 가니 <b>숫자가 작아져야</b> 해요`;
   let norm='';
   if(vs.e!==0){norm=`<div class="ln">${v} × 10${sup(k)} = ${vs.m} × 10${sup(vs.e)} × 10${sup(k)}</div><div class="ln">= ${vs.m} × 10${sup(vs.e+k)}</div><div class="rd">앞 숫자를 1~10 사이로 정리하고, 지수끼리 더하기: ${mn(vs.e)} + (${mn(k)}) = ${mn(vs.e+k)}</div>`}
-  const notes={cm2:'1 cm = 10⁻² m → 1 cm² = (10⁻²)² m² = 10⁻⁴ m²',mm2:'1 mm = 10⁻³ m → 1 mm² = 10⁻⁶ m²',um2:'1 μm = 10⁻⁶ m → 1 μm² = 10⁻¹² m²',cm3:'1 cm = 10⁻² m → 1 cm³ = (10⁻²)³ = 10⁻⁶ m³',L:'1 L = 1000 cm³ = 10⁻³ m³',G:'1 G = 10⁻⁴ T (가우스는 테슬라의 1만분의 1)'};
+  const notes={kg:'질량은 기준이 kg (접두어 k가 이미 붙어 있음) · g 기준으로 보려면 1 kg = 10³ g',g:'접두어 사다리는 g에 붙음(mg, μg) · 공식에 넣을 땐 1 g = 10⁻³ kg',mg:'g 기준 10⁻³, kg 기준 10⁻⁶ (3칸 더)',ug:'g 기준 10⁻⁶, kg 기준 10⁻⁹ (3칸 더)',cm2:'1 cm = 10⁻² m → 1 cm² = (10⁻²)² m² = 10⁻⁴ m²',mm2:'1 mm = 10⁻³ m → 1 mm² = 10⁻⁶ m²',um2:'1 μm = 10⁻⁶ m → 1 μm² = 10⁻¹² m²',cm3:'1 cm = 10⁻² m → 1 cm³ = (10⁻²)³ = 10⁻⁶ m³',L:'1 L = 1000 cm³ = 10⁻³ m³',G:'1 G = 10⁻⁴ T (가우스는 테슬라의 1만분의 1)'};
   const note=[notes[a],notes[b]].filter(Boolean).map(n=>`<div class="rd">⚠ ${n}</div>`).join('');
   const dt=decT(res);
   const steps=[
@@ -1832,7 +1834,7 @@ function cheatSheet(dimKey){
     else{const sets=[['u',D.u],['u2',D.u2]].filter(x=>x[1]);dim=sets.map(([nm,set])=>{const base=({area:nm==='u2'?'m³':'m²',fc:nm==='u2'?'F':'Hz',time:nm==='u2'?'B':'s'})[dimKey]||D.base;
       return `<div class="ladder">${Object.entries(set).sort((a,b)=>b[1]-a[1]).map(([k,e])=>`<div class="rung${e===0?' base':''}"><span class="p" style="font-size:15px">${UNIT[k].s}</span><span class="small">${UNIT[k].r}</span><span class="e">10${sup(e)}</span><span class="ex">${e===0?'기준 '+base:`1 ${UNIT[k].s} = 10${sup(e)} ${base}`}</span></div>`).join('')}</div>`}).join('<div style="height:8px"></div>')}}
   openSheet(`<div><h3>단위표</h3><div class="en">문제는 그대로 있어요 · 닫으면 이어서 풀어요</div></div>
-   ${dim?`<div class="eyebrow">지금 범위 · ${DIM[dimKey].name}</div>${dim}`:''}
+   ${dim?`<div class="eyebrow">지금 범위 · ${DIM[dimKey].name}</div>${dim}${dimKey==='mass'?'<div class="warnbox" style="margin-top:8px">질량만 특별: 기준 단위 <b>kg</b>에 접두어 k가 이미 붙어 있어요. 접두어 사다리(mg, μg)는 <b>g</b>에 붙으니, g 기준으로 센 뒤 kg로 갈 때 <b>÷ 1000 (3칸 더)</b>.<br>1 mg = 10⁻³ g = 10⁻⁶ kg · 1 μg = 10⁻⁶ g = 10⁻⁹ kg</div>':''}`:''}
    <div class="eyebrow" style="margin-top:12px">접두어 사다리</div><div class="ladder">${PF.map(r=>`<div class="rung${r[0]==='—'?' base':''}"><span class="p">${r[0]}</span><span>${r[1]}</span><span class="e">10${sup(+r[2].replace('−','-'))}</span><span class="ex">${r[0]==='—'?'m · g · Hz · F · T':''}</span></div>`).join('')}</div>
    <div class="rel" style="margin-top:10px"><b>규칙 3개</b><br>① 큰 단위 → 작은 단위면 숫자가 커진다<br>② 지수 빼기: (바꾸기 전) − (바꾼 뒤) → 10의 그 승을 곱한다<br>③ 제곱·세제곱 단위는 지수도 2배·3배</div>
    <div class="rel mono" style="margin-top:8px">1 % = 10⁴ ppm · 1 ppm = 10³ ppb · 1 G = 10⁻⁴ T · 1 ft = 0.3048 m · 180° = π rad</div>
