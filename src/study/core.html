@@ -146,6 +146,7 @@ ol.clean{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px}
 .qa summary::-webkit-details-marker{display:none}
 .qa summary::before{content:"Q";font-family:var(--f-mono);color:var(--accent)}
 .qa > div{padding:0 12px 12px 30px;font-size:15px}
+.qa > div.lad{padding-left:12px}.qa .ladder{margin-top:4px}
 .appchips{display:flex;flex-wrap:wrap;gap:8px}
 .appchips span{border:1px solid var(--line);background:var(--surface2);border-radius:10px;padding:6px 10px;font-size:14px}
 
@@ -199,7 +200,7 @@ kbd.sh{background:var(--warn-soft);border-color:var(--warn)}
 .verdict.ok{color:var(--good)}.verdict.ng{color:var(--bad)}
 .score{font-family:var(--f-mono);font-size:14px;color:var(--muted)}
 .ladder{display:flex;flex-direction:column;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.rung{display:grid;grid-template-columns:44px 74px 64px 1fr;gap:8px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--surface);font-size:14px;text-align:left;border-left:0;border-right:0;border-top:0;width:100%}
+.rung{display:grid;grid-template-columns:34px 60px 58px minmax(0,1fr);gap:6px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line);background:var(--surface);font-size:14px;text-align:left;border-left:0;border-right:0;border-top:0;width:100%}
 .rung:last-child{border-bottom:0}
 .rung .p{font-family:var(--f-mono);font-weight:700;font-size:18px;color:var(--unit)}
 .rung .e{font-family:var(--f-mono);font-weight:700}
@@ -862,12 +863,23 @@ PAGES.cap={title:'정전용량형',part:'제2편 2장',secs:[
  {k:'문제',h:'',b:'__PROBS__'}
 ]};
 PAGES.unitbasic={title:'단위·접두어·읽는 법',part:'제0편 1장',secs:[
- {k:'접두어',h:'10의 몇 승인가 — 접두어 사다리',b:`<div class="ladder">${[
+ {k:'접두어',h:'10의 몇 승인가 — 접두어 사다리',b:`<p class="small muted">SI 접두어는 10³⁰(퀘타)부터 10⁻³⁰(퀙토)까지 24개예요. 센서 계산에 자주 나오는 가운데 구간을 먼저 외우고, 양 끝은 접어 두었어요. [AI 보충]</p>
+  <details class="qa"><summary>▲ 더 큰 접두어 7개 (T 테라 ~ Q 퀘타)</summary><div class="lad"><div class="ladder">${[
+   ['Q','퀘타','10³⁰','2022년 추가 · 지구 질량 ≈ 6 Qg'],['R','론나','10²⁷','2022년 추가'],['Y','요타','10²⁴','YB · 전 세계 데이터 규모'],['Z','제타','10²¹','ZB'],
+   ['E','엑사','10¹⁸','EB · 슈퍼컴 엑사플롭스'],['P','페타','10¹⁵','PB · 히스토리안 장기 저장'],['T','테라','10¹²','THz · TB 하드디스크']
+  ].map(r=>`<div class="rung"><span class="p">${r[0]}</span><span>${r[1]}</span><span class="e">${r[2]}</span><span class="ex">${r[3]}</span></div>`).join('')}</div></div></details>
+  <div class="ladder">${[
    ['G','기가','10⁹','GHz · 통신 주파수'],['M','메가','10⁶','MHz'],['k','킬로','10³','kHz · 자이로 공진 8 kHz'],['—','(기본)','10⁰','m · g · Hz · F · T'],
    ['c','센티','10⁻²','cm'],['m','밀리','10⁻³','mm · mT · mg'],['μ','마이크로','10⁻⁶','μm · 빗살 폭 5 μm'],['n','나노','10⁻⁹','nm · 감지 변위 6 nm'],['p','피코','10⁻¹²','pF · 감지 정전용량']
   ].map(r=>`<div class="rung${r[0]==='—'?' base':''}"><span class="p">${r[0]}</span><span>${r[1]}</span><span class="e">${r[2]}</span><span class="ex">${r[3]}</span></div>`).join('')}</div>
-  ${FIG.zoom()}<p class="small muted">⚠ m은 두 가지: 앞에 붙으면 <b>밀리</b>(mm), 혼자 있으면 <b>미터</b>(m). μ는 "뮤"라고 읽고 마이크로.</p>`,
-  easy:'킬로는 1000배, 밀리는 1000분의 1, 마이크로는 100만분의 1, 나노는 10억분의 1이에요. 3칸씩(1000배씩) 내려가요.'},
+  <details class="qa"><summary>▼ 더 작은 접두어 6개 (f 펨토 ~ q 퀙토)</summary><div class="lad"><div class="ladder">${[
+   ['f','펨토','10⁻¹⁵','fT · SQUID로 재는 뇌 자기장 · fs 레이저'],['a','아토','10⁻¹⁸','as 아토초 (2023 노벨 물리학상)'],['z','젭토','10⁻²¹','zmol'],['y','욕토','10⁻²⁴','yg · 양성자 질량 ≈ 1.67 yg'],['r','론토','10⁻²⁷','2022년 추가'],['q','퀙토','10⁻³⁰','2022년 추가']
+  ].map(r=>`<div class="rung"><span class="p">${r[0]}</span><span>${r[1]}</span><span class="e">${r[2]}</span><span class="ex">${r[3]}</span></div>`).join('')}</div></div></details>
+  <details class="qa"><summary>3칸 규칙의 예외 3개 (h · da · d)</summary><div class="lad"><div class="ladder">${[
+   ['h','헥토','10²','hPa · 기압 1013 hPa'],['da','데카','10¹','dam (거의 안 씀)'],['d','데시','10⁻¹','dB 데시벨 = 10분의 1 벨 · dL']
+  ].map(r=>`<div class="rung"><span class="p">${r[0]}</span><span>${r[1]}</span><span class="e">${r[2]}</span><span class="ex">${r[3]}</span></div>`).join('')}</div><p class="small muted">1000배씩 뛰는 규칙에서 벗어난 셋. 센서에서는 dB(데시벨)와 hPa가 자주 나와요.</p></div></details>
+  ${FIG.zoom()}<p class="small muted">⚠ m은 두 가지: 앞에 붙으면 <b>밀리</b>(mm), 혼자 있으면 <b>미터</b>(m). μ는 "뮤"라고 읽고 마이크로. 대문자 M(메가)·소문자 m(밀리), 대문자 T(테라 또는 테슬라)·소문자 t(톤)도 구분!</p>`,
+  easy:'킬로는 1000배, 밀리는 1000분의 1, 마이크로는 100만분의 1, 나노는 10억분의 1이에요. 3칸씩(1000배씩) 내려가요. 위로는 테라·페타·엑사…, 아래로는 펨토·아토… 하고 계속 이어져요.'},
  {k:'규칙 3개',h:'단위 변환 규칙 3개',b:`<div class="rules">
    <div class="rule"><i>1</i><div><b>큰 단위 → 작은 단위면 숫자가 커진다.</b><div class="rd">1 m = 1000 mm. 작은 자로 재면 눈금 수가 많아지니까</div></div></div>
    <div class="rule"><i>2</i><div><b>지수 빼기: (바꾸기 전 지수) − (바꾼 뒤 지수)</b><div class="rd">μm → mm: (−6) − (−3) = −3 → × 10⁻³</div></div></div>
@@ -893,6 +905,9 @@ const CARDS=[
  {id:'u7',tag:'단위',f:'1 ft는 몇 m? 1 in는 몇 cm?',a:'1 ft = 0.3048 m · 1 in = 2.54 cm',r:'피트 · 인치',e:'1 ft ≈ 30 cm, 1 ft = 12 in'},
  {id:'u8',tag:'단위',f:'180°는 몇 rad? 1°는?',a:'π rad · 1° = π/180 ≈ 0.01745 rad',r:'라디안',e:'공식에 각도를 넣을 땐 rad로'},
  {id:'u9',tag:'단위',f:'1 °/s는 몇 °/hr?',a:'3600 °/hr',r:'도 퍼 아워',e:'1시간 = 3600초'},
+ {id:'u10',tag:'단위',f:'G 위로 큰 접두어 순서 (10¹²~10²⁴)',a:'T 테라 · P 페타 · E 엑사 · Z 제타 · Y 요타',r:'3칸(1000배)씩',e:'TB → PB → EB'},
+ {id:'u11',tag:'단위',f:'p 아래로 작은 접두어 순서 (10⁻¹⁵~10⁻²⁴)',a:'f 펨토 · a 아토 · z 젭토 · y 욕토',r:'',e:'fT = SQUID 자기장, fs = 초고속 레이저'},
+ {id:'u12',tag:'단위',f:'dB와 hPa의 접두어는?',a:'d 데시 = 10⁻¹ · h 헥토 = 10²',r:'3칸 규칙의 예외',e:'데시벨 = 10분의 1 벨'},
  {id:'g1',tag:'자이로',f:'자이로센서가 측정하는 물리량과 단위는?',a:'각속도 · °/s (rad/s, °/hr)',r:'도 퍼 세컨드',e:'각속도 × 시간 = 회전각'},
  {id:'g2',tag:'자이로',f:'MEMS 진동형 자이로의 감지 원리는?',a:'코리올리 힘 F = 2m(Ω × v)',r:'진동 방향에 직각인 힘 → 정전용량 변화',e:'돌아가는 판 위 공이 옆으로 휘는 원리'},
  {id:'g3',tag:'자이로',f:'코리올리 힘의 방향은?',a:'회전축 Ω와 속도 v 모두에 직각',r:'Ω가 z, v가 x면 F는 y',e:''},
@@ -919,9 +934,10 @@ const DIM={
  len:{name:'길이',lv:1,base:'m',u:{km:3,m:0,cm:-2,mm:-3,um:-6,nm:-9}},
  mass:{name:'질량',lv:1,base:'kg',u:{kg:0,g:-3,mg:-6,ug:-9}},
  ratio:{name:'%·ppm',lv:1,base:'(소수)',u:{dec:0,pct:-2,ppm:-6,ppb:-9}},
- mag:{name:'자기장',lv:1,base:'T',u:{T:0,mT:-3,uT:-6,G:-4}},
+ mag:{name:'자기장',lv:1,base:'T',u:{T:0,mT:-3,uT:-6,nT:-9,fT:-15,G:-4}},
  area:{name:'넓이·부피',lv:2,base:'m² · m³',u:{m2:0,cm2:-4,mm2:-6,um2:-12},u2:{m3:0,L:-3,cm3:-6}},
- fc:{name:'주파수·정전용량',lv:2,base:'Hz · F',u:{Hz:0,kHz:3,MHz:6},u2:{F:0,uF:-6,nF:-9,pF:-12}},
+ fc:{name:'주파수·정전용량',lv:2,base:'Hz · F',u:{Hz:0,kHz:3,MHz:6,GHz:9,THz:12},u2:{F:0,uF:-6,nF:-9,pF:-12}},
+ time:{name:'시간·큰 접두어',lv:2,base:'s · B',u:{s:0,ms:-3,us:-6,ns:-9,ps:-12,fs:-15},u2:{B:0,kB:3,MB:6,GB:9,TB:12,PB:15}},
  ang:{name:'각도·각속도',lv:2,np:1},
  imp:{name:'피트·인치',lv:2,np:1}
 };
@@ -939,7 +955,8 @@ const EASY={len:'1 m 막대를 작은 자로 재면 눈금이 많아져요. 단�
  area:'가로·세로가 둘 다 작아지니까 10⁻²가 두 번 곱해져서 10⁻⁴이 돼요.',
  fc:'킬로는 1000배. 8 kHz = 1초에 8000번 떨림.',
  ang:'한 바퀴 = 360° = 2π rad. 그래서 180° = π rad. 1°는 π를 180으로 나눈 것.',
- imp:'1 ft는 어른 발 길이 정도(약 30 cm), 1 in는 손가락 한 마디(약 2.5 cm).'};
+ imp:'1 ft는 어른 발 길이 정도(약 30 cm), 1 in는 손가락 한 마디(약 2.5 cm).',
+ time:'ms → μs → ns → ps → fs 로 1000배씩 작아지고, kB → MB → GB → TB → PB 로 1000배씩 커져요. 지수를 3씩 더하거나 빼면 돼요.'};
 const VALS=[1,1.5,2,2.5,3,4,4.7,5,6,7.5,8,12,25,50,120,250,500,800];
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const g10=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a};
@@ -963,10 +980,10 @@ function genUnit(dimKey){
   const set=(D.u2&&Math.random()<.5)?D.u2:D.u;const keys=Object.keys(set);
   let a,b,k,v,res,tries=0;
   do{a=pick(keys);b=pick(keys.filter(x=>x!==a));k=set[a]-set[b];v=pick(VALS);res=v*10**k;tries++}
-  while((Math.abs(sci(res).e)>12||k===0)&&tries<50);
+  while((Math.abs(sci(res).e)>15||k===0)&&tries<50);
   const ua=UNIT[a],ub=UNIT[b],pa=set[a],pb=set[b];
   const vs=sci(v);const rs=sci(res);
-  const baseName=(set===D.u2?{area:'m³',fc:'F'}:{area:'m²',fc:'Hz'})[dimKey]||D.base;
+  const baseName=(set===D.u2?{area:'m³',fc:'F',time:'B'}:{area:'m²',fc:'Hz',time:'s'})[dimKey]||D.base;
   const rel=(x,p)=>p===0?`<b>${UNIT[x].s}</b> = 기준 단위`:`1 ${UNIT[x].s} = 10${sup(p)} ${baseName}`;
   const dir=k>0?`${ua.s}가 ${ub.s}보다 <b>10${sup(k)}배 큰</b> 단위 → 작은 단위로 가니 <b>숫자가 커져야</b> 해요`:`${ua.s}가 ${ub.s}보다 <b>작은</b> 단위 → 큰 단위로 가니 <b>숫자가 작아져야</b> 해요`;
   let norm='';
@@ -1378,7 +1395,7 @@ Object.assign(UNIT,{
  pmV:{s:'pm/V',r:'피코미터 퍼 볼트',mean:'압전 계수 d 단위. 1 V당 몇 pm 변형'},
  pCN:{s:'pC/N',r:'피코쿨롬 퍼 뉴턴',mean:'압전 계수 d 단위. 1 N당 몇 pC 전하. pm/V와 같은 크기'},
  pC:{s:'pC',r:'피코쿨롬',mean:'전하 1 pC = 10⁻¹² C'}, nC:{s:'nC',r:'나노쿨롬',mean:'1 nC = 10⁻⁹ C = 1000 pC'},
- pm:{s:'pm',r:'피코미터',mean:'1 pm = 10⁻¹² m (1 nm = 1000 pm)'}, MPa:{s:'MPa',r:'메가파스칼',mean:'1 MPa = 10⁶ Pa'},
+ pm:{s:'pm',r:'피코미터',mean:'1 pm = 10⁻¹² m (1 nm = 1000 pm)'}, GHz:{s:'GHz',r:'기가헤르츠',mean:'10⁹ Hz · 통신·RF'}, THz:{s:'THz',r:'테라헤르츠',mean:'10¹² Hz · 적외선과 전파 사이'}, ps:{s:'ps',r:'피코초',mean:'10⁻¹² s'}, fs:{s:'fs',r:'펨토초',mean:'10⁻¹⁵ s · 초고속 레이저'}, hPa:{s:'hPa',r:'헥토파스칼',mean:'10² Pa · 기압 1013 hPa'}, B:{s:'B',r:'바이트',mean:'데이터 기본 단위 (8비트)'}, kB:{s:'kB',r:'킬로바이트',mean:'10³ B (십진)'}, MB:{s:'MB',r:'메가바이트',mean:'10⁶ B'}, GB:{s:'GB',r:'기가바이트',mean:'10⁹ B'}, TB:{s:'TB',r:'테라바이트',mean:'10¹² B'}, PB:{s:'PB',r:'페타바이트',mean:'10¹⁵ B · 공장 히스토리안 수년치'}, MPa:{s:'MPa',r:'메가파스칼',mean:'1 MPa = 10⁶ Pa'},
  kgm3:{s:'kg/m³',r:'킬로그램 퍼 세제곱미터',mean:'밀도 단위. 물 1000 kg/m³ = 1 g/cm³'},
  degC:{s:'°C',r:'섭씨 도',mean:'온도. 절대온도 K = °C + 273'}
 });
