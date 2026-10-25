@@ -1,0 +1,1851 @@
+<title>센서 핵심노트</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&family=Noto+Serif+KR:wght@600;900&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: 폰 한 손 학습 노트 — 좁은 단일 칼럼, 위 고정 제목줄 + 아래 탭, 카드 한 장씩 넘기기 */
+:root{
+  --bg:#f3f5ef; --grid:#e4e8de; --surface:#ffffff; --surface2:#f7f8f4;
+  --ink:#17201b; --muted:#5b685f; --line:#d6dbd1;
+  --accent:#1c7449; --accent-soft:#e2f0e7; --on-accent:#ffffff;
+  --unit:#2353a3; --unit-soft:#e5ecf8;
+  --good:#1c7449; --good-soft:#e2f0e7; --warn:#a86a12; --warn-soft:#fbf0dc; --bad:#b8372a; --bad-soft:#fbe5e2;
+  --f-body:"Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-serif:"Noto Serif KR","Nanum Myeongjo","AppleMyungjo",serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111512; --grid:#171c18; --surface:#1a201c; --surface2:#151a16;
+  --ink:#e6ebe7; --muted:#9aa69e; --line:#2c352f;
+  --accent:#5cc28b; --accent-soft:#1c3226; --on-accent:#0f1a13;
+  --unit:#8fb2f0; --unit-soft:#1b263b;
+  --good:#5cc28b; --good-soft:#1c3226; --warn:#e2a64c; --warn-soft:#352816; --bad:#ef7b6c; --bad-soft:#3a1d19; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111512; --grid:#171c18; --surface:#1a201c; --surface2:#151a16;
+  --ink:#e6ebe7; --muted:#9aa69e; --line:#2c352f;
+  --accent:#5cc28b; --accent-soft:#1c3226; --on-accent:#0f1a13;
+  --unit:#8fb2f0; --unit-soft:#1b263b;
+  --good:#5cc28b; --good-soft:#1c3226; --warn:#e2a64c; --warn-soft:#352816; --bad:#ef7b6c; --bad-soft:#3a1d19; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--bg);color:var(--ink)}
+body{min-height:100vh;font-family:var(--f-body);font-size:16px;line-height:1.65;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:22px 22px;
+  -webkit-text-size-adjust:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{text-wrap:balance;margin:0;line-height:1.35}
+p{margin:0}
+b{font-weight:700}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.top-in{max-width:600px;margin:0 auto;display:flex;align-items:center;gap:10px;min-height:54px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top h1{font-size:17px;font-weight:800;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iconbtn{border:1px solid var(--line);background:var(--surface);border-radius:10px;height:38px;min-width:38px;padding:0 10px;font-size:14px;font-weight:700}
+.iconbtn[hidden]{display:none}
+
+.wrap{max-width:600px;margin:0 auto;padding-block:16px calc(92px + env(safe-area-inset-bottom,0px));
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.tabbar-in{max-width:600px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+.tab{background:none;border:0;padding:9px 0 10px;font-size:12px;font-weight:700;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px}
+.tab svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8}
+.tab[aria-current="true"]{color:var(--accent)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;border-radius:999px;padding:2px 10px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.chip.gray{background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+
+/* 용어·단위 */
+.t{background:none;border:0;padding:0;border-bottom:2px dotted var(--accent);color:inherit;font-weight:700;line-height:1.3}
+.u{font-family:var(--f-mono);font-weight:700;font-size:.92em;color:var(--unit);background:var(--unit-soft);border:0;border-radius:6px;padding:0 5px;line-height:1.5;white-space:nowrap}
+.mono{font-family:var(--f-mono)}
+
+/* 홈 */
+.today{display:flex;flex-direction:column;gap:10px}
+.do{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+.do .n{font-family:var(--f-mono);font-weight:700;font-size:20px;min-width:44px;text-align:center;color:var(--accent)}
+.do .tx{flex:1;min-width:0}
+.do .tx b{display:block;font-size:16px}
+.do .tx span{font-size:13px;color:var(--muted)}
+.do .go{font-size:20px;color:var(--muted)}
+.do.done{opacity:.6}
+.days{display:flex;gap:6px}
+.day{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);display:grid;place-items:center;font-size:11px;color:var(--muted);background:var(--surface2)}
+.day.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:700}
+.weak{display:flex;flex-wrap:wrap;gap:6px}
+.note-sample{font-size:13px;color:var(--muted);border:1px dashed var(--line);border-radius:12px;padding:10px 12px;background:var(--surface)}
+
+/* 목차 */
+.part{display:flex;flex-direction:column;gap:8px}
+.part h2{font-size:15px;font-weight:800;display:flex;align-items:baseline;gap:8px}
+.part h2 small{font-size:12px;font-weight:500;color:var(--muted)}
+.item{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.item:disabled{background:transparent;color:var(--muted);cursor:default;border-style:dashed}
+.item .nm{flex:1;min-width:0;font-weight:700}
+.item .nm small{display:block;font-weight:400;font-size:13px;color:var(--muted)}
+.tag-in{font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;background:var(--unit-soft);color:var(--unit)}
+.tag-ex{font-size:11px;font-weight:700;padding:1px 7px;border-radius:6px;background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
+
+/* 요약 페이지 */
+.steps{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.steps::-webkit-scrollbar{display:none}
+.stp{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 12px;font-size:13px;font-weight:700;color:var(--muted)}
+.stp.seen{color:var(--ink)}
+.steps .stp[aria-current="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.sec h2{font-size:21px;font-weight:800}
+.big{font-size:19px;font-weight:700;line-height:1.5}
+.rel{font-size:15px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.flow{display:flex;flex-direction:column;gap:0;font-size:15px}
+.flow div{padding:7px 12px;border:1px solid var(--line);background:var(--surface2);border-radius:10px;position:relative}
+.flow div+div{margin-top:18px}
+.flow div+div::before{content:"↓";position:absolute;top:-20px;left:18px;color:var(--muted);font-weight:700}
+.key{border:1px solid var(--accent);background:var(--accent-soft);border-radius:10px;padding:10px 12px;font-size:15px}
+.warnbox{border:1px solid var(--warn);background:var(--warn-soft);border-radius:10px;padding:10px 12px;font-size:14px}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px}
+.tbtn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:700}
+.tbtn[aria-expanded="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.panel{border-radius:12px;padding:12px 14px;font-size:15px;display:flex;flex-direction:column;gap:6px}
+.panel .lb{font-size:12px;font-weight:800;letter-spacing:.04em}
+.panel.easy{background:var(--accent-soft)}
+.panel.easy .lb{color:var(--accent)}
+.panel.src{background:var(--surface2);border:1px solid var(--line)}
+.panel.src .lb{color:var(--muted)}
+.pager{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pbtn{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:13px;font-weight:800;font-size:15px}
+.pbtn.next{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.pbtn:disabled{opacity:.35;cursor:default}
+.f4{display:flex;flex-direction:column;gap:10px}
+.f4 > div{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface2)}
+.f4 .h{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.04em;margin-bottom:4px}
+.eqn{font-family:var(--f-mono);font-size:22px;font-weight:700;text-align:center;padding:12px 8px;border:1.5px solid var(--ink);border-radius:12px;background:var(--surface)}
+.eqn small{display:block;font-family:var(--f-body);font-size:13px;font-weight:500;color:var(--muted)}
+.syms{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:15px;align-items:baseline}
+.syms .s{font-family:var(--f-mono);font-weight:700;font-size:17px}
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:460px}
+.tblwrap.fit table{min-width:0;font-size:13px}.tblwrap.fit th,.tblwrap.fit td{padding:7px 6px}
+.tblwrap.fit td:first-child{white-space:nowrap}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--surface2);font-size:12px;color:var(--muted);font-weight:800}
+tr:last-child td{border-bottom:0}
+ul.clean{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+ol.clean{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px}
+.qa{border:1px solid var(--line);border-radius:10px;background:var(--surface2)}
+.qa summary{padding:10px 12px;font-weight:700;font-size:15px;list-style:none;display:flex;gap:8px}
+.qa summary::-webkit-details-marker{display:none}
+.qa summary::before{content:"Q";font-family:var(--f-mono);color:var(--accent)}
+.qa > div{padding:0 12px 12px 30px;font-size:15px}
+.appchips{display:flex;flex-wrap:wrap;gap:8px}
+.appchips span{border:1px solid var(--line);background:var(--surface2);border-radius:10px;padding:6px 10px;font-size:14px}
+
+/* 애니메이션 그림 */
+.fig{border:1px solid var(--line);border-radius:12px;background:var(--surface2);padding:8px;display:flex;flex-direction:column;gap:8px}
+.fig svg{width:100%;height:auto;display:block}
+.figctl{display:flex;gap:8px;flex-wrap:wrap}
+.cbar{display:grid;grid-template-columns:auto 1fr auto;gap:4px 8px;align-items:center;font-size:13px;font-family:var(--f-mono)}
+.cbar i{display:block;height:10px;border-radius:5px;background:var(--unit);transition:width .05s linear}
+
+/* 풀이 */
+.prob .q{font-size:16px;font-weight:500}
+.first{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.first .lb{font-size:12px;font-weight:800;color:var(--on-accent);background:var(--accent);border-radius:6px;padding:2px 8px}
+.first span.k{font-size:13px;font-weight:700;border:1px solid var(--accent);color:var(--accent);border-radius:999px;padding:1px 9px;font-family:var(--f-mono)}
+.stepbox{display:flex;flex-direction:column;gap:10px}
+.st{border:1px solid var(--line);border-radius:12px;background:var(--surface2);padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.st .h{display:flex;gap:8px;align-items:center;font-weight:800;font-size:15px}
+.st .h i{font-style:normal;font-family:var(--f-mono);width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--surface);display:grid;place-items:center;font-size:12px;flex:none}
+.st .b{font-size:15px;display:flex;flex-direction:column;gap:4px}
+.ln{font-family:var(--f-mono);font-size:14.5px;padding:2px 0;overflow-wrap:break-word}
+.rd{font-size:13px;color:var(--muted)}
+.ans{border:1.5px solid var(--good);background:var(--good-soft);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:2px}
+.ans .v{font-family:var(--f-mono);font-size:19px;font-weight:700}
+.ans .lb{font-size:12px;font-weight:800;color:var(--good)}
+.calc{display:flex;flex-direction:column;gap:8px}
+.krows{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.krows li{display:grid;grid-template-columns:26px 1fr;gap:4px 8px;padding:8px 10px;border-bottom:1px solid var(--line);background:var(--surface)}
+.krows li:last-child{border-bottom:0}
+.krows .no{font-family:var(--f-mono);color:var(--muted);font-size:13px;padding-top:3px}
+.krows .keys{display:flex;flex-wrap:wrap;gap:2px;align-items:center;min-width:0}
+.krows .scr{grid-column:2;font-family:var(--f-mono);font-size:13.5px;color:var(--ink);background:var(--surface2);border:1px solid var(--line);border-radius:6px;padding:2px 8px;justify-self:start;max-width:100%;overflow-wrap:anywhere}
+.krows .scr::before{content:"화면 ";font-family:var(--f-body);font-size:11px;color:var(--muted)}
+.krows .rd{grid-column:2}
+kbd{font-family:var(--f-mono);font-size:13px;font-weight:700;display:inline-block;min-width:26px;text-align:center;padding:2px 6px;margin:1px 2px 1px 0;border:1px solid var(--line);border-bottom-width:3px;border-radius:7px;background:var(--surface)}
+kbd.sh{background:var(--warn-soft);border-color:var(--warn)}
+.calcwarn{font-size:13px;border-radius:10px;background:var(--warn-soft);border:1px solid var(--warn);padding:8px 10px;display:flex;flex-direction:column;gap:3px}
+
+/* 단위 훈련 */
+.cats{display:flex;flex-wrap:wrap;gap:6px}
+.cat{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:700;color:var(--muted)}
+.cat[aria-pressed="true"]{border-color:var(--unit);background:var(--unit-soft);color:var(--unit)}
+.uq{font-size:24px;font-weight:800;font-family:var(--f-mono);text-align:center;padding:6px 0 0}
+.uqr{text-align:center;color:var(--muted);font-size:14px}
+.opts{display:grid;gap:8px}
+.opt{border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:12px;font-family:var(--f-mono);font-size:17px;font-weight:700;text-align:left}
+.opt.ok{border-color:var(--good);background:var(--good-soft)}
+.opt.ng{border-color:var(--bad);background:var(--bad-soft)}
+.opt:disabled{cursor:default}
+.verdict{font-weight:800;font-size:17px}
+.verdict.ok{color:var(--good)}.verdict.ng{color:var(--bad)}
+.score{font-family:var(--f-mono);font-size:14px;color:var(--muted)}
+.ladder{display:flex;flex-direction:column;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.rung{display:grid;grid-template-columns:44px 74px 64px 1fr;gap:8px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--surface);font-size:14px;text-align:left;border-left:0;border-right:0;border-top:0;width:100%}
+.rung:last-child{border-bottom:0}
+.rung .p{font-family:var(--f-mono);font-weight:700;font-size:18px;color:var(--unit)}
+.rung .e{font-family:var(--f-mono);font-weight:700}
+.rung .ex{color:var(--muted);font-size:13px;min-width:0}
+.rung.base{background:var(--surface2)}
+.rules{display:flex;flex-direction:column;gap:8px}
+.rule{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;font-size:15px}
+.rule i{font-style:normal;font-family:var(--f-mono);font-weight:700;width:26px;height:26px;border-radius:8px;background:var(--unit-soft);color:var(--unit);display:grid;place-items:center}
+
+/* 카드 */
+.fc{min-height:300px;justify-content:space-between}
+.fc .front{font-size:21px;font-weight:800;line-height:1.5}
+.fc .back{font-size:17px;border-top:1px dashed var(--line);padding-top:12px;display:flex;flex-direction:column;gap:8px}
+.fc .back .a{font-weight:700;font-size:18px}
+.rate{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.rate button{border-radius:12px;padding:12px 4px;font-weight:800;font-size:15px;border:1.5px solid}
+.r0{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.r1{background:var(--warn-soft);border-color:var(--warn);color:var(--warn)}
+.r2{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.rate small{display:block;font-size:11px;font-weight:500;opacity:.85}
+.showbtn{width:100%;border:0;background:var(--ink);color:var(--surface);border-radius:12px;padding:14px;font-weight:800;font-size:16px}
+.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.primary{border:0;background:var(--accent);color:var(--on-accent);border-radius:12px;padding:13px 16px;font-weight:800;font-size:16px;width:100%}
+.ghost{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 16px;font-weight:700;font-size:15px;width:100%}
+
+/* 시트 */
+.scrim{position:fixed;inset:0;background:rgba(10,14,12,.45);z-index:40}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--surface);border-radius:18px 18px 0 0;max-height:78vh;overflow:auto;
+  padding:8px max(18px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));box-shadow:0 -6px 24px rgba(0,0,0,.18)}
+.sheet-in{max-width:600px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:4px auto 6px}
+.sheet h3{font-size:22px;font-weight:800}
+.sheet .en{font-family:var(--f-mono);font-size:14px;color:var(--muted)}
+.defs{display:flex;flex-direction:column;gap:10px}
+.def{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface2)}
+.def .h{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.04em}
+.readas{font-size:15px;border-radius:10px;background:var(--unit-soft);color:var(--ink);padding:8px 12px}
+.readas b{color:var(--unit)}
+.photos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ph{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--line);aspect-ratio:1;max-width:100%;background:var(--surface2)}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.phfull img{width:100%;border-radius:12px;border:1px solid var(--line)}
+textarea{width:100%;min-height:70px;font:inherit;font-size:15px;color:var(--ink);background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.filebtn{position:relative;overflow:hidden}
+.filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer}
+
+/* 표지·차례 (학습 바이블) */
+.cover{display:flex;flex-direction:column;gap:12px;padding:26px 18px 20px;background:var(--surface);border:1px solid var(--line);border-bottom:4px solid var(--ink);border-radius:var(--r) var(--r) 6px 6px}
+.cv-eyebrow{font-family:var(--f-mono);font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--accent)}
+.cv-title{font-family:var(--f-serif);font-weight:900;font-size:40px;line-height:1.15;letter-spacing:-.01em}
+.cv-sub{font-family:var(--f-serif);font-weight:600;font-size:16px;color:var(--muted)}
+.search{display:block;position:relative}
+.search .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.search input{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:11px 14px 11px 40px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23889488' stroke-width='2'%3E%3Ccircle cx='10.5' cy='10.5' r='6'/%3E%3Cpath d='M15 15l5 5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-size:18px;background-position:13px center}
+.qres{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.qr{display:grid;grid-template-columns:auto 1fr;column-gap:10px;align-items:baseline;text-align:left;background:var(--surface);border:0;border-bottom:1px solid var(--line);padding:9px 12px;font-weight:700}
+.qr:last-child{border-bottom:0}
+.qr small{grid-column:2;font-weight:400;color:var(--muted);font-size:13px}
+.qk{font-size:11px;font-weight:800;padding:1px 7px;border-radius:6px;background:var(--accent-soft);color:var(--accent);grid-row:span 2;align-self:center}
+.qk.u-k{background:var(--unit-soft);color:var(--unit)}.qk.f-k{background:var(--warn-soft);color:var(--warn)}.qk.p-k{background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
+.ribbon{display:flex;gap:6px;align-items:baseline;flex-wrap:wrap;text-align:left;border:0;background:none;padding:0;font-size:14px}
+.ribbon span:first-child{font-weight:800;color:var(--bad)}
+.contents{display:flex;flex-direction:column;gap:22px;padding:6px 2px}
+.ct-h{font-family:var(--f-serif);font-weight:900;font-size:22px;letter-spacing:.3em;text-align:center;padding:6px 0 0}
+.pt{display:flex;flex-direction:column;gap:2px}
+.pt-h{display:flex;align-items:baseline;gap:10px;border-bottom:1.5px solid var(--ink);padding-bottom:4px}
+.pt-n{font-family:var(--f-serif);font-weight:900;font-size:14px;color:var(--accent);flex:none}
+.pt-t{font-family:var(--f-serif);font-weight:900;font-size:21px}
+.pt-d{font-size:13px;color:var(--muted);padding:2px 0 4px}
+.chs{list-style:none;margin:0;padding:0}
+.ch{display:flex;align-items:baseline;gap:10px;width:100%;background:none;border:0;padding:10px 2px;text-align:left;border-bottom:1px solid var(--line)}
+.ch:disabled{cursor:default;color:var(--muted)}
+.ch-n{font-family:var(--f-mono);font-size:13px;color:var(--muted);width:16px;flex:none}
+.ch-t{font-weight:700;font-size:16px;min-width:0}
+.ch:disabled .ch-t{font-weight:500}
+.lead{flex:1;border-bottom:2px dotted var(--line);transform:translateY(-4px);min-width:16px}
+.ch-p{font-size:13px;font-weight:700;color:var(--accent);flex:none}
+.ch:disabled .ch-p{color:var(--muted);font-weight:400}
+.colophon{text-align:center;font-size:12px;color:var(--muted)}
+.sec h2{font-family:var(--f-serif);font-weight:900}
+/* 사전 */
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px}
+.seg button{border:0;background:none;border-radius:9px;padding:8px 4px;font-weight:700;font-size:14px;color:var(--muted)}
+.seg button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.dg{display:flex;flex-direction:column;gap:6px}
+.dlist{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.drow{display:flex;flex-direction:column;gap:1px;text-align:left;background:var(--surface);border:0;border-bottom:1px solid var(--line);padding:10px 14px}
+.drow:last-child{border-bottom:0}
+.drow small{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.dgen{font-size:14px;color:var(--muted);display:block}
+.urow{flex-direction:row;gap:12px;align-items:baseline}
+.us{min-width:72px;font-weight:700;color:var(--unit)}
+.keyrow{flex-direction:row;gap:12px;align-items:center;font-size:14px}
+.keyrow > span:first-child{min-width:110px}
+.fcard .eqn{font-size:20px}
+/* 문제 머리 */
+.pk{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.kind{font-size:12px;font-weight:800;border-radius:6px;padding:2px 8px}
+.k-기본{background:var(--ink);color:var(--surface)}.k-유사{background:var(--unit-soft);color:var(--unit)}.k-응용{background:var(--warn-soft);color:var(--warn)}
+.ptitle{font-weight:800;font-size:15px;flex:1;min-width:0}
+.regen{border:1px solid var(--line);background:var(--surface2);border-radius:999px;padding:3px 10px;font-size:13px;font-weight:700}
+.slot{display:flex;flex-direction:column}
+
+/* 내 노트·내 카드 */
+.mynote{display:flex;flex-direction:column;gap:4px;text-align:left;width:100%;border:1.5px dashed var(--warn);background:var(--warn-soft);border-radius:12px;padding:12px 14px;font-size:15px}
+.mynote .lb{font-size:12px;font-weight:800;color:var(--warn)}
+.mynote .nt-tx{white-space:pre-wrap;overflow-wrap:anywhere}
+.mynote.empty{background:transparent;border-color:var(--line);color:var(--muted);font-weight:700;font-size:14px;align-items:center}
+.note-ta{min-height:160px}
+.nt-bar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.fl{font-size:13px;font-weight:800;color:var(--muted);margin-bottom:-6px}
+select{width:100%;font:inherit;font-size:15px;color:var(--ink);background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:9px 10px}
+.chip.mine{background:var(--warn-soft);color:var(--warn)}
+.qk.m-k{background:var(--warn-soft);color:var(--warn)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:50;background:var(--ink);color:var(--surface);padding:9px 16px;border-radius:999px;font-weight:700;font-size:14px}
+
+/* 그림 */
+.figs{margin:0;border:1px solid var(--line);border-radius:12px;background:var(--surface2);padding:10px 8px 8px;display:flex;flex-direction:column;gap:6px;max-width:100%}
+.figs svg{width:100%;height:auto;display:block;overflow:visible}
+.figs text{font-family:var(--f-body);font-size:13px;fill:var(--ink)}
+.figs text.b2{font-weight:700}.figs text.small2{font-size:11.5px}
+.figs text.m{fill:var(--muted)}.figs text.a{fill:var(--accent)}.figs text.u{fill:var(--unit)}.figs text.b{fill:var(--bad)}
+.figs figcaption{font-size:13.5px;color:var(--muted);padding:0 4px;line-height:1.55}
+
+/* 움직이는 그림 보조 */
+.tofcalc{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;line-height:1.7}
+.rbar{display:grid;grid-template-columns:1fr;gap:4px;padding:4px 2px}
+.rlab{display:flex;justify-content:space-between;font-size:14px}
+.rtrack{height:14px;border-radius:7px;background:var(--surface);border:1px solid var(--line);overflow:hidden}
+.rtrack i{display:block;height:100%;transition:width .3s}
+.figctl label{display:inline-flex;align-items:center;gap:6px}
+.figctl select{min-width:0}
+.mx2{display:inline-flex;flex-direction:column;vertical-align:middle;border-left:2px solid var(--ink);border-right:2px solid var(--ink);padding:0 6px;border-radius:4px;margin:0 2px}.mx2 span{white-space:nowrap;text-align:center}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+
+<header class="top"><div class="top-in">
+  <button class="iconbtn" id="back" aria-label="뒤로" hidden>←</button>
+  <h1 id="ttl">센서 핵심노트</h1>
+  <button class="iconbtn" id="photoBtn" aria-label="내 노트·사진" hidden>✎ 노트</button>
+</div></header>
+
+<main class="wrap" id="view"></main>
+
+<nav class="tabbar" aria-label="메뉴"><div class="tabbar-in">
+  <button class="tab" data-tab="home"><svg viewBox="0 0 24 24"><path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H19v15H5.5A1.5 1.5 0 0 0 4 19.5z"/><path d="M4 19.5A1.5 1.5 0 0 0 5.5 21H19v-3"/><path d="M9 7h6M9 10.5h6"/></svg>차례</button>
+  <button class="tab" data-tab="dict"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/></svg>사전</button>
+  <button class="tab" data-tab="cards"><svg viewBox="0 0 24 24"><rect x="6" y="3" width="13" height="16" rx="2"/><path d="M4 7v12a2 2 0 0 0 2 2h10"/></svg>암기</button>
+  <button class="tab" data-tab="practice"><svg viewBox="0 0 24 24"><path d="M3 17l14-14 4 4L7 21H3z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/></svg>연습</button>
+</div></nav>
+
+<div id="sheetHost"></div>
+
+<script>
+(()=>{
+'use strict';
+/* ───────── 저장 (실패해도 동작) ───────── */
+const LS={get(k,d){try{const v=localStorage.getItem('skn-'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem('skn-'+k,JSON.stringify(v))}catch(e){}}};
+const today=()=>{const d=new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate()};
+const dayNum=()=>Math.floor((Date.now()-new Date().getTimezoneOffset()*60000)/86400000);
+function markStudy(){const s=new Set(LS.get('days',[]));s.add(dayNum());LS.set('days',[...s].slice(-60))}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ───────── 숫자 표기 ───────── */
+const SUP={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+const mn=n=>n<0?'−'+Math.abs(n):String(n);
+const sup=n=>String(n).split('').map(c=>SUP[c]||c).join('');
+function sci(x,sig=3){if(x===0)return{m:'0',e:0};let e=Math.floor(Math.log10(Math.abs(x)));let m=+(x/10**e).toPrecision(sig);
+  if(Math.abs(m)>=10){m=+(m/10).toPrecision(sig);e++} if(Math.abs(m)<1){m=+(m*10).toPrecision(sig);e--} return{m:String(m),e}}
+const sciT=s=>s.e===0?s.m:`${s.m} × 10${sup(s.e)}`;
+const sciR=s=>s.e===0?s.m:`${s.m} 곱하기 10의 ${s.e<0?'마이너스 ':''}${Math.abs(s.e)}승`;
+function decT(x,sig=3){const a=Math.abs(x);if(a===0)return'0';if(a<1e-6||a>=1e9)return null;const s=sci(x,sig);const d=Math.max(0,sig-1-s.e);
+  let t=x.toFixed(Math.min(d,14));if(t.includes('.'))t=t.replace(/0+$/,'').replace(/\.$/,'');
+  const [i,f]=t.split('.');return i.replace(/\B(?=(\d{3})+(?!\d))/g,',')+(f?'.'+f:'')}
+function numT(x,sig=3){const s=sci(x,sig);const d=decT(x,sig);if(s.e>=-2&&s.e<=3)return d;return sciT(s)}
+
+/* ───────── 용어집 ───────── */
+const TERM={
+ gyro:{ko:'자이로센서',en:'Gyroscope / Gyro sensor',gen:'회전하는 빠르기를 재는 센서.',tech:'물체의 각속도(angular rate, °/s)를 측정하는 관성센서. 각속도를 시간에 대해 적분하면 회전각이 된다.',easy:'폰을 돌리면 "지금 1초에 몇 도씩 돌고 있는지"를 알아채는 작은 부품이에요.'},
+ inertial:{ko:'관성센서',en:'Inertial sensor',gen:'바깥 기준 없이 자기 몸의 움직임을 재는 센서.',tech:'관성(현재 운동 상태를 유지하려는 성질)을 이용해 가속도·각속도를 측정하는 센서. 가속도계와 자이로가 대표적이다.',easy:'눈을 감고 버스에 타도 "출발했다", "꺾었다"를 몸으로 느끼죠? 그 느낌을 기계로 만든 거예요.'},
+ angvel:{ko:'각속도',en:'Angular velocity (Ω, 오메가)',gen:'얼마나 빨리 도는가.',tech:'단위 시간당 회전각. Ω = dθ/dt. 단위 rad/s, °/s, °/hr.',easy:'자동차 속도가 "1시간에 몇 km"라면, 각속도는 "1초에 몇 도"예요.'},
+ coriolis:{ko:'코리올리 힘',en:'Coriolis force',gen:'회전하는 곳에서 움직이는 물체가 옆으로 밀리는 것처럼 보이게 하는 힘.',tech:'회전 좌표계에서 속도 v로 움직이는 질량 m에 작용하는 겉보기 힘. F = 2m(Ω × v). 방향은 Ω와 v 모두에 직각.',easy:'돌아가는 회전판 위에서 공을 앞으로 굴리면 공이 옆으로 휘어 가요. 그 "휘게 만드는 힘"이에요.'},
+ proofmass:{ko:'검증 질량 (프루프 매스)',en:'Proof mass',gen:'센서 안에서 움직이는 작은 추.',tech:'MEMS 관성센서 내부에서 스프링에 매달려 움직이는 질량체. 이 질량의 변위로 가속도·각속도를 측정한다.',easy:'용수철에 매단 작은 쇳덩이라고 생각하면 돼요. 아주아주 작아요(약 10⁻⁸ kg).'},
+ comb:{ko:'콤 드라이브 (빗살 구동기)',en:'Comb drive',gen:'빗처럼 생긴 전극이 맞물린 구조.',tech:'맞물린 빗살 전극 사이의 정전기력으로 질량을 선형적으로 크게 진동시키는 구동기.',easy:'빗 두 개를 마주 끼운 모양이에요. 전압을 걸면 서로 당겨서 질량을 좌우로 흔들어요.'},
+ mems:{ko:'멤스',en:'MEMS (Micro-Electro-Mechanical Systems)',gen:'아주 작은 기계 + 전자회로.',tech:'반도체 공정으로 μm 크기의 기계 구조(스프링·질량·전극)와 회로를 한 칩에 만든 소자.',easy:'머리카락보다 가는 스프링과 추를 반도체 칩 위에 깎아 만든 거예요.'},
+ capacitance:{ko:'정전용량',en:'Capacitance (C)',gen:'전기를 담아 두는 능력.',tech:'두 도체 사이에 저장되는 전하량과 전압의 비. 평행판에서 C = εA/d. 단위 F(패럿).',easy:'두 금속판이 전기를 담는 그릇 크기예요. 판이 넓을수록, 가까울수록 많이 담겨요.'},
+ permittivity:{ko:'유전율',en:'Permittivity (ε, 엡실론)',gen:'두 판 사이 물질이 전기장을 얼마나 잘 받아들이는가.',tech:'ε = ε₀·εᵣ. 진공 유전율 ε₀ ≈ 8.85 × 10⁻¹² F/m, εᵣ는 비유전율(공기≈1, 물≈80).',easy:'판 사이에 무엇이 들어 있느냐에 따라 그릇 크기가 바뀌어요. 물이 들어가면 크게 늘어나요(그래서 습도센서가 됨).'},
+ sagnac:{ko:'사냑 효과',en:'Sagnac effect',gen:'회전하는 고리 안에서 반대로 도는 두 빛의 도착 시간이 달라지는 현상.',tech:'회전하는 폐경로에서 회전 방향과 같은 방향으로 진행한 빛의 유효 경로가 더 길어져 두 빛 사이에 위상차(또는 주파수차)가 생기는 현상. FOG·RLG의 원리.',easy:'회전목마 위에서 두 사람이 반대 방향으로 한 바퀴 달리면, 목마가 도는 방향으로 달린 사람이 조금 더 오래 걸려요.'},
+ resonance:{ko:'공진',en:'Resonance',gen:'특정 진동수에서 흔들림이 크게 커지는 현상.',tech:'외력의 주파수가 계의 고유 진동수와 같을 때 진폭이 최대가 되는 현상. 감쇠가 작을수록(Q가 클수록) 증폭이 크다.',easy:'그네를 딱 맞는 박자로 밀면 조금만 밀어도 높이 올라가요.'},
+ damping:{ko:'감쇠 (댐핑)',en:'Damping',gen:'움직임을 멈추게 하는 제동.',tech:'진동 에너지를 열 등으로 잃게 하는 효과. 공기 감쇠가 크면 공진 증폭이 줄어든다.',easy:'물속에서 손을 흔들면 금방 느려지죠? 공기도 아주 작은 MEMS에는 꽤 끈적한 브레이크예요.'},
+ brownian:{ko:'브라운 노이즈',en:'Brownian noise',gen:'기체 분자가 무작위로 부딪쳐 생기는 잡음.',tech:'패키지 안 기체 분자의 무작위 충돌로 proof mass에 작용하는 미세한 불균형 힘에 의한 잡음. 진공 패키지로 줄인다.',easy:'작은 공에 모래알이 사방에서 계속 부딪치면 공이 저절로 덜덜 떨려요.'},
+ scalefactor:{ko:'스케일 팩터 (환산 계수)',en:'Scale factor',gen:'입력 1당 출력이 얼마나 변하는가.',tech:'각속도 단위 변화당 출력 변화. 단위 V/(°/s). 자이로에서는 감도(sensitivity)와 같은 역할.',easy:'1 °/s 돌 때 출력 전압이 몇 V 바뀌는지예요. 클수록 작은 회전도 잘 보여요.'},
+ bias:{ko:'바이어스 안정도',en:'Bias stability',gen:'가만히 있을 때 값이 얼마나 흔들리는가.',tech:'회전 입력이 없을 때의 출력(영점)이 시간에 따라 변동하는 정도. 단위 °/hr. 작을수록 정밀하다.',easy:'저울에 아무것도 안 올렸는데 숫자가 슬금슬금 변하는 정도예요.'},
+ zro:{ko:'영점 출력',en:'ZRO (Zero Rate Output)',gen:'회전이 없을 때 나오는 출력.',tech:'각속도 0에서의 출력. 백색 잡음과 천천히 변하는 드리프트로 이루어진다.',easy:'안 돌고 있는데도 나오는 "0이 아닌 값"이에요.'},
+ noised:{ko:'노이즈 밀도',en:'Noise density',gen:'잡음 크기.',tech:'대역폭의 제곱근당 잡음 크기. 단위 °/s/√Hz. 대역폭 B에서 잡음 ≈ 노이즈 밀도 × √B.',easy:'얼마나 지지직거리는지를 나타내는 숫자예요. 작을수록 깨끗해요.'},
+ dof:{ko:'자유도',en:'DOF (Degrees of Freedom)',gen:'움직일 수 있는 방향의 수.',tech:'3 DOF: 직선 이동 3축. 6 DOF: 직선 3축 + 회전 3축(roll·pitch·yaw). 3축 가속도계 + 3축 자이로로 측정.',easy:'앞뒤·좌우·위아래로 움직이기(3개) + 고개 끄덕·갸웃·도리도리(3개) = 6개예요.'},
+ imu:{ko:'관성측정장치',en:'IMU (Inertial Measurement Unit)',gen:'움직임 센서 묶음.',tech:'가속도계·자이로(·자기센서)를 한 패키지로 묶어 자세와 운동을 추정하는 장치.',easy:'폰 안에 들어 있는 "움직임 센서 3종 세트"예요.'},
+ modematch:{ko:'모드 매칭',en:'Mode matching',gen:'두 진동의 박자를 맞추기.',tech:'구동 모드와 감지 모드의 공진 주파수를 일치시키는 것(kx = ky). 맞으면 감지 진폭이 크게 증폭된다. 어긋나면 DC 전압으로 튜닝.',easy:'좌우 흔들림과 위아래 흔들림의 박자를 똑같이 맞추면, 회전 신호가 크게 울려요.'},
+ radian:{ko:'라디안',en:'Radian (rad)',gen:'각도를 재는 또 다른 단위.',tech:'호의 길이가 반지름과 같을 때의 각. 180° = π rad, 1 rad ≈ 57.3°. 물리 공식에는 rad를 쓴다.',easy:'피자 한 판(360°)이 2π(약 6.28) 라디안이에요. 공식에 넣을 땐 도(°)가 아니라 라디안을 써요.'}
+};
+
+/* ───────── 단위 (읽는 법 필수) ───────── */
+const UNIT={
+ m:{s:'m',r:'미터',mean:'길이의 기본 단위'}, cm:{s:'cm',r:'센티미터',mean:'1 cm = 10⁻² m (100분의 1 m)'}, mm:{s:'mm',r:'밀리미터',mean:'1 mm = 10⁻³ m'},
+ um:{s:'μm',r:'마이크로미터',mean:'1 μm = 10⁻⁶ m · 머리카락 굵기 ≈ 70 μm · MEMS 빗살 폭 5 μm'},
+ nm:{s:'nm',r:'나노미터',mean:'1 nm = 10⁻⁹ m · 자이로 감지 변위 수 nm'}, km:{s:'km',r:'킬로미터',mean:'1 km = 10³ m'},
+ kg:{s:'kg',r:'킬로그램',mean:'질량의 SI 기본 단위'}, g:{s:'g',r:'그램',mean:'1 g = 10⁻³ kg'}, mg:{s:'mg',r:'밀리그램',mean:'1 mg = 10⁻⁶ kg'}, ug:{s:'μg',r:'마이크로그램',mean:'1 μg = 10⁻⁹ kg'},
+ T:{s:'T',r:'테슬라',mean:'자기장(자속밀도)의 SI 단위'}, mT:{s:'mT',r:'밀리테슬라',mean:'1 mT = 10⁻³ T'}, uT:{s:'μT',r:'마이크로테슬라',mean:'1 μT = 10⁻⁶ T · 지구 자기장 ≈ 50 μT'},
+ G:{s:'G',r:'가우스',mean:'1 G = 10⁻⁴ T (옛 단위, 아직 많이 씀). 지구 자기장 ≈ 0.5 G'},
+ dec:{s:'(소수)',r:'그냥 숫자',mean:'비율을 그냥 숫자로 쓴 것. 1 = 100 %'}, pct:{s:'%',r:'퍼센트',mean:'100분의 1 = 10⁻²'},
+ ppm:{s:'ppm',r:'피피엠 (백만분율)',mean:'parts per million, 백만분의 1 = 10⁻⁶'}, ppb:{s:'ppb',r:'피피비 (십억분율)',mean:'parts per billion, 10억분의 1 = 10⁻⁹'},
+ m2:{s:'m²',r:'제곱미터',mean:'넓이의 SI 단위'}, cm2:{s:'cm²',r:'제곱센티미터',mean:'1 cm² = 10⁻⁴ m²'}, mm2:{s:'mm²',r:'제곱밀리미터',mean:'1 mm² = 10⁻⁶ m²'}, um2:{s:'μm²',r:'제곱마이크로미터',mean:'1 μm² = 10⁻¹² m²'},
+ m3:{s:'m³',r:'세제곱미터',mean:'부피의 SI 단위'}, L:{s:'L',r:'리터',mean:'1 L = 10⁻³ m³ = 1000 cm³'}, cm3:{s:'cm³',r:'세제곱센티미터 (= mL 밀리리터)',mean:'1 cm³ = 10⁻⁶ m³'},
+ Hz:{s:'Hz',r:'헤르츠',mean:'1초에 몇 번 진동하는가'}, kHz:{s:'kHz',r:'킬로헤르츠',mean:'1 kHz = 10³ Hz · MEMS 자이로 공진 8 kHz'}, MHz:{s:'MHz',r:'메가헤르츠',mean:'1 MHz = 10⁶ Hz'},
+ F:{s:'F',r:'패럿',mean:'정전용량의 SI 단위'}, uF:{s:'μF',r:'마이크로패럿',mean:'1 μF = 10⁻⁶ F'}, nF:{s:'nF',r:'나노패럿',mean:'1 nF = 10⁻⁹ F'}, pF:{s:'pF',r:'피코패럿',mean:'1 pF = 10⁻¹² F · MEMS 감지 정전용량 수 pF'},
+ rad:{s:'rad',r:'라디안',mean:'180° = π rad, 1 rad ≈ 57.3°'}, deg:{s:'°',r:'도',mean:'한 바퀴 = 360°'},
+ rads:{s:'rad/s',r:'라디안 퍼 세컨드',mean:'1초에 몇 라디안 도는가. 공식에 넣을 때 쓰는 각속도 단위'},
+ dps:{s:'°/s',r:'도 퍼 세컨드 (초당 도)',mean:'1초에 몇 도 도는가. 1 °/s = π/180 rad/s ≈ 0.01745 rad/s'},
+ dph:{s:'°/hr',r:'도 퍼 아워 (시간당 도)',mean:'1시간에 몇 도 도는가. 1 °/s = 3600 °/hr. 바이어스 안정도에 씀'},
+ ft:{s:'ft',r:'피트',mean:'1 ft = 0.3048 m ≈ 30 cm = 12 in'}, inch:{s:'in',r:'인치',mean:'1 in = 2.54 cm = 0.0254 m'},
+ s:{s:'s',r:'세컨드 (초)',mean:'시간의 SI 단위'}, N:{s:'N',r:'뉴턴',mean:'힘의 단위. 1 N = 1 kg·m/s² (1 kg을 1 m/s²로 가속하는 힘)'},
+ mps:{s:'m/s',r:'미터 퍼 세컨드',mean:'1초에 몇 m 가는가'}, Nm:{s:'N/m',r:'뉴턴 퍼 미터',mean:'스프링 상수 k의 단위. 1 m 늘이는 데 필요한 힘'},
+ Fm:{s:'F/m',r:'패럿 퍼 미터',mean:'유전율 ε의 단위'}, V:{s:'V',r:'볼트',mean:'전압의 단위'},
+ mVdps:{s:'mV/(°/s)',r:'밀리볼트 퍼 도 퍼 세컨드',mean:'스케일 팩터 단위. 1 °/s 돌 때 출력이 몇 mV 바뀌나'},
+ Vdps:{s:'V/(°/s)',r:'볼트 퍼 도 퍼 세컨드',mean:'스케일 팩터 단위. 1 °/s 돌 때 출력이 몇 V 바뀌나'},
+ nd:{s:'°/s/√Hz',r:'도 퍼 세컨드 퍼 루트헤르츠',mean:'노이즈 밀도 단위'},
+ ohm:{s:'Ω',r:'옴',mean:'저항의 단위. ⚠ 같은 글자 Ω(오메가)가 각속도 기호로도 쓰임 — 문맥으로 구분'}
+};
+const u=k=>UNIT[k]?`<button class="u" data-u="${k}">${UNIT[k].s}</button>`:(console.warn("unit?",k),k);
+const t=(k,label)=>{if(!TERM[k]){console.warn("term?",k);return label||k}return `<button class="t" data-t="${k}">${label||TERM[k].ko}</button>`};
+/* 본문 표기: [[key|글자]] = 용어, {{key}} = 단위 */
+const md=s=>s.replace(/\[\[(\w+)(?:\|([^\]]+))?\]\]/g,(_,k,l)=>t(k,l)).replace(/\{\{(\w+)\}\}/g,(_,k)=>u(k));
+
+/* ───────── 계산기 키 표기 ───────── */
+const KEY={'×10ˣ':'×10ˣ','(−)':'(−)','SHIFT':'SHIFT','S⇔D':'S⇔D','Ans':'Ans'};
+const kb=k=>`<kbd${k==='SHIFT'?' class="sh"':''}>${esc(k)}</kbd>`;
+function calcBlock(rows,warns){
+  return `<div class="calc"><div class="small muted">fx-570ES PLUS 2nd Edition · 누르는 순서대로</div>
+  <ol class="krows">${rows.map((r,i)=>`<li><span class="no">${i+1}</span><div class="keys">${r[0].map(kb).join('')}</div><div class="scr">${r[1]}</div>${r[2]?`<div class="rd">${r[2]}</div>`:''}</li>`).join('')}</ol>
+  ${warns&&warns.length?`<div class="calcwarn">${warns.map(w=>`<div>⚠ ${w}</div>`).join('')}</div>`:''}</div>`}
+
+/* ───────── 풀이 카드 (단계별로 하나씩 펼침) ───────── */
+let PID=0;
+function probHTML(p,regen){const id='p'+(++PID);
+  return `<div class="card prob" data-prob="${id}">
+  <div class="pk"><span class="kind k-${p.kind}">${p.kind}</span><span class="ptitle">${p.title}</span>${regen?'<button class="regen" data-regen aria-label="새 숫자로 다시">↻ 새 숫자</button>':''}</div>
+  <p class="q">${md(p.q)}</p>${p.fig||''}
+  <div class="first"><span class="lb">먼저 떠올릴 것</span>${p.first.map(k=>`<span class="k">${k}</span>`).join('')}</div>
+  <div class="btnrow">
+    <button class="tbtn" data-open="sol">풀이 보기</button>
+    <button class="tbtn" data-open="ans">정답</button>
+    <button class="tbtn" data-open="calc">🔢 계산기</button>
+    ${p.easy?'<button class="tbtn" data-open="easy">쉽게</button>':''}
+  </div>
+  <div data-pn="sol" hidden><div class="stepbox">${p.steps.map((s,i)=>`<div class="st" ${i>0?'hidden':''}><div class="h"><i>${i+1}</i>${s.h}</div><div class="b">${md(s.b)}</div></div>`).join('')}</div>
+    <button class="ghost" data-more style="margin-top:10px">다음 단계 ▾ (${p.steps.length>1?`1 / ${p.steps.length}`:'끝'})</button></div>
+  <div data-pn="ans" hidden><div class="ans"><span class="lb">정답</span><span class="v">${p.ans}</span><span class="rd">읽기: ${p.ansRead}</span></div></div>
+  <div data-pn="calc" hidden>${p.calc}</div>
+  ${p.easy?`<div data-pn="easy" hidden><div class="panel easy"><span class="lb">쉽게 보기</span><div>${md(p.easy)}</div></div></div>`:''}
+  ${p.more?`<details class="qa"><summary>더 알아보기</summary><div>${md(p.more)}</div></details>`:''}
+  </div>`}
+function wireProb(root){
+  root.querySelectorAll('[data-prob]').forEach(card=>{
+    card.querySelectorAll('[data-open]').forEach(b=>{b.setAttribute('aria-expanded','false');b.onclick=()=>{const pn=card.querySelector(`[data-pn="${b.dataset.open}"]`);pn.hidden=!pn.hidden;b.setAttribute('aria-expanded',String(!pn.hidden));markStudy()}});
+    const more=card.querySelector('[data-more]');if(!more)return;const sts=[...card.querySelectorAll('.st')];
+    const upd=()=>{const n=sts.filter(s=>!s.hidden).length;more.textContent=n<sts.length?`다음 단계 ▾ (${n} / ${sts.length})`:'모든 단계를 봤어요 · 처음부터 다시';};
+    upd();more.onclick=()=>{const h=sts.find(s=>s.hidden);if(h){h.hidden=false}else{sts.forEach((s,i)=>s.hidden=i>0)}upd()};
+  })}
+function wireToggles(root){root.querySelectorAll('[data-tg]').forEach(b=>{b.setAttribute('aria-expanded','false');b.onclick=()=>{const pn=b.closest('.card').querySelector(`[data-tp="${b.dataset.tg}"]`);pn.hidden=!pn.hidden;b.setAttribute('aria-expanded',String(!pn.hidden))}})}
+
+/* ───────── 그림 (SVG) ───────── */
+let FIGN=0;
+const COL={a:'var(--accent)',b:'var(--bad)',u:'var(--unit)',i:'var(--ink)',m:'var(--muted)',w:'var(--warn)'};
+function svgFig(w,h,inner,label,cap){const id='fg'+(++FIGN);
+  const defs=`<defs>${Object.entries(COL).map(([k,c])=>`<marker id="${id}${k}" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:${c}"/></marker>`).join('')}</defs>`;
+  return `<figure class="figs"><svg viewBox="0 0 ${w} ${h}" role="img" aria-label="${label}">${defs}${inner.replace(/#M([abuimw])/g,(_,k)=>'#'+id+k)}</svg>${cap?`<figcaption>${cap}</figcaption>`:''}</figure>`}
+const ar=(x1,y1,x2,y2,c='i',w=2.5,o='')=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" style="stroke:${COL[c]};stroke-width:${w}${o.includes('d')?';stroke-dasharray:5 4':''}" marker-end="url(#M${c})"${o.includes('2')?` marker-start="url(#M${c})"`:''}/>`;
+const tx=(x,y,s,cls='',an='start')=>`<text x="${x}" y="${y}" class="${cls}" text-anchor="${an}">${s}</text>`;
+const pth=(d,c='i',w=2,o='')=>`<path d="${d}" style="fill:none;stroke:${COL[c]};stroke-width:${w}${o.includes('d')?';stroke-dasharray:5 4':''}"${o.includes('>')?` marker-end="url(#M${c})"`:''}/>`;
+const omegaDot=(x,y,r=10)=>`<circle cx="${x}" cy="${y}" r="${r}" style="fill:var(--surface);stroke:var(--ink);stroke-width:2"/><circle cx="${x}" cy="${y}" r="3" style="fill:var(--ink)"/>`;
+const plate=(x,y,w,dx,dy,fill='var(--surface2)')=>`<polygon points="${x},${y+dy} ${x+w},${y+dy} ${x+w+dx},${y} ${x+dx},${y}" style="fill:${fill};stroke:var(--ink);stroke-width:2"/>`;
+
+const FIG={
+ sixDOF(){return svgFig(340,240,`
+   <polygon points="132,150 196,150 214,124 150,124" style="fill:var(--surface2);stroke:var(--line);stroke-width:2"/>
+   ${ar(173,137,173,42)}${tx(181,50,'z · 위아래','b2')}
+   ${ar(173,137,300,137)}${tx(300,158,'x · 앞뒤','b2','end')}
+   ${ar(173,137,86,196)}${tx(52,220,'y · 좌우','b2')}
+   ${pth('M145 64 A28 9 0 0 0 201 64','u',2.2,'>')}${tx(207,70,'요 yaw','u b2')}
+   ${pth('M228 113 A8 24 0 0 1 228 161','u',2.2,'>')}${tx(214,106,'롤 roll','u b2')}
+   <g transform="rotate(-55 112 174)">${pth('M112 150 A9 24 0 0 1 112 198','u',2.2,'>')}</g>${tx(24,160,'피치 pitch','u b2')}
+   ${tx(170,236,'직선 3축(가속도계) + 회전 3축(자이로) = 6 DOF','m','middle')}`,'6자유도: x·y·z 직선 이동과 roll·pitch·yaw 회전')},
+
+ coriolis(){return svgFig(340,215,`
+   ${tx(85,18,'회전판 위에서 굴린 공','b2','middle')}${tx(262,18,'세 방향은 서로 직각','b2','middle')}
+   <circle cx="85" cy="110" r="68" style="fill:var(--surface2);stroke:var(--line);stroke-width:2"/>
+   ${pth('M58 37 A78 78 0 0 0 17 71','i',2.2,'>')}${tx(8,34,'Ω 회전','b2')}
+   ${ar(85,110,150,110,'m',1.6,'d')}${tx(118,102,'똑바로','m small2','middle')}
+   ${pth('M85 110 Q122 113 143 141','a',2.6,'>')}<circle cx="85" cy="110" r="5" style="fill:var(--ink)"/>
+   ${tx(85,200,'실제로는 옆으로 휘어 보임','a small2','middle')}
+   <path d="M262 135 V123 H250" style="fill:none;stroke:var(--muted);stroke-width:1.5"/>
+   ${ar(250,135,322,135,'a',3)}${tx(318,156,'v 속도','a b2','end')}
+   ${ar(250,135,250,58,'b',3)}${tx(258,64,'F 힘','b b2')}
+   ${omegaDot(250,135,11)}${tx(250,172,'Ω 회전축','b2','middle')}${tx(250,188,'(종이 밖으로 ⊙)','m small2','middle')}`,
+   '코리올리 힘: 회전판 위 공이 휘는 모습과 Ω·v·F의 직각 관계',
+   '판이 도는 동안 공은 똑바로 가지만, 판 위에서 보면 옆으로 휘어요. F는 Ω와 v <b>둘 다에 직각</b>. (위·아래 부호는 교재마다 반대로 쓰기도 해요 — 핵심은 직각)')},
+
+ fog(){return svgFig(340,225,`
+   ${pth('M77 38 A86 86 0 0 1 163 38','i',2.2,'>')}${tx(120,16,'Ω (시계 방향 회전)','b2','middle')}
+   <circle cx="120" cy="115" r="70" style="fill:none;stroke:var(--line);stroke-width:9"/>
+   <circle cx="120" cy="115" r="70" style="fill:none;stroke:var(--surface);stroke-width:1.5;stroke-dasharray:2 3"/>
+   ${pth('M110 172 A58 58 0 1 1 149 165','a',2.6,'>')}
+   ${pth('M128 160 A46 46 0 1 0 97 155','u',2.6,'>')}
+   <rect x="108" y="180" width="24" height="14" rx="3" style="fill:var(--ink)"/>${tx(120,214,'A 출발·도착점','small2','middle')}
+   ${tx(206,62,'시계 방향 빛','a b2')}${tx(206,78,'→ 더 긴 길, 늦게 도착','a small2')}
+   ${tx(206,104,'반시계 방향 빛','u b2')}${tx(206,120,'→ 먼저 도착','u small2')}
+   ${tx(206,152,'위상차 Δφ ∝ Ω','b2')}${tx(206,168,'→ 간섭 빛 세기로 읽음','m small2')}${tx(206,184,'코일 길수록·넓을수록','m small2')}${tx(206,198,'더 민감','m small2')}`,
+   'FOG 사냑 효과: 광섬유 고리에서 반대로 도는 두 빛',
+   '회전하는 동안 출발점 A가 움직여서, 회전 방향으로 간 빛이 조금 더 먼 길을 가요. 이 차이(위상차)로 회전을 재요 — <b>사냑 효과</b>')},
+
+ rlg(){return svgFig(340,160,`
+   <polygon points="40,135 120,25 200,135" style="fill:none;stroke:var(--accent);stroke-width:2.4"/>
+   <polygon points="58,126 120,42 182,126" style="fill:none;stroke:var(--unit);stroke-width:2.4;stroke-dasharray:6 4"/>
+   ${[[40,135,-30],[120,25,90],[200,135,30]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="7" style="fill:var(--ink)"/>`).join('')}
+   ${tx(120,154,'세 모서리 = 거울','m small2','middle')}
+   ${tx(214,52,'두 레이저 빛의','b2')}${tx(214,70,'주파수 차 Δf','b2')}${tx(214,96,'= 맥놀이(beat)','u b2')}${tx(214,114,'주파수','u b2')}${tx(214,138,'Δf ∝ Ω','a b2')}`,
+   'RLG: 삼각형 레이저 고리에서 두 빛의 주파수 차',
+   'RLG도 사냑 효과예요. FOG는 <b>위상차</b>, RLG는 <b>주파수차(맥놀이)</b>로 읽어요.')},
+
+ twoMass(){return svgFig(340,190,`
+   ${[[40,'←','b','↑'],[200,'→','b','↓']].map(([x],k)=>`<rect x="${x}" y="70" width="100" height="56" rx="6" style="fill:var(--surface);stroke:var(--ink);stroke-width:2"/>${tx(x+50,103,k?'질량 2':'질량 1','b2','middle')}`).join('')}
+   ${ar(90,140,50,140,'a',2.6)}${ar(250,140,290,140,'a',2.6)}${tx(70,158,'v','a b2','middle')}${tx(270,158,'v','a b2','middle')}
+   ${ar(152,98,152,62,'b',2.8)}${ar(188,98,188,134,'b',2.8)}${tx(160,62,'F','b b2')}${tx(196,140,'F','b b2')}
+   ${ar(90,20,90,62,'m',2,'d')}${ar(250,20,250,62,'m',2,'d')}${tx(170,30,'외부 충격 · 둘 다 같은 방향','m small2','middle')}
+   ${tx(170,182,'출력 = 질량1 − 질량2 → 충격은 지워지고, 회전 신호는 2배','small2','middle')}`,
+   '2-질량 구조: 반대로 진동하는 두 질량',
+   '두 질량을 <b>반대로</b> 흔들면 코리올리 힘도 반대가 돼요. 차이를 빼면 회전 신호는 커지고, 둘 다 같은 방향으로 받는 충격은 지워져요.')},
+
+ plate(o={}){const A=o.A||'A 넓이',d=o.d||'간격',e=o.e||'ε (사이 물질)';return svgFig(340,210,`
+   ${plate(70,128,170,40,30)}
+   <polygon points="70,128 240,128 240,88 70,88" style="fill:var(--unit-soft);stroke:none"/>
+   <polygon points="240,128 280,98 280,58 240,88" style="fill:var(--unit-soft);stroke:none;opacity:.7"/>
+   ${plate(70,58,170,40,30)}
+   ${tx(175,80,'+ + + + +','b b2','middle')}${tx(175,152,'− − − − −','u b2','middle')}
+   ${tx(155,114,e,'u b2','middle')}
+   ${ar(294,88,294,128,'i',2,'2')}${tx(300,104,'d','b2')}${tx(300,121,d,'small2')}
+   ${tx(175,48,A,'b2','middle')}
+   ${tx(170,196,'C = εA / d · 넓을수록·가까울수록·ε 클수록 C↑','m small2','middle')}`,
+   '평행판 정전용량: 넓이 A, 간격 d, 사이 물질 ε')},
+
+ threeWays(){const pn=(x,t,b1,b2,inner)=>`${tx(x+55,18,t,'b2','middle')}${inner}${tx(x+55,150,b1,'a b2','middle')}${tx(x+55,168,b2,'m small2','middle')}`;
+  return svgFig(340,180,`
+   ${pn(2,'① 간격 d','d↓ → C↑','가속도·자이로·압력',`<rect x="22" y="44" width="70" height="7" style="fill:var(--ink)"/><rect x="22" y="44" width="70" height="7" transform="translate(0,22)" style="fill:none;stroke:var(--muted);stroke-dasharray:3 3"/><rect x="22" y="104" width="70" height="7" style="fill:var(--ink)"/>${ar(57,30,57,62,'b',2)}`)}
+   ${pn(115,'② 겹친 넓이 A','A↑ → C↑','콤 드라이브·각도',`<rect x="126" y="56" width="70" height="7" style="fill:var(--ink)"/><rect x="146" y="98" width="70" height="7" style="fill:var(--ink)"/><rect x="146" y="63" width="50" height="35" style="fill:var(--unit-soft)"/>${ar(196,82,222,82,'b',2)}`)}
+   ${pn(228,'③ 사이 물질 ε','ε↑ → C↑','습도·레벨·터치',`<rect x="248" y="56" width="70" height="7" style="fill:var(--ink)"/><rect x="248" y="98" width="70" height="7" style="fill:var(--ink)"/><rect x="252" y="66" width="62" height="29" rx="3" style="fill:var(--warn-soft);stroke:var(--warn)"/>${[[264,80],[283,74],[300,84]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="4" style="fill:var(--unit)"/>`).join('')}`)}`,
+   'C를 바꾸는 3가지: 간격, 겹친 넓이, 사이 물질')},
+
+ zoom(){const rows=[['1 m','책상 폭 ≈ 1 m'],['1 mm','샤프심 굵기 0.5 mm'],['1 μm','머리카락 굵기 ≈ 70 μm'],['1 nm','자이로 감지 변위 수 nm']];
+  return svgFig(340,262,rows.map(([l,ex],k)=>{const y=28+k*66;
+   return `${tx(20,y-6,l,'b2')}${tx(62,y-6,'· '+ex,'m small2')}<rect x="20" y="${y}" width="300" height="12" rx="2" style="fill:var(--unit-soft);stroke:var(--unit);stroke-width:1.2"/>
+   ${Array.from({length:9},(_,j)=>`<line x1="${20+30*(j+1)}" y1="${y}" x2="${20+30*(j+1)}" y2="${y+12}" style="stroke:var(--unit);stroke-width:1"/>`).join('')}
+   ${k<3?`<rect x="20" y="${y}" width="3" height="12" style="fill:var(--bad)"/><polygon points="20,${y+12} 23,${y+12} 320,${y+60} 20,${y+60}" style="fill:var(--bad);opacity:.08"/><line x1="23" y1="${y+12}" x2="320" y2="${y+60}" style="stroke:var(--bad);stroke-width:1;stroke-dasharray:3 3"/>${tx(252,y+34,'1000배 확대 (10³)','b small2','middle')}`:''}`}).join(''),
+   '길이 확대: 1 m → 1 mm → 1 μm → 1 nm, 한 칸마다 1000배',
+   '빨간 조각 하나를 1000배 키우면 아래 막대가 돼요. <b>m → mm → μm → nm</b>는 한 칸 내려갈 때마다 1000분의 1.')},
+
+ area(){return svgFig(340,200,`
+   <rect x="20" y="30" width="150" height="150" style="fill:var(--surface);stroke:var(--ink);stroke-width:2"/>
+   ${Array.from({length:9},(_,j)=>`<line x1="${20+15*(j+1)}" y1="30" x2="${20+15*(j+1)}" y2="180" style="stroke:var(--line);stroke-width:1"/><line x1="20" y1="${30+15*(j+1)}" x2="170" y2="${30+15*(j+1)}" style="stroke:var(--line);stroke-width:1"/>`).join('')}
+   <rect x="20" y="30" width="15" height="15" style="fill:var(--bad);opacity:.35"/>
+   ${tx(95,22,'1 m','b2','middle')}${tx(8,110,'1 m','b2','middle')}
+   ${tx(186,52,'1 m = 100 cm 이니까','small2')}${tx(186,78,'가로 100칸 × 세로 100칸','b2')}${tx(186,100,'= 10 000칸 = 10⁴','b2')}
+   ${tx(186,134,'1 cm² = 10⁻⁴ m²','b b2')}${tx(186,152,'지수 −2가 두 번 → −4','m small2')}${tx(186,178,'(그림 한 칸 = 10 cm × 10 cm)','m small2')}`,
+   '1 m² 안에 1 cm² 칸이 1만 개',
+   '넓이는 가로·세로 둘 다 작아지니까 지수가 두 번 들어가요.')},
+
+ /* ── 문제 그림 (숫자가 바뀌면 같이 바뀜) ── */
+ pCoriolis(o){return svgFig(340,170,`
+   <rect x="92" y="62" width="128" height="56" rx="6" style="fill:var(--surface);stroke:var(--ink);stroke-width:2"/>${tx(156,95,o.m,'b2','middle')}
+   ${ar(220,90,326,90,'a',3)}${tx(326,80,o.v,'a b2','end')}${o.v2?tx(334,134,o.v2,'m small2','end'):''}
+   ${ar(156,62,156,14,'b',3)}${tx(164,24,o.F,'b b2')}
+   ${omegaDot(44,90,12)}${tx(44,128,o.W,'b2','middle')}${tx(44,145,'회전축 ⊙','m small2','middle')}
+   ${tx(170,164,'Ω · v · F 서로 직각','m small2','middle')}`,'코리올리 문제 그림')},
+ pAngle(W,t,th){const R=46,cx=120,cy=118;const a=Math.min(th,359.9)*Math.PI/180;const x2=cx+R*Math.sin(a),y2=cy-R*Math.cos(a);const L=th>180?1:0;
+  return svgFig(340,190,`
+   ${ar(cx,cy,cx,cy-80,'m',2,'d')}${tx(cx,cy-86,'처음 방향','m small2','middle')}
+   ${ar(cx,cy,cx+82*Math.sin(a),cy-82*Math.cos(a),'a',2.6)}
+   <path d="M${cx} ${cy-R} A${R} ${R} 0 ${L} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}" style="fill:none;stroke:var(--bad);stroke-width:2.4"/>
+   <rect x="${cx-9}" y="${cy-14}" width="18" height="28" rx="5" style="fill:var(--ink)"/>
+   ${tx(230,70,`Ω = ${W} °/s`,'b2')}${tx(230,94,`t = ${t} s`,'b2')}${tx(230,124,'θ = ? (빨간 호)','b b2')}${tx(230,148,'위에서 본 차량','m small2')}`,'회전각 문제 그림')},
+ pSF(o){const box=(x,w,t1,t2,c)=>`<rect x="${x}" y="50" width="${w}" height="60" rx="8" style="fill:${c};stroke:var(--ink);stroke-width:1.6"/>${tx(x+w/2,76,t1,'b2','middle')}${tx(x+w/2,96,t2,'small2','middle')}`;
+  return svgFig(340,150,`${box(6,92,'회전',o.in,'var(--surface)')}${ar(98,80,120,80)}${box(122,96,'자이로',o.sf,'var(--surface2)')}${ar(218,80,240,80)}${box(242,92,'출력',o.out,'var(--surface)')}
+   ${tx(170,138,'출력 = SF × Ω','m small2','middle')}`,'스케일 팩터 문제 그림')},
+ pBias(BS,tm){return svgFig(340,180,`
+   ${ar(40,150,320,150,'i',1.6)}${ar(40,150,40,20,'i',1.6)}${tx(170,172,'시간 (분) →','m small2','middle')}${tx(46,22,'각도 오차 (°)','small2')}
+   <line x1="40" y1="150" x2="290" y2="50" style="stroke:var(--bad);stroke-width:2.6"/><circle cx="290" cy="50" r="5" style="fill:var(--bad)"/>
+   ${tx(290,40,'?','b b2','middle')}<line x1="290" y1="150" x2="290" y2="56" style="stroke:var(--muted);stroke-dasharray:3 3"/>${tx(290,168,`${tm}분`,'b2','middle')}
+   ${tx(120,92,`기울기 = ${BS} °/hr`,'b small2','middle')}`,'바이어스 누적 문제 그림')},
+ pCapGap(C0,d0,dd){const p=(x,gap,lb1,lb2)=>`<rect x="${x}" y="40" width="110" height="8" style="fill:var(--ink)"/><rect x="${x}" y="${48+gap}" width="110" height="8" style="fill:var(--ink)"/>${ar(x+122,48,x+122,48+gap,'i',1.6,'2')}${tx(x+55,30,lb1,'b2','middle')}${tx(x+55,78+gap,lb2,'small2','middle')}`;
+  return svgFig(340,150,`${p(10,50,'전',`d₀ = ${d0} μm · C₀ = ${C0} pF`)}${ar(150,70,182,70,'a',2.6)}${p(196,34,'후',`d = ${d0} − ${dd} μm · C = ?`)}`,'간격 변화 문제 그림')},
+ pCapEps(C0,e0,e1){return svgFig(340,150,`
+   <rect x="40" y="30" width="170" height="9" style="fill:var(--ink)"/><rect x="40" y="101" width="170" height="9" style="fill:var(--ink)"/>
+   <rect x="44" y="45" width="162" height="50" rx="4" style="fill:var(--warn-soft);stroke:var(--warn)"/>${tx(125,76,'폴리머 막','b2','middle')}
+   ${[[66,58],[100,84],[152,60],[186,82]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="5" style="fill:var(--unit)"/>`).join('')}
+   ${tx(226,54,`εᵣ: ${e0} → ${e1}`,'b2')}${tx(226,78,`C₀ = ${C0} pF`,'b2')}${tx(226,102,'C = ?','b b2')}${tx(125,134,'● 흡수된 물 분자','u small2','middle')}`,'유전율 변화 문제 그림')}
+};
+
+/* ───────── 계산 문제 생성기 (기본·유사·응용) ───────── */
+const N=(m,e)=>e===0?String(m):`${m} × 10${sup(e)}`;          // 표시
+const NS=(m,e)=>e===0?String(m):`${m}×10${sup(e)}`;            // 계산기 화면
+const K=(m,e)=>[...String(m).split(''),...(e?['×10ˣ',...(e<0?['(−)']:[]),...String(Math.abs(e)).split('')]:[])];
+const ks=x=>String(x).split('');
+const fx=(x,s=3)=>{const c=sci(x,s);const d=decT(x,s);return (c.e>=-3&&c.e<=4&&d)?d:sciT(c)};
+const fxR=(x,s=3)=>{const c=sci(x,s);const d=decT(x,s);return (c.e>=-3&&c.e<=4&&d)?d:sciR(c)};
+function piForm(p,q){const g=g10(p,q);p/=g;q/=g;return `${p===1?'':p}π${q===1?'':'/'+q} (π가 든 식)`}
+function fracScreen(p,q){const g=g10(p,q);p/=g;q/=g;if(q===1)return {s:String(p)};if(digits(p)+digits(q)<=10)return {s:`${p}/${q} (분수)`,sd:casioDec(p/q)};return {s:casioDec(p/q)}}
+const SDROW=(v,lb)=>[['S⇔D'],casioDec(v),lb||'소수로 바꾸기'];
+const W_NEG='지수 앞 마이너스는 [−](빼기)가 아니라 [(−)]';
+const W_PI='π는 [SHIFT] 누른 뒤 [×10ˣ]';
+const W_SD='분수나 π가 든 식으로 나오면 [S⇔D]를 눌러 소수로';
+
+const GEN={
+/* 자이로 ① 코리올리 힘 */
+coriolis(base){
+  const m=base?{m:1,e:-8}:pick([{m:1,e:-8},{m:2,e:-8},{m:5,e:-9},{m:3,e:-8}]);
+  const f=base?8:pick([4,5,8,10,12,15]), A=base?800:pick([400,500,800,1000,1500]), W=base?1:pick([1,2,5,10,30,100]);
+  const As=sci(A*1e-9), v=2*Math.PI*f*1e3*A*1e-9, Wr=W*Math.PI/180, mv=m.m*10**m.e, F=2*mv*Wr*v;
+  const s2=sci(2*mv), s3=sci(2*mv*Wr), vs=sci(v), Fs=sci(F), Wrs=sci(Wr,4);
+  const front=+(2*m.m*Wrs.m*vs.m).toPrecision(2), ex=m.e+Wrs.e+vs.e;
+  const vp=2*f*A, vq=1e6;
+  const fig=FIG.pCoriolis({m:`m = ${N(m.m,m.e)} kg`,v:'v = ?',v2:`f = ${f} kHz · A = ${A} nm`,F:'F = ?',W:`Ω = ${W} °/s`});
+  return {kind:base?'기본':'유사',title:'코리올리 힘 구하기',fig,
+   q:`MEMS 자이로의 [[proofmass|질량]] m = ${N(m.m,m.e)} {{kg}}이 구동 주파수 ${f} {{kHz}}, 진폭 ${A} {{nm}}로 진동한다. ${W} {{dps}} 회전이 들어올 때 (1) 최대 속도 v, (2) [[coriolis|코리올리 힘]] F의 크기를 구하라.`,
+   first:['단위 먼저: kHz·nm·°/s','v = 2πfA','F = 2mΩv'],
+   steps:[
+    {h:'단위 먼저 맞추기 (SI로)',b:`<div class="ln">f = ${f} kHz = ${f} × 10³ Hz = ${f*1000} Hz</div><div class="rd">"${f} 킬로헤르츠 = ${f} 곱하기 10의 3승 헤르츠"</div>
+     <div class="ln">A = ${A} nm = ${A} × 10⁻⁹ m = ${sciT(As)} m</div><div class="rd">앞 숫자 ${A} = ${sciT(sci(A))}, 지수 더하기 → ${mn(As.e)}</div>
+     <div class="ln">Ω = ${W} °/s × π/180 = ${fx(Wr,4)} rad/s</div><div class="rd">⚠ 공식에는 °/s가 아니라 rad/s</div>
+     <div class="ln">m = ${N(m.m,m.e)} kg (이미 SI)</div>`},
+    {h:'공식 고르기',b:`<div class="ln">v = 2π f A</div><div class="rd">"2 파이 에프 에이" · 사인 진동에서 가장 빠른 순간의 속도 [AI 보충]</div><div class="ln">F = 2 m Ω v</div><div class="rd">"2 엠 오메가 브이" · Ω ⟂ v일 때 크기</div>`},
+    {h:'(1) 속도 v',b:`<div class="ln">v = 2 × π × ${f*1000} × ${sciT(As)}</div><div class="ln">= ${fx(v)} m/s${vs.e<-1?` = ${sciT(vs)} m/s`:''}</div>`},
+    {h:'(2) 힘 F — 두 개씩 곱하기',b:`<div class="ln">2 × ${N(m.m,m.e)} = ${sciT(s2)}</div><div class="ln">× ${fx(Wr,4)} = ${sciT(s3)}</div><div class="ln">× ${fx(v)} = ${sciT(Fs)} N</div>`},
+    {h:'검산 — 지수만 대충',b:`<div class="ln">지수: 10${sup(m.e)} × 10${sup(Wrs.e)} × 10${sup(vs.e)} = 10${sup(ex)}</div><div class="ln">앞 숫자: 2 × ${m.m} × ${Wrs.m} × ${vs.m} ≈ ${front}</div><div class="ln">≈ ${front} × 10${sup(ex)} = ${sciT(sci(front*10**ex,2))} ✓</div>`}],
+   ans:`v ≈ ${fx(v)} m/s · F ≈ ${sciT(Fs)} N`,ansRead:`${fxR(v)} 미터 퍼 세컨드 / ${sciR(Fs)} 뉴턴`,
+   calc:calcBlock([[['2','×','SHIFT','×10ˣ'],'2×π','π = SHIFT → ×10ˣ'],[['×',...K(f,3)],`2×π×${NS(f,3)}`],[['×',...K(A,-9)],`…×${NS(A,-9)}`],[['='],piForm(vp,vq)],SDROW(v,'(1) v'),
+     [['2','×',...K(m.m,m.e)],`2×${NS(m.m,m.e)}`,'이어서 (2)'],[['×',...ks(W),'×','SHIFT','×10ˣ','÷','1','8','0'],`…×${W}×π÷180`,'°/s → rad/s'],[['×','Ans','='],casioDec(F),'(2) F · π 꼴이면 S⇔D']],[W_NEG,W_PI,W_SD,'[Ans] = 바로 앞 결과(v)']),
+   easy:`${sciT(Fs)} N은 모래알 하나 무게(약 10⁻⁵ N)보다 훨씬 작아요. 이렇게 작은 힘을 재야 해서 진공 포장과 공진을 써요.`,
+   more:base?'[AI 보충] 이 힘으로 스프링(120 {{Nm}})을 그냥 밀면 F ÷ k ≈ 1.2 × 10⁻¹³ m밖에 안 움직여요. 진공 속에서 [[modematch|모드 매칭]]으로 [[resonance|공진]]시키면 수만 배 커져 수 nm 수준이 돼요(추정).':''}},
+
+/* 자이로 ② 코리올리 역산: F → Ω */
+coriolisInv(){
+  const m=pick([{m:1,e:-8},{m:2,e:-8},{m:5,e:-9}]), v=pick([0.02,0.03,0.04,0.05]), W=pick([2,5,10,20,50]);
+  const mv=m.m*10**m.e, Fs=sci(2*mv*W*Math.PI/180*v,3), F=+Fs.m*10**Fs.e;
+  const den=2*mv*v, Wr=F/den, Wd=Wr*180/Math.PI;
+  const fig=FIG.pCoriolis({m:`m = ${N(m.m,m.e)} kg`,v:`v = ${v} m/s`,F:`F = ${sciT(Fs)} N`,W:'Ω = ?'});
+  return {kind:'응용',title:'힘에서 회전 속도 거꾸로 구하기',fig,
+   q:`질량 ${N(m.m,m.e)} {{kg}}이 ${v} {{mps}}로 진동하는 MEMS 자이로에서 [[coriolis|코리올리 힘]] ${sciT(Fs)} {{N}}이 측정됐다. 회전 각속도는 몇 {{dps}}인가?`,
+   first:['F = 2mΩv → Ω = F ÷ (2mv)','rad/s → °/s: × 180/π'],
+   steps:[
+    {h:'식 뒤집기',b:`<div class="ln">F = 2 m Ω v</div><div class="ln">Ω = F ÷ (2 m v)</div><div class="rd">양쪽을 2mv로 나누기. 구하려는 Ω만 혼자 남기기</div>`},
+    {h:'분모 먼저',b:`<div class="ln">2 × ${N(m.m,m.e)} × ${v} = ${sciT(sci(den))}</div>`},
+    {h:'나누기',b:`<div class="ln">Ω = ${sciT(Fs)} ÷ ${sciT(sci(den))}</div><div class="ln">= ${fx(Wr,4)} rad/s</div><div class="rd">나눗셈은 지수 빼기</div>`},
+    {h:'°/s로 바꾸기',b:`<div class="ln">${fx(Wr,4)} × 180 ÷ π = ${fx(Wd,3)} °/s</div><div class="rd">1 rad ≈ 57.3° → rad/s 값에 약 57을 곱하는 것</div>`},
+    {h:'검산',b:`<div class="ln">2 × ${N(m.m,m.e)} × ${fx(Wr,4)} × ${v} ≈ ${sciT(sci(den*Wr))} N ✓</div>`}],
+   ans:`Ω ≈ ${fx(Wd,3)} °/s (≈ ${fx(Wr,3)} rad/s)`,ansRead:`${fxR(Wd)} 도 퍼 세컨드`,
+   calc:calcBlock([[[...K(Fs.m,Fs.e)],NS(Fs.m,Fs.e)],[['÷','(','2','×',...K(m.m,m.e),'×',...ks(v),')'],`…÷(2×${NS(m.m,m.e)}×${v})`,'분모 전체를 괄호로'],[['='],casioDec(Wr),'rad/s'],[['×','1','8','0','÷','SHIFT','×10ˣ','='],casioDec(Wd),'°/s']],['분모를 괄호로 묶지 않으면 2로만 나눈 뒤 나머지를 곱해 버려요',W_NEG,W_PI]),
+   easy:'곱하기로 만든 식은 나누기로 거꾸로 풀 수 있어요. "힘이 이만큼이면, 얼마나 돌았길래?"를 구하는 거예요.'}},
+
+/* 자이로 ③ 회전각 = 각속도 × 시간 */
+angle(){
+  let W,t;do{W=pick([5,10,12,15,20,30,45,90]);t=pick([2,3,4,6,8,10])}while(W*t>360);const th=W*t, thr=th*Math.PI/180;
+  return {kind:'응용',title:'회전한 각도 구하기',fig:FIG.pAngle(W,t,th),
+   q:`차량이 커브를 도는 동안 자이로가 평균 ${W} {{dps}}를 ${t} {{s}} 동안 출력했다. 차량이 회전한 각도는 몇 {{deg}}이며, 몇 {{rad}}인가?`,
+   first:['θ = Ω × t','° → rad: × π/180'],
+   steps:[
+    {h:'단위 확인',b:`<div class="ln">°/s × s = °</div><div class="rd">"초당 도"에 "초"를 곱하면 초가 지워지고 "도"만 남아요</div>`},
+    {h:'공식',b:`<div class="ln">θ = Ω × t</div><div class="rd">"세타는 오메가 곱하기 티" · 일정한 속도로 돌 때</div>`},
+    {h:'계산',b:`<div class="ln">θ = ${W} × ${t} = ${th}°</div>`},
+    {h:'rad로 바꾸기',b:`<div class="ln">${th} × π/180 = ${fx(thr,4)} rad</div>`},
+    {h:'검산',b:`<div class="ln">${th}° ÷ 360° = ${+(th/360).toFixed(3)} 바퀴</div><div class="rd">${th<=90?'90° 이하 = 직각 이하로 꺾음, 커브로 그럴듯함 ✓':th<=180?'U턴 이하 ✓':'한 바퀴 가까이 — 회전 교차로라면 가능 ✓'}</div>`}],
+   ans:`θ = ${th}° ≈ ${fx(thr,3)} rad`,ansRead:`${th}도, ${fxR(thr)} 라디안`,
+   calc:calcBlock([[[...ks(W),'×',...ks(t),'='],String(th),'도(°)'],[['×','SHIFT','×10ˣ','÷','1','8','0','='],piForm(th,180)],SDROW(thr,'rad')],[W_PI,W_SD]),
+   easy:`시계 초침은 1초에 6°씩 돌아요. 10초면 60°. 자이로도 똑같이 "1초에 몇 도 × 몇 초"예요.`}},
+
+/* 자이로 ④ 스케일 팩터 */
+sf(){
+  const SF=pick([2,5,8,10,20,25]), W=pick([10,20,25,40,50,100,150]), mV=SF*W, V=mV/1000, inv=Math.random()<.5;
+  const base={fig:FIG.pSF({in:inv?'Ω = ?':`${W} °/s`,sf:`${SF} mV/(°/s)`,out:inv?`${fx(V)} V`:'? V'}),kind:'응용',title:inv?'출력 전압에서 회전 속도 구하기':'스케일 팩터로 출력 전압 구하기',first:inv?['V → mV 먼저','Ω = 출력 ÷ SF']:['출력 = SF × Ω','mV → V: ÷ 1000']};
+  if(!inv)return {...base,
+   q:`[[scalefactor|스케일 팩터]]가 ${SF} {{mVdps}}인 자이로가 ${W} {{dps}}로 회전 중이다. 출력 전압 변화는 몇 {{V}}인가?`,
+   steps:[{h:'단위 읽기',b:`<div>${SF} mV/(°/s) = "1 °/s 돌 때마다 ${SF} mV(밀리볼트)씩 변한다"</div>`},
+    {h:'공식',b:`<div class="ln">출력 = SF × Ω</div><div class="rd">단위: mV/(°/s) × °/s = mV ✓</div>`},
+    {h:'계산',b:`<div class="ln">${SF} × ${W} = ${mV} mV</div>`},
+    {h:'mV → V',b:`<div class="ln">${mV} mV = ${mV} × 10⁻³ V = ${fx(V)} V</div><div class="rd">밀리 = 1000분의 1 → 1000으로 나누기</div>`},
+    {h:'검산',b:`<div class="ln">${fx(V)} V × 1000 ÷ ${SF} = ${W} °/s ✓</div>`}],
+   ans:`${mV} mV = ${fx(V)} V`,ansRead:`${mV} 밀리볼트 = ${fxR(V)} 볼트`,
+   calc:calcBlock([[[...ks(SF),'×',...ks(W),'='],String(mV),'mV'],[['÷','1','0','0','0','='],fracScreen(mV,1000).s,'V'],...(fracScreen(mV,1000).sd?[SDROW(V)]:[])],[W_SD]),
+   easy:`1 °/s마다 ${SF} mV씩 오르는 계단이에요. ${W}칸 올라가면 ${mV} mV.`};
+  return {...base,
+   q:`[[scalefactor|스케일 팩터]]가 ${SF} {{mVdps}}인 자이로의 출력이 ${fx(V)} {{V}} 변했다. 회전 속도는 몇 {{dps}}인가?`,
+   steps:[{h:'단위 먼저 맞추기',b:`<div class="ln">${fx(V)} V = ${fx(V)} × 1000 mV = ${mV} mV</div><div class="rd">⚠ SF가 mV 단위라서 출력도 mV로 맞춰야 해요</div>`},
+    {h:'공식 뒤집기',b:`<div class="ln">출력 = SF × Ω → Ω = 출력 ÷ SF</div>`},
+    {h:'계산',b:`<div class="ln">Ω = ${mV} ÷ ${SF} = ${W} °/s</div><div class="rd">단위: mV ÷ mV/(°/s) = °/s ✓</div>`},
+    {h:'검산',b:`<div class="ln">${SF} × ${W} = ${mV} mV = ${fx(V)} V ✓</div>`}],
+   ans:`Ω = ${W} °/s`,ansRead:`${W} 도 퍼 세컨드`,
+   calc:calcBlock([[[...ks(V),'×','1','0','0','0','='],String(mV),'mV로'],[['÷',...ks(SF),'='],String(W),'°/s']],['V를 mV로 안 바꾸고 나누면 1000배 작은 답이 나와요']),
+   easy:'단위를 안 맞추면 1000배 틀려요. 이 문제의 함정은 V와 mV예요.'}},
+
+/* 자이로 ⑤ 바이어스 누적 오차 */
+bias(){
+  const BS=pick([3,5,10,20,36,60]), tm=pick([6,10,15,30,45,90]), err=BS*tm/60, hr=tm/60;
+  const fs=fracScreen(BS*tm,60);
+  return {kind:'응용',title:'바이어스로 쌓이는 각도 오차',fig:FIG.pBias(BS,tm),
+   q:`[[bias|바이어스 안정도]]가 ${BS} {{dph}}인 자이로를 보정 없이 ${tm}분 동안 썼다. 바이어스가 그대로 쌓인다고 할 때 각도 오차는 최대 몇 °인가?`,
+   first:['분 → 시간: ÷ 60','오차각 = 바이어스 × 시간'],
+   steps:[{h:'단위 먼저 맞추기',b:`<div class="ln">${tm}분 = ${tm} ÷ 60 시간 = ${fx(hr,3)} hr</div><div class="rd">바이어스가 °/hr(시간당 도)라서 시간도 hr로</div>`},
+    {h:'공식',b:`<div class="ln">오차각 = 바이어스 × 시간</div><div class="rd">θ = Ω × t와 같은 모양 · 가만히 있어도 "돌고 있다"고 착각한 양</div>`},
+    {h:'계산',b:`<div class="ln">${BS} × ${fx(hr,3)} = ${fx(err,3)}°</div>`},
+    {h:'참고: °/s로 보면',b:`<div class="ln">${BS} °/hr ÷ 3600 = ${fx(BS/3600,3)} °/s</div><div class="rd">아주 작아 보여도 시간이 지나면 쌓여요</div>`},
+    {h:'검산',b:`<div class="ln">${tm}분은 1시간의 ${fx(hr,3)}배 → ${BS}°의 ${fx(hr,3)}배 = ${fx(err,3)}° ✓</div>`}],
+   ans:`약 ${fx(err,3)}°`,ansRead:`${fxR(err)} 도`,
+   calc:calcBlock([[[...ks(BS),'×',...ks(tm),'÷','6','0','='],fs.s],...(fs.sd?[SDROW(err)]:[])],[W_SD]),
+   easy:'시계가 하루에 1분씩 빨라지면, 한 달 뒤엔 30분이 틀려요. 자이로 영점도 조금씩 틀린 게 계속 쌓여요. 그래서 GPS·자기센서로 가끔 바로잡아요.'}},
+
+/* 정전용량 ① 평행판 C */
+cap(base){
+  const er=base?1:pick([1,1,3.9]), A=base?1:pick([0.25,0.5,1,2,4]), d=base?5:pick([1,2,2.5,4,5,10]);
+  const Am=sci(A*1e-6), dm=sci(d*1e-6), top=8.85e-12*er*A*1e-6, C=top/(d*1e-6), pF=C*1e12;
+  const medium=er===1?'공기 (εᵣ ≈ 1)':'산화막 SiO₂ (εᵣ ≈ 3.9)';
+  return {kind:base?'기본':'유사',title:'평행판 정전용량 구하기',fig:FIG.plate({A:`A = ${A} mm²`,d:`${d} μm`,e:er===1?'공기 · εᵣ ≈ 1':'SiO₂ · εᵣ ≈ 3.9'}),
+   q:`평행판 전극: 면적 A = ${A} {{mm2}}, 간격 d = ${d} {{um}}, 판 사이는 ${medium}. ε₀ = 8.85 × 10⁻¹² {{Fm}}일 때 정전용량 C는 몇 {{pF}}인가?`,
+   first:['mm² → m²: 지수 ×2','μm → m','C = ε₀εᵣA/d'],
+   steps:[{h:'단위 먼저 맞추기',b:`<div class="ln">A = ${A} mm² = ${A} × (10⁻³)² m² = ${sciT(Am)} m²</div><div class="rd">⚠ 제곱 단위는 지수도 2배: −3 × 2 = −6</div><div class="ln">d = ${d} μm = ${sciT(dm)} m</div>`},
+    {h:'공식',b:`<div class="ln">C = ε₀ × εᵣ × A ÷ d</div><div class="rd">"씨는 엡실론 제로 엡실론 알 에이 나누기 디"</div>`},
+    {h:'분자(위) 계산',b:`<div class="ln">8.85 × 10⁻¹² × ${er} × ${sciT(Am)} = ${sciT(sci(top))}</div><div class="rd">곱셈은 지수 더하기</div>`},
+    {h:'나누기',b:`<div class="ln">${sciT(sci(top))} ÷ ${sciT(dm)} = ${sciT(sci(C))} F</div><div class="rd">나눗셈은 지수 빼기</div>`},
+    {h:'pF로 바꾸기',b:`<div class="ln">1 pF = 10⁻¹² F → ${sciT(sci(C))} F = ${fx(pF)} pF</div>`},
+    {h:'검산 — 지름길',b:`<div class="ln">A(10⁻⁶)와 d(10⁻⁶)의 지수가 서로 지워짐</div><div class="ln">→ C ≈ 8.85 × ${er} × ${A} ÷ ${d} = ${fx(pF)} pF ✓</div><div class="rd">mm²·μm 조합이면 pF가 바로 나와요 [AI 보충]</div>`}],
+   ans:`C ≈ ${sciT(sci(C))} F = ${fx(pF)} pF`,ansRead:`${fxR(pF)} 피코패럿`,
+   calc:calcBlock([[['8','.','8','5','×10ˣ','(−)','1','2'],'8.85×10⁻¹²'],...(er!==1?[[['×','3','.','9'],'…×3.9']]:[]),[['×',...K(A,-6)],`…×${NS(A,-6)}`],[['÷',...K(d,-6)],`…÷${NS(d,-6)}`],[['='],casioDec(C),'F']],['[×10ˣ]로 넣은 수는 한 덩어리라 괄호 없이 나눠도 돼요',W_NEG]),
+   easy:`판이 넓을수록, 가까울수록, 사이 물질이 전기를 잘 받아들일수록(εᵣ) 그릇이 커져요. ${er!==1?'산화막은 공기보다 3.9배 잘 받아들여요.':''}`}},
+
+/* 정전용량 ② 간격 변화 (가속도계·자이로 감지) */
+capGap(){
+  const C0=pick([1.5,2,2.5,3,4]), d0=pick([2,4,5]), dd=pick([0.1,0.2,0.25,0.5]).valueOf();
+  const d1=+(d0-dd).toFixed(2), C1=C0*d0/d1, dC=C1-C0, pct=dC/C0*100;
+  return {kind:'응용',title:'간격이 줄면 C는 얼마나 늘까',fig:FIG.pCapGap(C0,d0,dd),
+   q:`MEMS 가속도계의 감지 전극이 처음에 C₀ = ${C0} {{pF}}, 간격 ${d0} {{um}}이다. 가속도 때문에 간격이 ${dd} μm 줄었다. 새 정전용량 C와 변화량 ΔC는?`,
+   first:['C ∝ 1/d','C = C₀ × d₀ ÷ d','비율 계산은 단위 변환 불필요'],
+   steps:[{h:'무엇이 그대로인가',b:`<div>ε와 A는 그대로, d만 변함 → <b>C는 d에 반비례</b></div><div class="ln">C × d = 일정 → C = C₀ × d₀ ÷ d</div>`},
+    {h:'새 간격',b:`<div class="ln">d = ${d0} − ${dd} = ${d1} μm</div>`},
+    {h:'새 C',b:`<div class="ln">C = ${C0} × ${d0} ÷ ${d1} = ${fx(C1,4)} pF</div><div class="rd">μm ÷ μm → 단위가 지워져서 m로 바꿀 필요 없어요</div>`},
+    {h:'변화량',b:`<div class="ln">ΔC = ${fx(C1,4)} − ${C0} = ${fx(dC,3)} pF</div><div class="ln">변화율 = ${fx(dC,3)} ÷ ${C0} × 100 = ${fx(pct,3)} %</div>`},
+    {h:'검산',b:`<div class="rd">간격이 줄었으니 C는 커져야 함 → ${fx(C1,4)} > ${C0} ✓</div>`}],
+   ans:`C ≈ ${fx(C1,4)} pF · ΔC ≈ ${fx(dC,3)} pF (+${fx(pct,3)} %)`,ansRead:`${fxR(C1,4)} 피코패럿, 변화량 ${fxR(dC)} 피코패럿`,
+   calc:calcBlock([[[...ks(C0),'×',...ks(d0),'÷','(',...ks(d0),'−',...ks(dd),')'],`${C0}×${d0}÷(${d0}−${dd})`,'새 간격을 괄호로'],[['='],casioDec(C1),'분수로 나오면 S⇔D'],[['Ans','−',...ks(C0),'='],casioDec(dC),'ΔC']],['여기 [−]는 빼기 키가 맞아요 (지수 부호가 아님)','괄호를 빼면 d₀를 나눈 뒤 dd를 빼 버려요']),
+   easy:'두 판이 조금만 가까워져도 그릇이 커져요. 간격이 10% 줄면 C는 약 11% 늘어요(반비례라 딱 10%는 아님).'}},
+
+/* 정전용량 ③ 유전율 변화 (습도센서) */
+capEps(){
+  const e0=pick([3,3.5,4]), de=pick([0.3,0.5,0.6,1]), e1=+(e0+de).toFixed(1), C0=pick([50,100,120,200]), C1=C0*e1/e0, pct=(e1/e0-1)*100;
+  return {kind:'응용',title:'습기를 먹으면 C는 얼마나 늘까',fig:FIG.pCapEps(C0,e0,e1),
+   q:`습도센서: 폴리머 막(εᵣ = ${e0})을 사이에 둔 전극의 정전용량이 ${C0} {{pF}}이다. 습기를 흡수해 εᵣ가 ${e1}로 커졌다. 새 정전용량은?`,
+   first:['C ∝ ε','C = C₀ × εᵣ₁ ÷ εᵣ₀'],
+   steps:[{h:'무엇이 그대로인가',b:`<div>A와 d는 그대로, ε만 변함 → <b>C는 ε에 비례</b></div>`},
+    {h:'공식',b:`<div class="ln">C = C₀ × εᵣ₁ ÷ εᵣ₀</div><div class="rd">εᵣ는 단위가 없는 숫자(비유전율)</div>`},
+    {h:'계산',b:`<div class="ln">C = ${C0} × ${e1} ÷ ${e0} = ${fx(C1,4)} pF</div>`},
+    {h:'변화율',b:`<div class="ln">${e1} ÷ ${e0} = ${fx(e1/e0,4)} → +${fx(pct,3)} %</div>`},
+    {h:'검산',b:`<div class="rd">ε가 커졌으니 C도 커져야 함 ✓ · 물의 εᵣ ≈ 80이라 조금만 흡수해도 C가 변해요</div>`}],
+   ans:`C ≈ ${fx(C1,4)} pF (+${fx(pct,3)} %)`,ansRead:`${fxR(C1,4)} 피코패럿`,
+   calc:calcBlock([[[...ks(C0),'×',...ks(e1),'÷',...ks(e0),'='],fracScreen(Math.round(C0*e1*10),Math.round(e0*10)).s],...(fracScreen(Math.round(C0*e1*10),Math.round(e0*10)).sd?[SDROW(C1)]:[])],[W_SD]),
+   easy:'물은 전기를 아주 잘 받아들이는 물질이에요(εᵣ ≈ 80). 막이 습기를 머금으면 그릇이 커져서 C가 늘고, 그걸로 습도를 알아내요.'}}
+};
+/* 페이지별 문제 묶음: [생성기, 기본으로 시작?] */
+const PSET={gyro:[['coriolis',true],['coriolis'],['coriolisInv'],['angle'],['sf'],['bias']],cap:[['cap',true],['cap'],['capGap'],['capEps']]};
+const TOPICS={gyro:{name:'자이로',g:['coriolis','coriolisInv','angle','sf','bias']},cap:{name:'정전용량',g:['cap','capGap','capEps']}};
+
+/* ───────── 요약 페이지 데이터 ───────── */
+const PAGES={};
+PAGES.gyro={title:'자이로센서',part:'제3편 5장',secs:[
+ {k:'정의',h:'자이로센서란?',b:`<p class="big">물체가 <b>얼마나 빠르게 회전하는지</b>(각속도)를 재는 센서</p>
+   <div class="rel">각속도 {{dps}} × 시간 {{s}} = 회전각 {{deg}}<div class="rd">회전 속도가 일정할 때. 속도가 변하면 조금씩 더해 감(적분)</div></div>
+   <p>[[inertial]]의 한 종류예요. 바깥에 기준점이 없어도 자기 회전을 스스로 알아내요.</p>`,
+  easy:'폰을 옆으로 눕히면 화면이 같이 돌아가죠? 폰 안의 자이로가 "지금 1초에 90도씩 돌고 있어"라고 알려 주기 때문이에요. 이 값을 시간만큼 더하면 "총 몇 도 돌았는지"가 나와요.',
+  src:'【물체의 각속도(°/s)를 측정하는 센서를 관성센서(Inertial Sensor)라고 한다】 【각속도(°/s)에 시간을 곱하면 회전각(°)을 얻을 수 있다】'},
+ {k:'측정 대상',h:'각속도 Ω (오메가)',b:`<div class="syms"><span class="s">°/s</span><span>{{dps}} 도 퍼 세컨드 · 일상적인 표기</span><span class="s">rad/s</span><span>{{rads}} 라디안 퍼 세컨드 · <b>공식에 넣을 때</b></span><span class="s">°/hr</span><span>{{dph}} 도 퍼 아워 · 아주 느린 회전, 정밀 사양</span></div>
+   <div class="rel mono">1 °/s = π/180 rad/s ≈ 0.01745 rad/s<br>1 °/s = 3600 °/hr</div>
+   <div class="warnbox">⚠ <b>Ω 글자 주의</b>: 각속도 기호 Ω(오메가)와 저항 단위 {{ohm}}(옴)은 같은 글자예요. 식 안의 Ω는 각속도, 숫자 뒤 단위 Ω는 옴.</div>
+   <p>[[dof|6 자유도]] = 직선 이동 3축(가속도계) + 회전 3축 roll·pitch·yaw(자이로)</p>${FIG.sixDOF()}`,
+  easy:'자동차 속도가 "1시간에 몇 km"라면, 회전 속도는 "1초에 몇 도"예요. 360 °/s면 1초에 한 바퀴예요.',
+  src:'【6 자유도: 3축 가속도 센서와 3축 자이로스코프를 함께 사용하여 측정】'},
+ {k:'감지 원리',h:'코리올리 힘으로 회전을 잰다',b:`<p>[[coriolis]]: 회전하는 곳에서 <b>움직이고 있는</b> 물체는 옆으로 밀리는 힘을 받아요.</p>${FIG.coriolis()}
+   <div class="flow"><div>회전 Ω 입력</div><div>코리올리 힘 F (진동 방향에 직각)</div><div>[[proofmass|질량]]이 옆으로 몇 {{nm}} 이동</div><div>감지 전극 간격 d 변화</div><div>[[capacitance|정전용량]] C 변화 → 전압 → ADC</div></div>
+   <div class="key">핵심: <b>질량을 계속 진동시켜 둔다.</b> 움직이고 있어야(v ≠ 0) 코리올리 힘이 생기기 때문이에요.</div>
+   <button class="ghost" data-goto="cap">↗ 정전용량형 원리 보기 (제2편 2장)</button>`,
+  easy:'돌아가는 놀이기구 위에서 공을 앞으로 굴리면 공이 옆으로 휘어 가요. 공은 똑바로 가려 했지만 바닥이 돌았기 때문이에요. 자이로는 이 "옆으로 휘는 정도"를 재서 회전 속도를 알아내요.',
+  src:'【진동 축(±X축)에 직각인 방향(±Y방향)으로 코리올리 힘이 발생한다】 【센싱 축(±Y방향)에서 정전용량 C의 변화가 나타난다】'},
+ {k:'구조',h:'MEMS 진동형 자이로 — 움직여 보기',b:`<div class="fig" id="gyroFig"></div>
+   <ol class="clean small"><li>[[comb]]가 질량을 <b>x 방향</b>으로 계속 흔든다 (구동 모드)</li><li>회전 Ω가 들어오면 <b>y 방향</b>으로 힘 F가 생긴다 (감지 모드)</li><li>위 전극 C₁과 아래 전극 C₂의 차이가 출력이 된다</li></ol>`,
+  easy:'가운데 네모(질량)는 용수철에 매달려 좌우로 흔들려요. 회전 버튼을 누르면 위아래로도 흔들리고, 위·아래 전극과의 거리가 달라지면서 C₁, C₂ 막대 길이가 달라져요.',
+  src:'【The comb drive unit is capable of a large travel range while providing a linear force】'},
+ {k:'대표 식',h:'F = 2m(Ω × v)',b:`<div class="eqn">F = 2 m Ω v<small>"에프는 2 엠 오메가 브이" · Ω ⟂ v일 때 크기</small></div>
+   <div class="f4">
+    <div><div class="h">무엇을 위한 식</div>회전 Ω가 있을 때, 진동하는 질량이 받는 <b>옆 방향</b> 힘</div>
+    <div><div class="h">기호 · 단위 · 읽는 법</div><div class="syms"><span class="s">F</span><span>코리올리 힘 · {{N}}</span><span class="s">m</span><span>질량 · {{kg}}</span><span class="s">Ω</span><span>각속도 · {{rads}} (°/s 아님!)</span><span class="s">v</span><span>질량의 속도 · {{mps}}</span></div></div>
+    <div><div class="h">커지면 / 작아지면</div><ul class="clean"><li>Ω 2배 → F 2배 → <b>출력이 Ω에 비례</b> (그래서 측정 가능)</li><li>v 커지면 F 커짐 → 크게·빠르게 진동시키면 감도↑</li><li>m 커지면 F 커짐 → 하지만 열잡음·[[brownian]]도 고려</li></ul></div>
+    <div><div class="h">방향</div>× 는 "벡터 곱". F는 Ω와 v <b>둘 다에 직각</b>. Ω가 z축, v가 x축이면 F는 y축.</div>
+   </div>`,
+  easy:'돌수록(Ω), 빨리 흔들수록(v), 무거울수록(m) 옆으로 미는 힘이 세져요. 앞의 2는 그냥 외우는 숫자예요.',
+  src:'【F = m∙a = m∙(2Ω×v)】'},
+ {k:'문제',h:'',b:'__PROBS__'},
+ {k:'종류',h:'자이로 4가지 가족',b:`<div class="tblwrap"><table><tr><th>종류</th><th>원리</th><th>무엇이 변하나</th><th>특징</th></tr>
+   <tr><td><b>회전 바퀴형</b></td><td>각운동량 보존 (팽이)</td><td>축의 기울어짐</td><td>크고 무겁고 전력↑, 기동 30 s</td></tr>
+   <tr><td><b>MEMS 진동형</b></td><td>[[coriolis]]</td><td>정전용량 → 전압</td><td>작고 저렴. 폰·자동차</td></tr>
+   <tr><td><b>FOG</b> 광섬유</td><td>[[sagnac]]</td><td><b>위상차</b> → 빛 세기</td><td>가동부 없음, 고정밀</td></tr>
+   <tr><td><b>RLG</b> 링 레이저</td><td>[[sagnac]]</td><td><b>주파수차</b> (맥놀이)</td><td>고정밀, 항공</td></tr></table></div>
+   <p class="small muted">표가 잘리면 옆으로 밀어 보세요.</p>${FIG.fog()}${FIG.rlg()}`,
+  easy:'도는 것(바퀴형), 떨리는 것(MEMS), 빛을 돌리는 것(FOG·RLG) 세 부류예요. 빛 두 개는 원리가 같고 "위상으로 읽냐, 주파수로 읽냐"만 달라요.',
+  src:'【FOG: 거리 차, 시간 차, 위상 차 → 간섭계의 광출력 세기 변화】 【RLG: 주파수 차이 → 간섭계의 맥놀이 주파수】'},
+ {k:'특성',h:'자이로 사양 읽기',b:`<div class="syms">
+   <span class="s">SF</span><span>[[scalefactor]] · {{Vdps}}<br><span class="rd">1 °/s당 출력 변화 = 감도</span></span>
+   <span class="s">BS</span><span>[[bias]] · {{dph}}<br><span class="rd">작을수록 정밀. 예) 10 °/hr</span></span>
+   <span class="s">ZRO</span><span>[[zro]]<br><span class="rd">안 돌 때 출력 = 백색잡음 + 드리프트</span></span>
+   <span class="s">ND</span><span>[[noised]] · {{nd}}</span>
+   <span class="s">FSR</span><span>측정 범위 · {{dps}}<br><span class="rd">예) ±2000 °/s</span></span></div>`,
+  easy:'스케일 팩터 = 얼마나 예민한가. 바이어스 안정도 = 가만히 있을 때 얼마나 흔들리나. 노이즈 = 얼마나 지지직거리나.',
+  src:'【Scale Factor: The change in output per unit change in angular rate (V/°/s)】 【Bias stability (deg/s, deg/hr)】'},
+ {k:'설계 포인트',h:'잘 만들려면 3가지',b:`<ol class="clean"><li><b>진공 패키지</b> — 공기 [[damping|감쇠]]와 [[brownian]]를 줄여 감지 신호를 키운다</li><li><b>[[modematch]]</b> — 구동·감지 공진 주파수를 같게 (kx = ky). 어긋나면 DC 전압으로 튜닝</li><li><b>2-질량 구조</b> — 두 질량을 반대로 흔들어 외부 충격·진동 오차를 상쇄</li></ol>${FIG.twoMass()}`,
+  easy:'① 공기를 빼서 브레이크를 없앤다 ② 두 방향 흔들림 박자를 맞춘다 ③ 쌍둥이로 만들어 바깥 흔들림은 서로 지운다.',
+  src:'【A vacuum package is required. The sensing mode is strongly damped by air.】 【The resonance frequencies of the drive and sense modes should be matched】'},
+ {k:'응용',h:'어디에 쓰나',b:`<div class="appchips"><span>📷 손떨림 보정</span><span>🚗 차량 자세 제어</span><span>🧭 터널 속 내비게이션</span><span>🚁 드론 방향 유지</span><span>📱 폰 화면 회전</span></div>
+   <p>폰의 [[imu]] = 가속도계 + 자이로 + 자기센서. 자이로는 빠른 회전을, 자기센서는 북쪽 기준을 잡아 서로 보완해요.</p>
+   <p class="small"><b>[현업]</b> 무인 운반차(AGV)·로봇 팔의 방향 추정에 IMU로 들어가요.</p>`,
+  easy:'GPS가 끊기는 터널에서도 내비가 움직이는 건 자이로와 바퀴 속도로 "얼마나 꺾었는지"를 계산하기 때문이에요.',
+  src:'【ECU는 자이로와 바퀴속도센서의 신호로부터 터널 구간의 위치를 추정】'},
+ {k:'외울 것',h:'이것만은 외우기',b:`<ol class="clean"><li><b>측정량</b>: 각속도 {{dps}}. 각속도 × 시간 = 회전각</li><li><b>MEMS 원리</b>: F = 2m(Ω × v). 진동에 직각인 힘 → 정전용량 변화</li><li><b>광학</b>: 둘 다 사냑 효과. FOG = 위상차, RLG = 주파수차(맥놀이)</li></ol>
+   <div class="eyebrow">백지 복원 순서</div><ol class="clean small"><li>네모(질량) + 좌우 빗살(구동) + 위아래 전극(C₁·C₂)을 그린다</li><li>x 방향 진동 화살표 v, 종이 밖으로 Ω(⊙)</li><li>y 방향 F, "C₁ ≠ C₂ → 출력"</li><li>옆에 F = 2mΩv와 단위</li></ol>
+   <div class="eyebrow">스스로 점검</div>
+   <details class="qa"><summary>왜 질량을 계속 진동시켜야 하나?</summary><div>v = 0이면 F = 2mΩv = 0. 움직여야 코리올리 힘이 생긴다.</div></details>
+   <details class="qa"><summary>Ω가 2배면 출력은?</summary><div>F가 2배 → 감지 변위·C 변화·출력 전압도 2배 (선형 구간에서).</div></details>
+   <details class="qa"><summary>진공 포장을 안 하면?</summary><div>공기 감쇠로 감지 진폭이 작아지고 브라운 노이즈가 커져 성능이 크게 떨어진다.</div></details>
+   <details class="qa"><summary>FOG와 RLG의 차이는?</summary><div>원리는 같은 사냑 효과. FOG는 위상차를 빛 세기로, RLG는 주파수차를 맥놀이 주파수로 읽는다.</div></details>
+   <button class="primary" data-goto="cards">이 내용 카드로 외우기</button>`}
+]};
+PAGES.cap={title:'정전용량형',part:'제2편 2장',secs:[
+ {k:'정의',h:'정전용량이란?',b:`<p class="big">두 금속판이 <b>전기를 담아 두는 능력</b></p>${FIG.plate()}
+   <div class="eqn">C = ε A / d<small>"씨는 엡실론 에이 나누기 디"</small></div>
+   <div class="syms"><span class="s">C</span><span>정전용량 · {{F}} 패럿 (보통 {{pF}})</span><span class="s">ε</span><span>[[permittivity]] · {{Fm}}</span><span class="s">A</span><span>판 넓이 · {{m2}}</span><span class="s">d</span><span>판 간격 · {{m}}</span></div>`,
+  easy:'두 판은 전기를 담는 그릇이에요. 판이 넓을수록(A↑), 가까울수록(d↓), 사이 물질이 전기를 잘 받아들일수록(ε↑) 많이 담겨요.',
+  src:'[AI 보충] 평행판 축전기 기본식. 가속도센서·자이로·습도센서 감지부에 쓰임'},
+ {k:'바뀌는 3가지',h:'센서는 셋 중 하나를 바꾼다',b:`${FIG.threeWays()}<div class="tblwrap"><table><tr><th>무엇이 변하나</th><th>C 변화</th><th>센서 예</th></tr>
+   <tr><td>간격 d</td><td>d↓ → C↑ (반비례)</td><td>가속도계, 자이로, 압력</td></tr>
+   <tr><td>넓이 A (겹친 면적)</td><td>A↑ → C↑ (비례)</td><td>콤 드라이브 변위, 회전 각도</td></tr>
+   <tr><td>유전율 ε</td><td>ε↑ → C↑ (비례)</td><td>습도(물 εᵣ≈80), 레벨, 근접·터치</td></tr></table></div>
+   <div class="key">외우기: <b>C는 ε·A에 비례, d에 반비례.</b> 원리 하나로 센서 여러 개가 설명돼요.</div>`,
+  easy:'그릇 크기를 바꾸는 방법이 세 가지예요. 판을 가까이(d), 판을 넓게(A), 사이에 물을 넣기(ε).'},
+ {k:'문제',h:'',b:'__PROBS__'}
+]};
+PAGES.unitbasic={title:'단위·접두어·읽는 법',part:'제0편 1장',secs:[
+ {k:'접두어',h:'10의 몇 승인가 — 접두어 사다리',b:`<div class="ladder">${[
+   ['G','기가','10⁹','GHz · 통신 주파수'],['M','메가','10⁶','MHz'],['k','킬로','10³','kHz · 자이로 공진 8 kHz'],['—','(기본)','10⁰','m · g · Hz · F · T'],
+   ['c','센티','10⁻²','cm'],['m','밀리','10⁻³','mm · mT · mg'],['μ','마이크로','10⁻⁶','μm · 빗살 폭 5 μm'],['n','나노','10⁻⁹','nm · 감지 변위 6 nm'],['p','피코','10⁻¹²','pF · 감지 정전용량']
+  ].map(r=>`<div class="rung${r[0]==='—'?' base':''}"><span class="p">${r[0]}</span><span>${r[1]}</span><span class="e">${r[2]}</span><span class="ex">${r[3]}</span></div>`).join('')}</div>
+  ${FIG.zoom()}<p class="small muted">⚠ m은 두 가지: 앞에 붙으면 <b>밀리</b>(mm), 혼자 있으면 <b>미터</b>(m). μ는 "뮤"라고 읽고 마이크로.</p>`,
+  easy:'킬로는 1000배, 밀리는 1000분의 1, 마이크로는 100만분의 1, 나노는 10억분의 1이에요. 3칸씩(1000배씩) 내려가요.'},
+ {k:'규칙 3개',h:'단위 변환 규칙 3개',b:`<div class="rules">
+   <div class="rule"><i>1</i><div><b>큰 단위 → 작은 단위면 숫자가 커진다.</b><div class="rd">1 m = 1000 mm. 작은 자로 재면 눈금 수가 많아지니까</div></div></div>
+   <div class="rule"><i>2</i><div><b>지수 빼기: (바꾸기 전 지수) − (바꾼 뒤 지수)</b><div class="rd">μm → mm: (−6) − (−3) = −3 → × 10⁻³</div></div></div>
+   <div class="rule"><i>3</i><div><b>제곱·세제곱 단위는 지수도 2배·3배.</b><div class="rd">cm = 10⁻² m → cm² = 10⁻⁴ m², cm³ = 10⁻⁶ m³</div></div></div></div>
+   ${FIG.area()}<button class="primary" data-goto="units">단위 훈련 바로 하기</button>`,
+  easy:'1 m 막대를 mm 자로 재면 1000칸이 나오죠. 단위가 작아지면 숫자는 커져요. 이 감각 하나가 제일 중요해요.'},
+ {k:'비율 단위',h:'%, ppm, ppb',b:`<div class="syms"><span class="s">%</span><span>{{pct}} 퍼센트 · 100분의 1 = 10⁻²</span><span class="s">ppm</span><span>{{ppm}} 피피엠 · 백만분의 1 = 10⁻⁶</span><span class="s">ppb</span><span>{{ppb}} 피피비 · 10억분의 1 = 10⁻⁹</span></div>
+   <div class="rel mono">1 % = 10 000 ppm<br>1 ppm = 1000 ppb<br>5 ppm = 5 × 10⁻⁶ (소수)</div>
+   <div class="warnbox">계산 공식에 넣을 땐 항상 <b>소수</b>로 바꿔서 넣어요. 5 ppm → 5 × 10⁻⁶</div>`,
+  easy:'1 ppm은 100만 개 중 1개예요. 공기 분자 100만 개 중 수소 분자가 5개 섞여 있으면 5 ppm이에요.'},
+ {k:'읽는 법',h:'센서 단위 읽는 법',b:`<div class="tblwrap"><table><tr><th>단위</th><th>읽기</th><th>뜻</th></tr>${['dps','rads','dph','nd','Vdps','N','Nm','Fm','pF','ppm','G','T','ohm'].map(k=>`<tr><td>${u(k)}</td><td>${UNIT[k].r}</td><td class="small">${UNIT[k].mean}</td></tr>`).join('')}</table></div>
+   <p class="small muted">"/" 는 "퍼(per)", "²"는 "제곱", "√"는 "루트"로 읽어요.</p>`}
+]};
+
+/* ───────── 암기 카드 ───────── */
+const CARDS=[
+ {id:'u1',tag:'단위',f:'1 nm는 몇 m?',a:'10⁻⁹ m',r:'10의 마이너스 9승 미터 · 나노 = 10억분의 1',e:'1 m 자를 10억 조각 낸 것 중 1조각.'},
+ {id:'u2',tag:'단위',f:'μ (뮤)는 10의 몇 승? 읽는 법은?',a:'10⁻⁶ · 마이크로',r:'100만분의 1',e:'1 m = 1 000 000 μm'},
+ {id:'u3',tag:'단위',f:'5 ppm을 소수로?',a:'5 × 10⁻⁶ = 0.000005',r:'5 곱하기 10의 마이너스 6승',e:'공식에는 항상 소수로 넣기'},
+ {id:'u4',tag:'단위',f:'1 %는 몇 ppm?',a:'10 000 ppm',r:'10⁻² ÷ 10⁻⁶ = 10⁴',e:'% 지수 −2, ppm 지수 −6, 빼면 4'},
+ {id:'u5',tag:'단위',f:'1 G (가우스)는 몇 T (테슬라)?',a:'10⁻⁴ T',r:'10의 마이너스 4승 테슬라',e:'지구 자기장 ≈ 0.5 G = 50 μT'},
+ {id:'u6',tag:'단위',f:'1 cm²는 몇 m²?',a:'10⁻⁴ m²',r:'길이 지수 −2를 2배',e:'제곱 단위는 지수도 제곱(×2)'},
+ {id:'u7',tag:'단위',f:'1 ft는 몇 m? 1 in는 몇 cm?',a:'1 ft = 0.3048 m · 1 in = 2.54 cm',r:'피트 · 인치',e:'1 ft ≈ 30 cm, 1 ft = 12 in'},
+ {id:'u8',tag:'단위',f:'180°는 몇 rad? 1°는?',a:'π rad · 1° = π/180 ≈ 0.01745 rad',r:'라디안',e:'공식에 각도를 넣을 땐 rad로'},
+ {id:'u9',tag:'단위',f:'1 °/s는 몇 °/hr?',a:'3600 °/hr',r:'도 퍼 아워',e:'1시간 = 3600초'},
+ {id:'g1',tag:'자이로',f:'자이로센서가 측정하는 물리량과 단위는?',a:'각속도 · °/s (rad/s, °/hr)',r:'도 퍼 세컨드',e:'각속도 × 시간 = 회전각'},
+ {id:'g2',tag:'자이로',f:'MEMS 진동형 자이로의 감지 원리는?',a:'코리올리 힘 F = 2m(Ω × v)',r:'진동 방향에 직각인 힘 → 정전용량 변화',e:'돌아가는 판 위 공이 옆으로 휘는 원리'},
+ {id:'g3',tag:'자이로',f:'코리올리 힘의 방향은?',a:'회전축 Ω와 속도 v 모두에 직각',r:'Ω가 z, v가 x면 F는 y',e:''},
+ {id:'g4',tag:'자이로',f:'왜 proof mass를 계속 진동시키나?',a:'v = 0이면 F = 0이라서',r:'움직이고 있어야 코리올리 힘이 생김',e:''},
+ {id:'g5',tag:'자이로',f:'MEMS 자이로를 진공 패키지에 넣는 이유는?',a:'공기 감쇠와 브라운 노이즈를 줄이려고',r:'감지 모드가 공기에 강하게 감쇠됨',e:''},
+ {id:'g6',tag:'자이로',f:'FOG와 RLG는 각각 무엇을 측정하나?',a:'FOG = 위상차 · RLG = 주파수차(맥놀이)',r:'둘 다 사냑 효과',e:''},
+ {id:'g7',tag:'자이로',f:'바이어스 안정도의 단위와 뜻은?',a:'°/hr · 회전 없을 때 영점이 흔들리는 정도',r:'도 퍼 아워 · 작을수록 정밀',e:''},
+ {id:'g8',tag:'자이로',f:'6 DOF는 무엇과 무엇?',a:'직선 3축(가속도계) + 회전 3축(자이로)',r:'roll · pitch · yaw',e:''},
+ {id:'c1',tag:'원리',f:'평행판 정전용량 식과, d가 줄면?',a:'C = εA/d · d↓ → C↑',r:'씨는 엡실론 에이 나누기 디',e:'판이 가까울수록 그릇이 커짐'}
+];
+const DAY=86400000;
+function srs(){return LS.get('srs',{})}
+const MY={cards(){return LS.get('mycards',[])},setCards(a){LS.set('mycards',a)},notes(){return LS.get('notes',{})},note(id){return this.notes()[id]||''},
+  setNote(id,t){const n=this.notes();if(t.trim())n[id]=t;else delete n[id];LS.set('notes',n)}};
+const allCards=()=>CARDS.concat(MY.cards().map(c=>({...c,tag:'내 카드'+(c.page&&PAGES[c.page]?' · '+PAGES[c.page].title:''),mine:true})));
+function dueCards(){const s=srs(),now=Date.now();return deckPool().filter(c=>!s[c.id]||s[c.id].due<=now)}
+function deckPool(){const f=LS.get('deckf','all');const a=allCards();return f==='mine'?a.filter(c=>c.mine):a}
+function rateCard(id,g){const s=srs();const c=s[id]||{box:0,due:0};
+  if(g===0){c.box=0;c.due=Date.now()+10*60000}else if(g===1){c.box=Math.max(1,c.box);c.due=Date.now()+DAY}else{c.box=Math.min(c.box+1,5);c.due=Date.now()+[1,3,7,14,30,60][c.box]*DAY}
+  c.n=(c.n||0)+1;s[id]=c;LS.set('srs',s);markStudy()}
+
+/* ───────── 단위 변환 문제 생성기 ───────── */
+const DIM={
+ len:{name:'길이',lv:1,base:'m',u:{km:3,m:0,cm:-2,mm:-3,um:-6,nm:-9}},
+ mass:{name:'질량',lv:1,base:'kg',u:{kg:0,g:-3,mg:-6,ug:-9}},
+ ratio:{name:'%·ppm',lv:1,base:'(소수)',u:{dec:0,pct:-2,ppm:-6,ppb:-9}},
+ mag:{name:'자기장',lv:1,base:'T',u:{T:0,mT:-3,uT:-6,G:-4}},
+ area:{name:'넓이·부피',lv:2,base:'m² · m³',u:{m2:0,cm2:-4,mm2:-6,um2:-12},u2:{m3:0,L:-3,cm3:-6}},
+ fc:{name:'주파수·정전용량',lv:2,base:'Hz · F',u:{Hz:0,kHz:3,MHz:6},u2:{F:0,uF:-6,nF:-9,pF:-12}},
+ ang:{name:'각도·각속도',lv:2,np:1},
+ imp:{name:'피트·인치',lv:2,np:1}
+};
+/* 비(非) 10의 거듭제곱: 기준 단위로 가는 연산 목록 */
+const NP={
+ ang:{groups:[{base:'rad',u:{rad:[],deg:[['×','π'],['÷',180]]}},{base:'rad/s',u:{rads:[],dps:[['×','π'],['÷',180]],dph:[['×','π'],['÷',180],['÷',3600]]}}],
+  vals:{rad:[0.5,1,2,3],deg:[30,45,60,90,120,180,270,360],rads:[0.5,1,2,10],dps:[1,5,10,30,90,250,2000],dph:[10,36,100,360,3600,7200]}},
+ imp:{groups:[{base:'m',u:{m:[],cm:[['×',0.01]],ft:[['×',0.3048]],inch:[['×',0.0254]]}}],
+  vals:{m:[1,2,3,5,10],cm:[10,30,50,100,254],ft:[3,5,6,10,12,30,100],inch:[1,2,6,12,24]}}
+};
+const EASY={len:'1 m 막대를 작은 자로 재면 눈금이 많아져요. 단위가 작아지면 숫자는 커지고, 단위가 커지면 숫자는 작아져요.',
+ mass:'1 kg = 1000 g. 설탕 1 kg 봉지를 g 저울로 달면 1000이 나와요.',
+ ratio:'%는 100개 중 몇 개, ppm은 100만 개 중 몇 개예요. 계산할 땐 그냥 소수로 바꿔요.',
+ mag:'테슬라는 아주 큰 단위예요. 냉장고 자석이 약 0.01 T(=10 mT, 100 G) 정도예요.',
+ area:'가로·세로가 둘 다 작아지니까 10⁻²가 두 번 곱해져서 10⁻⁴이 돼요.',
+ fc:'킬로는 1000배. 8 kHz = 1초에 8000번 떨림.',
+ ang:'한 바퀴 = 360° = 2π rad. 그래서 180° = π rad. 1°는 π를 180으로 나눈 것.',
+ imp:'1 ft는 어른 발 길이 정도(약 30 cm), 1 in는 손가락 한 마디(약 2.5 cm).'};
+const VALS=[1,1.5,2,2.5,3,4,4.7,5,6,7.5,8,12,25,50,120,250,500,800];
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const g10=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b]}return a};
+function decPlaces(x){const s=String(x);return s.includes('e-')?+s.split('e-')[1]:(s.split('.')[1]||'').length}
+function rat(x){const d=decPlaces(x);let q=10**d,p=Math.round(x*q);const g=g10(p,q);return[p/g,q/g]}
+function ratMul(a,b){let p=a[0]*b[0],q=a[1]*b[1];const g=g10(p,q);return[p/g,q/g]}
+const digits=n=>String(Math.abs(Math.round(n))).length;
+/* 계산기 화면 흉내 */
+function casioDec(x){const a=Math.abs(x);if(a!==0&&(a<0.01||a>=1e10)){const s=sci(x,10);return `${s.m}×10${sup(s.e)}`}return String(+x.toPrecision(10))}
+function screenAfterEq(r,piPow){ // r = [p,q] 유리수, piPow = π 차수
+  const val=r[0]/r[1]*Math.PI**piPow;
+  if(piPow!==0){const num=r[0]===1?'':r[0];return {first:`${num}π${r[1]!==1?'/'+r[1]:''} (π가 든 식)`,sd:casioDec(val)}}
+  if(r[1]===1&&Math.abs(val)<1e10)return {first:String(r[0])};
+  if(digits(r[0])+digits(r[1])<=10)return {first:`${r[0]}/${r[1]} (분수)`,sd:casioDec(val)};
+  return {first:casioDec(val)}}
+function numKeys(v){return String(v).split('')}
+
+function genUnit(dimKey){
+  const D=DIM[dimKey];
+  if(D.np)return genNP(dimKey);
+  const set=(D.u2&&Math.random()<.5)?D.u2:D.u;const keys=Object.keys(set);
+  let a,b,k,v,res,tries=0;
+  do{a=pick(keys);b=pick(keys.filter(x=>x!==a));k=set[a]-set[b];v=pick(VALS);res=v*10**k;tries++}
+  while((Math.abs(sci(res).e)>12||k===0)&&tries<50);
+  const ua=UNIT[a],ub=UNIT[b],pa=set[a],pb=set[b];
+  const vs=sci(v);const rs=sci(res);
+  const baseName=(set===D.u2?{area:'m³',fc:'F'}:{area:'m²',fc:'Hz'})[dimKey]||D.base;
+  const rel=(x,p)=>p===0?`<b>${UNIT[x].s}</b> = 기준 단위`:`1 ${UNIT[x].s} = 10${sup(p)} ${baseName}`;
+  const dir=k>0?`${ua.s}가 ${ub.s}보다 <b>10${sup(k)}배 큰</b> 단위 → 작은 단위로 가니 <b>숫자가 커져야</b> 해요`:`${ua.s}가 ${ub.s}보다 <b>작은</b> 단위 → 큰 단위로 가니 <b>숫자가 작아져야</b> 해요`;
+  let norm='';
+  if(vs.e!==0){norm=`<div class="ln">${v} × 10${sup(k)} = ${vs.m} × 10${sup(vs.e)} × 10${sup(k)}</div><div class="ln">= ${vs.m} × 10${sup(vs.e+k)}</div><div class="rd">앞 숫자를 1~10 사이로 정리하고, 지수끼리 더하기: ${mn(vs.e)} + (${mn(k)}) = ${mn(vs.e+k)}</div>`}
+  const notes={cm2:'1 cm = 10⁻² m → 1 cm² = (10⁻²)² m² = 10⁻⁴ m²',mm2:'1 mm = 10⁻³ m → 1 mm² = 10⁻⁶ m²',um2:'1 μm = 10⁻⁶ m → 1 μm² = 10⁻¹² m²',cm3:'1 cm = 10⁻² m → 1 cm³ = (10⁻²)³ = 10⁻⁶ m³',L:'1 L = 1000 cm³ = 10⁻³ m³',G:'1 G = 10⁻⁴ T (가우스는 테슬라의 1만분의 1)'};
+  const note=[notes[a],notes[b]].filter(Boolean).map(n=>`<div class="rd">⚠ ${n}</div>`).join('');
+  const dt=decT(res);
+  const steps=[
+   {h:'단위 읽기',b:`<div>${u(a)} = ${ua.r} → ${u(b)} = ${ub.r}</div><div class="rd">"${v} ${ua.r}는 몇 ${ub.r}인가?"</div>`},
+   {h:'기준 단위와의 관계',b:`<div class="ln">${rel(a,pa)}</div><div class="ln">${rel(b,pb)}</div>${note}`},
+   {h:'방향 판단',b:`<div>${dir}</div>`},
+   {h:'지수 빼기',b:`<div class="ln">(${mn(pa)}) − (${mn(pb)}) = ${mn(k)}</div><div class="ln">${v} ${ua.s} = ${v} × 10${sup(k)} ${ub.s}</div><div class="rd">바꾸기 전 지수 − 바꾼 뒤 지수</div>`},
+   {h:'정리',b:(norm||`<div class="ln">= ${sciT(rs)} ${ub.s}</div>`)+(dt?`<div class="ln">= ${dt} ${ub.s}</div>`:'')},
+   {h:'검산',b:`<div class="ln">${sciT(rs)} × 10${sup(-k)} = ${v} ✓</div><div class="rd">${k>0?'작은 단위로 갔더니 숫자가 커졌다 ✓':'큰 단위로 갔더니 숫자가 작아졌다 ✓'}</div>`}
+  ];
+  const r=ratMul(rat(v),k>=0?[10**k,1]:[1,10**(-k)]);const sc=screenAfterEq(r,0);
+  const rows=[[numKeys(v),String(v)],[['×10ˣ'],`${v}×10■`]];
+  if(k<0)rows.push([['(−)'],`${v}×10⁻■`]);
+  rows.push([String(Math.abs(k)).split(''),`${v}×10${sup(k)}`]);
+  rows.push([['='],sc.first]);if(sc.sd)rows.push([['S⇔D'],sc.sd,'소수로 바꾸기']);
+  const warns=[];if(k<0)warns.push('지수 앞 마이너스는 [−]가 아니라 [(−)]');if(sc.sd)warns.push('분수로 나오면 [S⇔D]를 누르면 소수·지수 표기로 바뀌어요');
+  const ans=`${sciT(rs)} ${ub.s}`;
+  const wrong=[res*1e3,res*1e-3,v/10**k,res*10,res/10].map(x=>`${sciT(sci(x))} ${ub.s}`);
+  return {dim:dimKey,q:`${v} ${ua.s} = ? ${ub.s}`,qr:`${v} ${ua.r}는 몇 ${ub.r}?`,ans,ansRead:`${sciR(rs)} ${ub.r}`,wrong,steps,calc:calcBlock(rows,warns),easy:EASY[dimKey],key:`${a}>${b}`};
+}
+function genNP(dimKey){
+  const N=NP[dimKey];const G=pick(N.groups);const keys=Object.keys(G.u);
+  const a=pick(keys),b=pick(keys.filter(x=>x!==a));const v=pick(N.vals[a]);
+  // 연산: a의 기준화 + b 기준화의 역
+  const inv=o=>[o[0]==='×'?'÷':'×',o[1]];
+  let ops=[...G.u[a],...G.u[b].map(inv)];
+  // 같은 값 ×/÷ 상쇄
+  for(let i=0;i<ops.length;i++)for(let j=i+1;j<ops.length;j++){if(ops[i]&&ops[j]&&ops[i][1]===ops[j][1]&&ops[i][0]!==ops[j][0]){ops[i]=null;ops[j]=null}}
+  ops=ops.filter(Boolean);
+  let val=v,r=rat(v),pi=0;
+  ops.forEach(([o,x])=>{if(x==='π'){pi+=o==='×'?1:-1;val=o==='×'?val*Math.PI:val/Math.PI}else{val=o==='×'?val*x:val/x;const rx=rat(x);r=ratMul(r,o==='×'?rx:[rx[1],rx[0]])}});
+  const ua=UNIT[a],ub=UNIT[b];const opT=ops.map(([o,x])=>`${o} ${x}`).join(' ');
+  const rs=sci(val,4);const dt=decT(val,4);
+  const facs={deg:'1° = π/180 rad',dps:'1 °/s = π/180 rad/s',dph:'1 °/hr = (π/180) ÷ 3600 rad/s',ft:'1 ft = 0.3048 m',inch:'1 in = 0.0254 m (= 2.54 cm)',cm:'1 cm = 0.01 m'};
+  const rel=x=>facs[x]?`<div class="ln">${facs[x]}</div>`:`<div class="ln">${UNIT[x].s} = 기준 단위</div>`;
+  const big=val>v;
+  const steps=[
+   {h:'단위 읽기',b:`<div>${u(a)} = ${ua.r} → ${u(b)} = ${ub.r}</div><div class="rd">"${v} ${ua.r}는 몇 ${ub.r}인가?"</div>`},
+   {h:'기준 단위(${G.base})와의 관계'.replace('${G.base}',G.base),b:rel(a)+rel(b)},
+   {h:'식 세우기',b:`<div class="ln">${v} ${opT}</div><div class="rd">${ua.s} → ${G.base}로 갔다가 → ${ub.s}로. 같은 수를 곱하고 나누면 지워져요</div>`},
+   {h:'계산',b:`<div class="ln">= ${dt||sciT(rs)} ${ub.s}</div>${dt&&Math.abs(rs.e)>3?`<div class="ln">= ${sciT(rs)} ${ub.s}</div>`:''}`},
+   {h:'검산',b:`<div class="rd">${big?'숫자가 커졌다 → '+ub.s+'가 더 작은 단위인지 확인':'숫자가 작아졌다 → '+ub.s+'가 더 큰 단위인지 확인'} ✓</div>`}
+  ];
+  const rows=[[numKeys(v),String(v)]];let scr=String(v);
+  ops.forEach(([o,x])=>{if(x==='π'){rows.push([[o,'SHIFT','×10ˣ'],(scr+=o+'π'),'π = SHIFT + ×10ˣ'])}else{rows.push([[o,...String(x).split('')],(scr+=o+x)])}});
+  const sc=screenAfterEq(r,pi);rows.push([['='],sc.first]);if(sc.sd)rows.push([['S⇔D'],sc.sd,'소수로 바꾸기']);
+  const warns=[];if(pi)warns.push('π는 [SHIFT] 다음 [×10ˣ]');if(sc.sd)warns.push('π나 분수로 나오면 [S⇔D]');
+  const ans=`${dt||sciT(rs)} ${ub.s}`;
+  const f=x=>{const d=decT(x,4);return `${d||sciT(sci(x,4))} ${ub.s}`};
+  const wrong=[v*v/val,val*10,val/10,val*Math.PI,val/Math.PI].map(f);
+  return {dim:dimKey,q:`${v} ${ua.s} = ? ${ub.s}`,qr:`${v} ${ua.r}는 몇 ${ub.r}?`,ans,ansRead:`${dt||sciR(rs)} ${ub.r}`,wrong,steps,calc:calcBlock(rows,warns),easy:EASY[dimKey],key:`${a}>${b}`};
+}
+function options(p){const o=[p.ans];for(const w of p.wrong){if(o.length>=4)break;if(!o.includes(w))o.push(w)}for(let i=o.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[o[i],o[j]]=[o[j],o[i]]}return o}
+
+/* ───────── 공식 모음 ───────── */
+const FORM=[
+ {eq:'F = 2mΩv',read:'에프는 2 엠 오메가 브이',name:'코리올리 힘',page:'gyro',sec:4,syms:[['F','힘','N'],['m','질량','kg'],['Ω','각속도','rads'],['v','속도','mps']]},
+ {eq:'v = 2πfA',read:'브이는 2 파이 에프 에이',name:'진동의 최대 속도',page:'gyro',sec:5,syms:[['f','진동수','Hz'],['A','진폭','m']]},
+ {eq:'θ = Ω × t',read:'세타는 오메가 곱하기 티',name:'회전각',page:'gyro',sec:5,syms:[['θ','회전각','deg'],['Ω','각속도','dps'],['t','시간','s']]},
+ {eq:'출력 = SF × Ω',read:'출력은 스케일 팩터 곱하기 오메가',name:'자이로 출력',page:'gyro',sec:7,syms:[['SF','스케일 팩터','mVdps'],['Ω','각속도','dps']]},
+ {eq:'C = εA/d',read:'씨는 엡실론 에이 나누기 디',name:'평행판 정전용량',page:'cap',sec:0,syms:[['C','정전용량','F'],['ε','유전율','Fm'],['A','넓이','m2'],['d','간격','m']]},
+ {eq:'ε = ε₀ × εᵣ',read:'엡실론은 엡실론 제로 곱하기 엡실론 알',name:'유전율',page:'cap',sec:0,syms:[['ε₀','진공 유전율 8.85×10⁻¹²','Fm'],['εᵣ','비유전율 (단위 없음)',null]]},
+ {eq:'1° = π/180 rad',read:'1도는 180분의 파이 라디안',name:'도 ↔ 라디안',page:'unitbasic',sec:3,syms:[]},
+ {eq:'cm² = 10⁻⁴ m²',read:'제곱 단위는 지수도 2배',name:'넓이 단위',page:'unitbasic',sec:1,syms:[]}
+];
+const KEYDICT=[
+ [['SHIFT'],'키 위의 노란 글씨 기능을 쓸 때 먼저 누름'],[['×10ˣ'],'10의 거듭제곱 입력. 6 ×10ˣ (−) 9 = 6×10⁻⁹'],[['(−)'],'음수 부호. 지수 앞 마이너스는 반드시 이것'],
+ [['−'],'빼기. 지수 부호로 쓰면 틀림'],[['SHIFT','×10ˣ'],'π (파이)'],[['S⇔D'],'분수·π 꼴 ↔ 소수 전환'],[['Ans'],'바로 앞 계산 결과'],
+ [['x²'],'제곱'],[['√■'],'제곱근 (루트)'],[['x■'],'거듭제곱 (지수가 큰 수)'],[['(',')'],'괄호. 분모 전체를 나눌 때 필수'],[['MODE','3','2'],'통계 모드 (회귀·최소제곱)']
+];
+
+/* ───────── 화면 ───────── */
+const V=document.getElementById('view'),TT=document.getElementById('ttl'),BK=document.getElementById('back'),PB=document.getElementById('photoBtn');
+let stack=[],cur={v:'home'};
+function go(v,arg,push=true){if(push)stack.push(cur);cur={v,arg};render();window.scrollTo(0,0)}
+BK.onclick=()=>{cur=stack.pop()||{v:'home'};render();window.scrollTo(0,0)};
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{stack=[];go(b.dataset.tab,null,false)});
+function render(){
+  const tabOf={home:'home',page:'home',dict:'dict',cards:'cards',practice:'practice'};
+  document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-current',String(b.dataset.tab===tabOf[cur.v])));
+  BK.hidden=!stack.length;PB.hidden=cur.v!=='page';
+  if(cur.v!=='page'){if(figStop){figStop();figStop=null}ANS.forEach(f=>f());ANS=[]}
+  ({home:vHome,page:vPage,dict:vDict,cards:vCards,practice:vPractice})[cur.v](cur.arg);
+  wireCommon(V);
+}
+function wireCommon(root){
+  root.querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>{const g=b.dataset.goto;if(PAGES[g])go('page',{id:g,i:+(b.dataset.i||0)});else if(g.startsWith('dict:'))go('dict',{seg:g.slice(5)});else if(g==='units')go('practice',{mode:'unit'});else if(g==='calc')go('practice',{mode:'calc',topic:b.dataset.topic});else go(g)});
+}
+
+/* 목차 */
+const TOC=[
+ {n:'제0편',h:'기초 도구',d:'모든 계산의 바탕',items:[['unitbasic','단위·접두어·읽는 법'],['numsense','숫자 감각 — 지수·로그·유효숫자'],['calcbasic','공학용 계산기 기본'],['elec','전기 기초 — 전압·전류·저항'],['circuit','회로 기초 — 전압 분배·브리지·증폭기']]},
+ {n:'제1편',h:'센서 공통',d:'어떤 센서든 같은 기준으로',items:[['signal','센서와 신호의 흐름'],['char','센서 특성'],['calib','오차와 보정 — 최소제곱']]},
+ {n:'제2편',h:'감지 원리',d:'원리 몇 개로 센서 여러 개',items:[['resist','저항형'],['cap','정전용량형'],['induct','전자기 유도·와전류'],['hall','홀 효과·자기저항'],['piezo','압전형'],['optic','광학']]},
+ {n:'제3편',h:'센서별',d:'측정 대상마다 한 장씩',items:[['gas','가스센서'],['mag','자기센서'],['speed','속도센서·금속탐지기'],['accel','가속도·진동센서'],['gyro','자이로센서'],['ultra','초음파센서'],['temp','온도센서'],['press','압력센서'],['flow','유량·레벨센서'],['prox','근접·광센서']]},
+ {n:'제4편',h:'현업 연결',d:'센서 데이터의 큰 그림',items:[['plant','공장 데이터 흐름 — PLC·SCADA·MES'],['pdm','예지보전']]}
+];
+const APX=[['A','공식 모음','form'],['B','용어 사전','term'],['C','단위 읽는 법','unit'],['D','계산기 키','key']];
+function vHome(){
+  TT.textContent='센서 핵심노트';
+  const mark=LS.get('last',null);const mp=mark&&PAGES[mark.id];
+  V.innerHTML=`<section class="cover">
+    <div class="cv-eyebrow">SENSOR ENGINEERING · 학습 바이블</div>
+    <h2 class="cv-title">센서 핵심노트</h2>
+    <p class="cv-sub">원리에서 계산까지, 내 손에 맞춘 한 권</p>
+    <label class="search"><span class="sr">찾기</span><input id="q" type="search" placeholder="용어·단위·공식·내 노트 찾기" autocomplete="off"></label>
+    <div id="qres" class="qres" hidden></div>
+    ${mp?`<button class="ribbon" data-goto="${mark.id}" data-i="${mark.i}"><span>🔖 책갈피</span><b>${mp.title}</b><span class="muted">· ${mp.secs[mark.i]?mp.secs[mark.i].k:''}</span></button>`:''}
+  </section>
+  <section class="contents"><div class="ct-h">차례</div>
+  ${TOC.map(p=>`<div class="pt"><div class="pt-h"><span class="pt-n">${p.n}</span><span class="pt-t">${p.h}</span></div><div class="pt-d">${p.d}</div>
+    <ol class="chs">${p.items.map(([id,nm],k)=>`<li><button class="ch" ${PAGES[id]?`data-goto="${id}"`:'disabled'}><span class="ch-n">${k+1}</span><span class="ch-t">${nm}</span><span class="lead"></span><span class="ch-p">${PAGES[id]?PAGES[id].secs.length+'쪽':'준비 중'}</span></button></li>`).join('')}</ol></div>`).join('')}
+  <div class="pt"><div class="pt-h"><span class="pt-n">부록</span><span class="pt-t">찾아보기</span></div>
+    <ol class="chs">${APX.map(([n,t,m])=>`<li><button class="ch" data-dict="${m}"><span class="ch-n">${n}</span><span class="ch-t">${t}</span><span class="lead"></span><span class="ch-p">›</span></button></li>`).join('')}</ol></div>
+  </section>
+  <p class="colophon">샘플 시안 · 채워진 장: 제0편 1장 · 제2편 2·5장 · 제3편 5·6장</p>`;
+  V.querySelectorAll('[data-dict]').forEach(b=>b.onclick=()=>go('dict',{seg:b.dataset.dict}));
+  const qi=V.querySelector('#q'),qr=V.querySelector('#qres');
+  qi.oninput=()=>{const s=qi.value.trim().toLowerCase();if(!s){qr.hidden=true;return}
+    const R=[];
+    for(const [k,T] of Object.entries(TERM))if((T.ko+T.en).toLowerCase().includes(s))R.push(`<button class="qr" data-t2="${k}"><span class="qk">용어</span>${T.ko}<small>${T.en}</small></button>`);
+    for(const [k,U] of Object.entries(UNIT))if((U.s+U.r).toLowerCase().includes(s))R.push(`<button class="qr" data-u2="${k}"><span class="qk u-k">단위</span><span class="mono">${U.s}</span><small>${U.r}</small></button>`);
+    FORM.forEach((f,i)=>{if((f.eq+f.name+f.read).toLowerCase().includes(s))R.push(`<button class="qr" data-goto="${f.page}" data-i="${f.sec}"><span class="qk f-k">공식</span><span class="mono">${f.eq}</span><small>${f.name}</small></button>`)});
+    for(const [id,t] of Object.entries(MY.notes()))if(t.toLowerCase().includes(s)){const k=t.toLowerCase().indexOf(s);R.push(`<button class="qr" data-note="${id}"><span class="qk m-k">내 노트</span>${PAGES[id]?PAGES[id].title:id}<small>${esc(t.slice(Math.max(0,k-20),k+40))}</small></button>`)}
+    for(const c of MY.cards())if((c.f+c.a+(c.e||'')).toLowerCase().includes(s))R.push(`<button class="qr" data-mcard="${c.id}"><span class="qk m-k">내 카드</span>${esc(c.f)}<small>${esc(c.a)}</small></button>`);
+    for(const [id,P] of Object.entries(PAGES))P.secs.forEach((x,j)=>{if((P.title+x.k+x.h+' '+(x.b+(x.easy||'')).replace(/<[^>]+>|\[\[\w+\|?|\]\]|\{\{|\}\}/g,' ')).toLowerCase().includes(s))R.push(`<button class="qr" data-goto="${id}" data-i="${j}"><span class="qk p-k">본문</span>${P.title} · ${x.k}<small>${x.h}</small></button>`)});
+    qr.hidden=false;qr.innerHTML=R.length?R.slice(0,14).join(''):'<p class="small muted" style="padding:10px 12px">찾는 내용이 아직 없어요.</p>';
+    qr.querySelectorAll('[data-t2]').forEach(b=>b.onclick=()=>termSheet(b.dataset.t2));
+    qr.querySelectorAll('[data-u2]').forEach(b=>b.onclick=()=>unitSheet(b.dataset.u2));
+    qr.querySelectorAll('[data-note]').forEach(b=>b.onclick=()=>{go('page',{id:b.dataset.note,i:LS.get('last',{}).id===b.dataset.note?LS.get('last',{}).i:0});noteSheet(b.dataset.note)});
+    qr.querySelectorAll('[data-mcard]').forEach(b=>b.onclick=()=>cardForm(MY.cards().find(x=>x.id===b.dataset.mcard),null));
+    wireCommon(qr)};
+}
+
+/* 사전 */
+function vDict(arg){TT.textContent='사전';const seg=(arg&&arg.seg)||LS.get('dseg','term');LS.set('dseg',seg);
+  const segs=[['term','용어'],['unit','단위'],['form','공식'],['key','계산기 키']];
+  let body='';
+  if(seg==='term'){body=`<div class="dlist">${Object.entries(TERM).sort((a,b)=>a[1].ko.localeCompare(b[1].ko,'ko')).map(([k,T])=>`<button class="drow" data-t2="${k}"><b>${T.ko}</b><small>${T.en}</small><span class="dgen">${T.gen}</span></button>`).join('')}</div>`}
+  if(seg==='unit'){const groups=[['길이',['nm','um','mm','cm','m','km','ft','inch']],['넓이·부피',['um2','mm2','cm2','m2','cm3','L','m3']],['질량',['ug','mg','g','kg']],['비율',['dec','pct','ppm','ppb']],['자기장',['uT','mT','G','T']],['각도·각속도',['deg','rad','dps','rads','dph']],['전기',['V','ohm','F','uF','nF','pF','Fm']],['주파수·시간',['s','Hz','kHz','MHz']],['힘·기타',['N','mps','Nm','Vdps','mVdps','nd']],['음향·압전',['ms','us','dB','Wm2','Nm2','Ncm2','Pa','MPa','rayl','Mrayl','inps','kgm3','degC','pmV','pCN','pC','nC','pm']]];
+    body=groups.map(([g,ks2])=>`<div class="dg"><div class="eyebrow">${g}</div><div class="dlist">${ks2.map(k=>`<button class="drow urow" data-u2="${k}"><span class="mono us">${UNIT[k].s}</span><span><b>${UNIT[k].r}</b><span class="dgen">${UNIT[k].mean}</span></span></button>`).join('')}</div></div>`).join('')}
+  if(seg==='form'){body=FORM.map(f=>`<div class="card fcard"><div class="eyebrow">${f.name}</div><div class="eqn">${f.eq}<small>"${f.read}"</small></div>
+    ${f.syms.length?`<div class="syms">${f.syms.map(([s,m,uk])=>`<span class="s">${s}</span><span>${m}${uk?' · '+u(uk):''}</span>`).join('')}</div>`:''}
+    <button class="ghost" data-goto="${f.page}" data-i="${f.sec}">본문에서 보기 ›</button></div>`).join('')}
+  if(seg==='key'){body=`<p class="small muted">fx-570ES PLUS 2nd Edition 기준</p><div class="dlist">${KEYDICT.map(([k,d])=>`<div class="drow keyrow"><span>${k.map(kb).join('')}</span><span>${d}</span></div>`).join('')}</div>`}
+  V.innerHTML=`<div class="seg" role="tablist">${segs.map(([k,l])=>`<button role="tab" aria-selected="${k===seg}" data-seg="${k}">${l}</button>`).join('')}</div>${body}`;
+  V.querySelectorAll('[data-seg]').forEach(b=>b.onclick=()=>go('dict',{seg:b.dataset.seg},false));
+  V.querySelectorAll('[data-t2]').forEach(b=>b.onclick=()=>termSheet(b.dataset.t2));
+  V.querySelectorAll('[data-u2]').forEach(b=>b.onclick=()=>unitSheet(b.dataset.u2));
+}
+
+/* 본문 페이지 */
+let figStop=null,ANS=[];
+function probSlot(g,base){const p=GEN[g](base);return `<div class="slot" data-g="${g}">${probHTML(p,true)}</div>`}
+function wireSlots(root){root.querySelectorAll('.slot').forEach(sl=>{const b=sl.querySelector('[data-regen]');if(b)b.onclick=()=>{sl.innerHTML=probHTML(GEN[sl.dataset.g](false),true);wireProb(sl);wireSlots2(sl)}});}
+function wireSlots2(sl){const b=sl.querySelector('[data-regen]');if(b)b.onclick=()=>{sl.innerHTML=probHTML(GEN[sl.dataset.g](false),true);wireProb(sl);wireSlots2(sl)}}
+function vPage(arg){const P=PAGES[arg.id];const i=Math.min(arg.i||0,P.secs.length-1);const s=P.secs[i];TT.textContent=P.title;
+  LS.set('last',{id:arg.id,i});const seen=new Set(LS.get('seen-'+arg.id,[]));seen.add(i);LS.set('seen-'+arg.id,[...seen]);
+  const isProb=s.b==='__PROBS__';const mtm=/^__MT:(.+)__$/.exec(s.b);
+  const head=`<div class="eyebrow">${P.part} · ${i+1}/${P.secs.length} · ${s.k}</div>`;
+  V.innerHTML=`<div class="steps">${P.secs.map((x,j)=>`<button class="stp${seen.has(j)?' seen':''}" data-j="${j}" aria-current="${j===i}">${x.k}</button>`).join('')}</div>
+  ${mtm?`${head}<p class="small muted">작년 중간고사·숙제 문제를 그대로 옮겼어요. 상세 풀이, 계산기 입력, 새 문제 버튼이 함께 들어 있어요.</p>${mtHTML(mtm[1].split(','))}`:isProb?`${head}<p class="small muted">기본 문제로 감을 잡고, 유사 문제는 <b>↻ 새 숫자</b>로 계속 바꿔 풀어요. 응용은 같은 원리를 다른 상황에 써 보는 문제예요.</p>${PSET[arg.id].map(([g,b])=>probSlot(g,!!b)).join('')}
+     <button class="ghost" data-goto="calc" data-topic="${arg.id}">연습 탭에서 계속 풀기 ›</button>`:
+  `<section class="card sec">${head}<h2>${s.h}</h2>${md(s.b)}
+   ${(s.easy||s.src)?`<div class="btnrow">${s.easy?'<button class="tbtn" data-tg="easy">쉽게</button>':''}${s.src?'<button class="tbtn" data-tg="src">원문</button>':''}</div>`:''}
+   ${s.easy?`<div class="panel easy" data-tp="easy" hidden><span class="lb">쉽게 보기 · 중학생 눈높이</span><div>${md(s.easy)}</div></div>`:''}
+   ${s.src?`<div class="panel src" data-tp="src" hidden><span class="lb">강의자료 원문 · 【 】</span><div class="small">${md(s.src)}</div></div>`:''}
+  </section>`}
+  ${noteBox(arg.id)}
+  <div class="pager"><button class="pbtn" data-nav="-1" ${i===0?'disabled':''}>‹ 이전</button><button class="pbtn next" data-nav="1">${i===P.secs.length-1?'차례로':'다음 ›'}</button></div>`;wireNoteBox();
+  V.querySelectorAll('[data-j]').forEach(b=>b.onclick=()=>go('page',{id:arg.id,i:+b.dataset.j},false));
+  V.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>{const n=i+ +b.dataset.nav;if(n>=P.secs.length){stack=[];go('home',null,false)}else go('page',{id:arg.id,i:n},false)});
+  const cb=V.querySelector('.stp[aria-current="true"]');if(cb)cb.scrollIntoView({inline:'center',block:'nearest'});
+  wireToggles(V);wireProb(V);V.querySelectorAll('.slot').forEach(wireSlots2);
+  if(figStop){figStop();figStop=null}
+  const fig=V.querySelector('#gyroFig');if(fig)figStop=gyroFigure(fig);
+  ANS.forEach(f=>f());ANS=initAnims(V);
+  if(mtm&&window.__mtRender)window.__mtRender(V);
+}
+
+/* 연습: 단위 변환 / 계산 문제 */
+function segPractice(mode){return `<div class="seg" role="tablist"><button role="tab" aria-selected="${mode==='unit'}" data-pm="unit">단위 변환</button><button role="tab" aria-selected="${mode==='calc'}" data-pm="calc">계산 문제</button></div>`}
+function wirePM(){V.querySelectorAll('[data-pm]').forEach(b=>b.onclick=()=>go('practice',{mode:b.dataset.pm},false))}
+function vPractice(arg){const mode=(arg&&arg.mode)||LS.get('pmode','unit');LS.set('pmode',mode);TT.textContent='연습';
+  if(mode==='unit')vUnits();else vCalc(arg&&arg.topic)}
+let CS=null;
+function vCalc(topic){
+  const tp=topic||LS.get('ctopic','gyro');LS.set('ctopic',tp);
+  const kindSel=LS.get('ckind','all');
+  if(!CS||CS.tp!==tp||CS.kind!==kindSel){CS={tp,kind:kindSel,n:0,p:null}}
+  if(!CS.p){let gs=TOPICS[tp].g;const kindOf=g=>BASICG.has(g)?'유사':'응용';if(kindSel!=='all')gs=gs.filter(g=>kindOf(g)===kindSel);CS.g=pick(gs);CS.p=GEN[CS.g](false)}
+  V.innerHTML=`${segPractice('calc')}
+  <section class="card"><div class="eyebrow">주제</div><div class="cats">${Object.entries(TOPICS).map(([k,t])=>`<button class="cat" data-tp="${k}" aria-pressed="${k===tp}">${t.name}</button>`).join('')}</div>
+   <div class="eyebrow">종류</div><div class="cats">${[['all','전부'],['유사','유사'],['응용','응용']].map(([k,l])=>`<button class="cat" data-kd="${k}" aria-pressed="${k===kindSel}">${l}</button>`).join('')}</div></section>
+  <div class="slot" data-g="${CS.g}">${probHTML(CS.p,false)}</div>
+  <button class="primary" id="nextC">다음 문제 ›</button><p class="small muted" style="text-align:center">이번에 푼 문제 ${CS.n}개</p>`;
+  wirePM();wireProb(V);
+  V.querySelectorAll('[data-tp]').forEach(b=>b.onclick=()=>{CS=null;LS.set('ctopic',b.dataset.tp);vCalc(b.dataset.tp);wireCommon(V)});
+  V.querySelectorAll('[data-kd]').forEach(b=>b.onclick=()=>{LS.set('ckind',b.dataset.kd);CS=null;vCalc(tp);wireCommon(V)});
+  V.querySelector('#nextC').onclick=()=>{CS.n++;CS.p=null;vCalc(tp);wireCommon(V);window.scrollTo(0,0)};
+}
+
+/* ───────── 초음파·압전 그림과 움직이는 그림 ───────── */
+const cT=T=>331.3*Math.sqrt(1+T/273);           // 음속 m/s (13,044 inch/s × 0.0254)
+const MAT={air:['공기',1.2,330],water:['물',1000,1480],fat:['지방',952,1459],soft:['연조직',1060,1540],lung:['폐',400,650],bone:['뼈',1912,4080],pzt:['PZT',null,4000,38]};
+const Zof=k=>MAT[k][3]||MAT[k][1]*MAT[k][2]/1e6;   // Mrayl
+
+Object.assign(FIG,{
+ freqBand(){return svgFig(340,110,`
+   <rect x="10" y="34" width="80" height="26" style="fill:var(--surface);stroke:var(--line)"/><rect x="90" y="34" width="120" height="26" style="fill:var(--accent-soft);stroke:var(--line)"/><rect x="210" y="34" width="120" height="26" style="fill:var(--unit-soft);stroke:var(--unit)"/>
+   ${tx(50,52,'초저주파','small2','middle')}${tx(150,52,'가청음','a b2','middle')}${tx(270,52,'초음파','u b2','middle')}
+   ${tx(90,26,'20 Hz','small2','middle')}${tx(210,26,'20 kHz','b small2','middle')}
+   ${tx(50,78,'지진','m small2','middle')}${tx(150,78,'말·음악','m small2','middle')}${tx(270,78,'박쥐·주차센서·의료','m small2','middle')}
+   ${tx(170,102,'사람 귀가 듣는 범위를 넘으면 초음파 (20 kHz 이상)','m small2','middle')}`,'음파 주파수 범위')},
+
+ transducer(){const L=(y,h,c,t1,t2)=>`<rect x="60" y="${y}" width="150" height="${h}" style="fill:${c};stroke:var(--ink);stroke-width:1.4"/>${tx(222,y+h/2+4,t1,'b2')}${t2?tx(222,y+h/2+19,t2,'m small2'):''}`;
+  return svgFig(340,250,`
+   <path d="M48 14 V196 M222 14" style="fill:none;stroke:var(--muted);stroke-width:3"/><path d="M48 14 H58 M48 196 H58" style="stroke:var(--muted);stroke-width:3"/>${tx(8,30,'하우징','m small2')}
+   ${L(18,52,'var(--surface2)','백킹재','뒤로 가는 파동 흡수')}
+   <rect x="60" y="70" width="150" height="5" style="fill:var(--ink)"/>
+   ${L(75,46,'var(--warn-soft)','압전체 (PZT)','두께 = λ/2 → 공진')}
+   <rect x="60" y="121" width="150" height="5" style="fill:var(--ink)"/>${tx(30,126,'전극','m small2','middle')}
+   ${L(126,30,'var(--unit-soft)','정합층','두께 = λ/4')}
+   ${L(156,16,'var(--accent-soft)','겔','공기층 제거')}
+   <rect x="20" y="172" width="230" height="28" style="fill:var(--surface);stroke:var(--line)"/>${tx(135,191,'피부 · 대상','b2','middle')}
+   ${ar(135,205,135,240,'u',2.6)}${tx(146,232,'초음파 →','u b2')}`,'초음파 트랜스듀서 층 구조',
+   '<b>백킹재 | 전극 | 압전체(λ/2) | 전극 | 정합층(λ/4) | 겔 | 대상</b> 순서. 정합층과 겔이 "임피던스 계단"을 만들어 반사를 줄여요.')},
+
+ unimorph(){const st=(x,up,lb)=>{const c=up?-1:1;return `<path d="M${x} 80 Q${x+60} ${80+c*28} ${x+120} 80" style="fill:none;stroke:var(--muted);stroke-width:7"/><path d="M${x+20} ${80+c*4} Q${x+60} ${80+c*22} ${x+100} ${80+c*4}" style="fill:none;stroke:var(--warn);stroke-width:6"/>${tx(x+60,30,lb,'b2','middle')}${tx(x+60,140,up?'세라믹이 늘어남 → 위로 휨':'세라믹이 줄어듦 → 아래로 휨','m small2','middle')}`};
+  return svgFig(340,160,`${st(20,true,'(+) 전압')}${st(200,false,'(−) 전압')}${tx(170,156,'회색 = 금속판 · 주황 = 압전 세라믹','m small2','middle')}`,'유니모르프 굽힘',
+   '금속판은 늘거나 줄지 않고 압전 세라믹만 늘고 줄어서 판 전체가 <b>휘어요</b>. 전압 방향을 번갈아 바꾸면 판이 떨려서 음파가 나와요.')},
+
+ beam(){return svgFig(340,170,`
+   <rect x="8" y="60" width="26" height="50" rx="4" style="fill:var(--ink)"/>
+   <rect x="34" y="62" width="120" height="46" style="fill:var(--unit-soft);stroke:var(--unit)"/>
+   <polygon points="154,62 330,22 330,148 154,108" style="fill:var(--unit-soft);stroke:var(--unit);opacity:.75"/>
+   <line x1="154" y1="20" x2="154" y2="150" style="stroke:var(--muted);stroke-dasharray:4 3"/>
+   ${tx(94,52,'근거리장 (near)','b2','middle')}${tx(94,128,'평면파 · 폭 일정','m small2','middle')}
+   ${tx(250,14,'원거리장 (far)','b2','middle')}${tx(250,164,'구면파 · 퍼짐(발산)','m small2','middle')}
+   <path d="M34 62 Q60 30 90 46" style="fill:none;stroke:var(--bad);stroke-width:1.6;stroke-dasharray:3 3"/>${tx(60,28,'사이드 로브','b small2','middle')}
+   ${ar(170,85,320,85,'u',2)}`,'초음파 빔: 근거리장과 원거리장',
+   '센서 가까이에서는 빔 폭이 거의 일정하고(근거리장), 멀어지면 퍼져요(원거리장). <b>주파수↑·크기↑</b>면 덜 퍼져요.')},
+
+ qfactor(){const spec=(x,w,lb,s)=>{let d='';for(let i=0;i<=40;i++){const u=(i-20)/20;const y=110-70*Math.exp(-(u*u)/(2*w*w));d+=(i?'L':'M')+(x+i*3)+' '+y.toFixed(1)}return `<path d="${d}" style="fill:none;stroke:var(--ink);stroke-width:2.2"/>${tx(x+60,22,lb,'b2','middle')}${tx(x+60,132,s,'m small2','middle')}`};
+  return svgFig(340,150,`${spec(20,.12,'높은 Q (좁은 대역)','펄스 길다 · 순수한 주파수')}${spec(200,.45,'낮은 Q (넓은 대역)','펄스 짧다 · 거리 분해능↑')}
+   ${ar(68,74,92,74,'u',1.6,'2')}${ar(222,74,298,74,'u',1.6,'2')}${tx(170,146,'Q = f₀ / BW','b2','middle')}`,'Q 값: 좁은 대역과 넓은 대역')},
+
+ ndt(o={}){const T=o.T||'T',th=o.th||'θ';return svgFig(340,190,`
+   <rect x="10" y="60" width="320" height="80" style="fill:var(--accent-soft);stroke:var(--ink);stroke-width:1.6"/>${tx(300,132,'시료','m small2','end')}
+   <g transform="rotate(-25 46 50)"><rect x="24" y="30" width="44" height="26" rx="3" style="fill:var(--ink)"/></g>${tx(30,22,'사각 탐촉자','small2')}
+   <polyline points="56,60 136,140 216,60" style="fill:none;stroke:var(--unit);stroke-width:2.6"/>
+   ${ar(216,60,240,36,'u',2)}
+   <line x1="56" y1="60" x2="56" y2="140" style="stroke:var(--muted);stroke-dasharray:3 3"/>
+   <path d="M56 84 A24 24 0 0 0 73 77" style="fill:none;stroke:var(--bad);stroke-width:2"/>${tx(64,100,th,'b b2')}
+   ${ar(324,60,324,140,'i',1.4,'2')}${tx(318,108,T,'b2','end')}
+   ${tx(86,112,'Leg','u small2')}${ar(56,160,216,160,'i',1.4,'2')}${tx(136,176,'도약거리 = 2T·tanθ','b2','middle')}
+   ${tx(246,22,'Leg = T / cosθ','small2')}${tx(246,40,'V경로 = 2T / cosθ','small2')}`,'사각 탐상: V자 경로와 도약거리')}
+});
+
+/* ───────── 움직이는 그림 (페이지에 들어가면 시작, 나가면 멈춤) ───────── */
+const ANIM={};
+const RM=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+function animShell(host,svgInner,ctl,cap,w=340,h=200){host.innerHTML=`<figure class="figs"><svg viewBox="0 0 ${w} ${h}" role="img">${svgInner}</svg>${ctl?`<div class="figctl">${ctl}</div>`:''}${cap?`<figcaption>${cap}</figcaption>`:''}</figure>`;return host.querySelector('svg')}
+function loop(fn){let run=!RM(),raf,t0=performance.now(),tp=0;const f=now=>{if(run)tp+=(now-t0)/1000;t0=now;fn(tp);raf=requestAnimationFrame(f)};raf=requestAnimationFrame(f);
+  return {stop:()=>cancelAnimationFrame(raf),toggle:()=>{run=!run;return run},get run(){return run}}}
+
+ANIM.wave=host=>{const N=18;const dots=r=>Array.from({length:N},(_,i)=>`<circle data-r="${r}" data-i="${i}" r="5" style="fill:${i===6?'var(--bad)':'var(--accent)'}"/>`).join('');
+  const svg=animShell(host,`${tx(10,20,'종파 — 진행 방향으로 밀고 당김','b2')}${dots(0)}${tx(10,104,'횡파 — 진행 방향에 직각으로 흔들림','b2')}${dots(1)}${ar(240,182,320,182,'m',1.8)}${tx(236,186,'진행 방향','m small2','end')}`.replace(/#M([abuimw])/g,'#gm$1'),
+   `<button class="tbtn" data-pp>일시정지</button>`,'빨간 점 하나만 따라가 보세요. <b>입자는 제자리에서 흔들리기만</b> 하고, 흔들림의 모양(파동)만 앞으로 가요. 횡파는 고체에서만 생기고 종파보다 느려요.',340,195);
+  svg.insertAdjacentHTML('afterbegin',`<defs><marker id="gmm" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--muted)"/></marker></defs>`);
+  const c0=[...svg.querySelectorAll('[data-r="0"]')],c1=[...svg.querySelectorAll('[data-r="1"]')];
+  const L=loop(t=>{for(let i=0;i<N;i++){const x0=22+i*17.5,ph=2*Math.PI*(x0/120)-2*Math.PI*0.7*t;c0[i].setAttribute('cx',(x0+7*Math.sin(ph)).toFixed(1));c0[i].setAttribute('cy',56);c1[i].setAttribute('cx',x0);c1[i].setAttribute('cy',(140+16*Math.sin(ph)).toFixed(1))}});
+  const pb=host.querySelector('[data-pp]');pb.onclick=()=>{pb.textContent=L.toggle()?'일시정지':'재생'};if(!L.run)pb.textContent='재생';return L.stop};
+
+ANIM.tof=host=>{const id='tof'+(++FIGN);
+  const svg=animShell(host,`
+   <defs><marker id="${id}u" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--ink)"/></marker></defs>
+   <rect x="6" y="56" width="26" height="66" rx="4" style="fill:var(--ink)"/>${tx(19,138,'센서','small2','middle')}
+   <rect data-wall x="300" y="30" width="16" height="118" style="fill:var(--muted)"/>
+   <g data-go></g><g data-back></g>
+   <line data-dl x1="32" y1="160" x2="300" y2="160" style="stroke:var(--ink);stroke-width:1.4" marker-end="url(#${id}u)" marker-start="url(#${id}u)"/>
+   <text data-dt x="166" y="176" class="b2" text-anchor="middle"></text>
+   <text data-tm x="330" y="22" class="b2" text-anchor="end"></text>`,
+   `<label class="small">거리 <input type="range" min="0.5" max="3" step="0.1" value="1.5" data-d style="vertical-align:middle;width:110px"></label>
+    <label class="small">기온 <select data-T style="width:auto;padding:4px 6px"><option>0</option><option selected>20</option><option>35</option></select> °C</label>`,'',340,185);
+  const fig=host.querySelector('figure');fig.insertAdjacentHTML('beforeend','<div class="tofcalc mono small" data-calc></div>');
+  const q=s=>host.querySelector(s);let d=1.5,T=20,ph=0;
+  const calc=()=>{const c=cT(T),t=2*d/c;q('[data-calc]').innerHTML=`c = 331.3 × √(1 + ${T}/273) = <b>${c.toFixed(1)} m/s</b><br>왕복 t = 2d ÷ c = 2 × ${d.toFixed(1)} ÷ ${c.toFixed(1)} = <b>${(t*1000).toFixed(2)} ms</b><br>거리 d = c × t ÷ 2 = <b>${d.toFixed(2)} m</b>`;return t};
+  let tr=calc();
+  q('[data-d]').oninput=e=>{d=+e.target.value;tr=calc();ph=0};q('[data-T]').onchange=e=>{T=+e.target.value;tr=calc();ph=0};
+  const arcs=(x,dir)=>[0,1,2].map(k=>`<path d="M${x-dir*k*6} 66 Q${x+dir*14-dir*k*6} 89 ${x-dir*k*6} 112" style="fill:none;stroke:${dir>0?'var(--accent)':'var(--unit)'};stroke-width:2.4;opacity:${1-k*.3}"/>`).join('');
+  const L=loop(tp=>{const wx=32+d/3*268;q('[data-wall]').setAttribute('x',wx);q('[data-dl]').setAttribute('x2',wx);q('[data-dt]').setAttribute('x',(32+wx)/2);q('[data-dt]').textContent=`d = ${d.toFixed(1)} m`;
+    const per=3.2,u=(tp%per)/per*1.15;ph=u;
+    if(u<=.5){q('[data-go]').innerHTML=arcs(34+(wx-40)*(u/.5),1);q('[data-back]').innerHTML=''}
+    else if(u<=1){q('[data-go]').innerHTML='';q('[data-back]').innerHTML=arcs(wx-6-(wx-40)*((u-.5)/.5),-1)}
+    else{q('[data-go]').innerHTML='';q('[data-back]').innerHTML=''}
+    q('[data-tm]').textContent=`경과 t = ${(Math.min(u,1)*tr*1000).toFixed(2)} ms ${u>=1?'✓ 반사파 도착':''}`});
+  return L.stop};
+
+ANIM.piezo=host=>{let mode=0;
+  const svg=animShell(host,`
+   <rect data-top x="100" y="60" width="140" height="8" style="fill:var(--ink)"/><rect data-blk x="100" y="68" width="140" height="64" style="fill:var(--warn-soft);stroke:var(--warn);stroke-width:2"/><rect data-bot x="100" y="132" width="140" height="8" style="fill:var(--ink)"/>
+   <text data-pt x="170" y="56" class="b b2" text-anchor="middle"></text><text data-pb x="170" y="156" class="u b2" text-anchor="middle"></text>
+   <g data-force></g>
+   <g data-meter><circle cx="292" cy="100" r="28" style="fill:var(--surface);stroke:var(--ink);stroke-width:1.6"/><line data-needle x1="292" y1="108" x2="292" y2="80" style="stroke:var(--bad);stroke-width:2.4"/>${tx(292,122,'V','b2','middle')}</g>
+   <g data-src><circle cx="44" cy="100" r="20" style="fill:var(--surface);stroke:var(--ink);stroke-width:1.6"/><path d="M32 100 Q38 88 44 100 T56 100" style="fill:none;stroke:var(--ink);stroke-width:1.8"/>${tx(44,136,'교류 전압','small2','middle')}</g>
+   <g data-snd></g>
+   <text data-lb x="170" y="190" class="b2" text-anchor="middle"></text>`,
+   `<button class="tbtn" data-m="0" aria-pressed="true">① 누르기 → 전압 (정압전)</button><button class="tbtn" data-m="1" aria-pressed="false">② 전압 → 떨림 (역압전)</button>`,
+   '<b>정압전</b>: 누르면 결정 속 분극이 바뀌어 표면에 전하(전압)가 생겨요 — 센서(수신). <b>역압전</b>: 전압을 걸면 결정이 늘고 줄어요 — 교류면 떨려서 초음파를 내요(송신). 하나의 소자로 둘 다 할 수 있어요.',340,200);
+  const q=s=>host.querySelector(s);
+  host.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{mode=+b.dataset.m;host.querySelectorAll('[data-m]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)))});
+  const L=loop(tp=>{const s=Math.sin(2*Math.PI*0.8*tp);
+    if(mode===0){const sq=Math.max(0,s)*10;q('[data-src]').style.display='none';q('[data-meter]').style.display='';q('[data-snd]').innerHTML='';
+      q('[data-top]').setAttribute('y',60+sq);q('[data-blk]').setAttribute('y',68+sq);q('[data-blk]').setAttribute('height',64-sq*2);q('[data-bot]').setAttribute('y',132-sq);
+      q('[data-force]').innerHTML=`<line x1="170" y1="${14+sq}" x2="170" y2="${50+sq}" style="stroke:var(--bad);stroke-width:4"/><path d="M162 ${44+sq} L170 ${56+sq} L178 ${44+sq}z" style="fill:var(--bad)"/><line x1="170" y1="${186-sq}" x2="170" y2="${150-sq}" style="stroke:var(--bad);stroke-width:4"/><path d="M162 ${156-sq} L170 ${144-sq} L178 ${156-sq}z" style="fill:var(--bad)"/>`;
+      q('[data-pt]').textContent=sq>2?'+ + + +':'';q('[data-pb]').textContent=sq>2?'− − − −':'';q('[data-pt]').setAttribute('y',38);q('[data-pb]').setAttribute('y',172);
+      const a=sq/10*60*Math.PI/180;q('[data-needle]').setAttribute('x2',(292+28*Math.sin(a)).toFixed(1));q('[data-needle]').setAttribute('y2',(108-28*Math.cos(a)).toFixed(1));
+      q('[data-lb]').textContent='';}
+    else{const dh=s*8;q('[data-src]').style.display='';q('[data-meter]').style.display='none';q('[data-force]').innerHTML='';
+      q('[data-top]').setAttribute('y',60-dh);q('[data-blk]').setAttribute('y',68-dh);q('[data-blk]').setAttribute('height',64+dh*2);q('[data-bot]').setAttribute('y',132+dh);
+      q('[data-pt]').textContent=s>0?'+':'−';q('[data-pb]').textContent=s>0?'−':'+';q('[data-pt]').setAttribute('y',52-dh);q('[data-pb]').setAttribute('y',160+dh);
+      q('[data-snd]').innerHTML=[0,1,2].map(k=>{const r=((tp*40+k*16)%48);return `<path d="M${252+r} ${80-r/3} Q${262+r} 100 ${252+r} ${120+r/3}" style="fill:none;stroke:var(--unit);stroke-width:2;opacity:${1-r/48}"/>`}).join('');
+      q('[data-lb]').textContent=s>0?'늘어남':'줄어듦';}
+  });return L.stop};
+
+ANIM.refl=host=>{const opts=Object.entries(MAT).map(([k,m])=>`<option value="${k}">${m[0]}</option>`).join('');
+  host.innerHTML=`<figure class="figs"><div class="figctl"><label class="small">재료 1 <select data-a style="width:auto;padding:4px 6px">${opts}</select></label><label class="small">재료 2 <select data-b style="width:auto;padding:4px 6px">${opts}</select></label></div>
+   <div class="rbar"><div class="rlab"><span>반사</span><b data-rv></b></div><div class="rtrack"><i data-rb style="background:var(--bad)"></i></div>
+   <div class="rlab"><span>투과</span><b data-tv></b></div><div class="rtrack"><i data-tb style="background:var(--accent)"></i></div></div>
+   <div class="tofcalc mono small" data-rc></div>
+   <figcaption>Z 차이가 클수록 많이 튕겨 나와요. <b>연조직 ↔ 공기</b>는 99.9 % 반사 → 그래서 겔을 발라 공기층을 없애요.</figcaption></figure>`;
+  const q=s=>host.querySelector(s);q('[data-a]').value='soft';q('[data-b]').value='air';
+  const upd=()=>{const a=q('[data-a]').value,b=q('[data-b]').value,Z1=Zof(a),Z2=Zof(b),R=((Z2-Z1)/(Z2+Z1))**2;
+    q('[data-rb]').style.width=(R*100)+'%';q('[data-tb]').style.width=((1-R)*100)+'%';q('[data-rv]').textContent=(R*100).toFixed(R<0.01?2:1)+' %';q('[data-tv]').textContent=((1-R)*100).toFixed(1)+' %';
+    q('[data-rc]').innerHTML=`Z₁(${MAT[a][0]}) = ${fx(Z1,3)} Mrayl · Z₂(${MAT[b][0]}) = ${fx(Z2,3)} Mrayl<br>R = ((Z₂ − Z₁) ÷ (Z₂ + Z₁))² = <b>${(R*100).toFixed(2)} %</b>`};
+  q('[data-a]').onchange=upd;q('[data-b]').onchange=upd;upd();return null};
+
+ANIM.amode=host=>{const D=[60,110,215,255],A0=[1,.85,.32,.24],G=[1,1.15,2.9,3.9];let tgc=false;
+  host.innerHTML=`<figure class="figs"><svg viewBox="0 0 340 210" role="img"></svg><div class="figctl"><button class="tbtn" data-tgc aria-pressed="false">TGC 켜기</button></div>
+   <figcaption><b>A-mode</b>: 한 줄을 따라 에코 크기(진폭)를 시간(깊이) 축에 그려요. <b>B-mode</b>: 진폭을 점의 밝기로 바꿔 여러 줄을 모으면 2D 영상이 돼요. 깊을수록 약해지는 에코를 <b>TGC</b>가 시간에 따라 증폭해 고르게 만들어요.</figcaption></figure>`;
+  const svg=host.querySelector('svg');
+  const draw=()=>{const A=A0.map((a,i)=>Math.min(1,a*(tgc?G[i]:1)));
+    svg.innerHTML=`${tx(8,16,'A-mode (진폭)','b2')}<line x1="20" y1="100" x2="330" y2="100" style="stroke:var(--ink);stroke-width:1.4"/>
+     ${D.map((x,i)=>`<path d="M${x-10} 100 Q${x-5} ${100-70*A[i]} ${x} 100 Q${x+5} ${100+40*A[i]} ${x+10} 100" style="fill:none;stroke:var(--bad);stroke-width:2.2"/>`).join('')}
+     ${tgc?`<path d="M20 96 C120 94 200 60 330 30" style="fill:none;stroke:var(--accent);stroke-width:1.8;stroke-dasharray:4 3"/>${tx(326,26,'이득(gain)','a small2','end')}`:''}
+     ${tx(8,140,'B-mode (밝기)','b2')}<rect x="20" y="150" width="310" height="34" rx="4" style="fill:#111"/>
+     ${D.map((x,i)=>`<circle cx="${x}" cy="167" r="10" style="fill:rgb(255,255,255);opacity:${(0.15+0.85*A[i]).toFixed(2)}"/>`).join('')}
+     ${tx(325,202,'시간 = 깊이 →','m small2','end')}`};
+  draw();const b=host.querySelector('[data-tgc]');b.onclick=()=>{tgc=!tgc;b.setAttribute('aria-pressed',String(tgc));b.textContent=tgc?'TGC 끄기':'TGC 켜기';draw()};return null};
+
+function initAnims(root){return [...root.querySelectorAll('[data-anim]')].map(el=>ANIM[el.dataset.anim]&&ANIM[el.dataset.anim](el)).filter(f=>typeof f==='function')}
+
+/* ───────── 초음파·압전: 용어 · 단위 · 공식 ───────── */
+Object.assign(TERM,{
+ ultrasound:{ko:'초음파',en:'Ultrasound',gen:'사람이 들을 수 없는 높은 소리.',tech:'주파수 20 kHz 이상의 음파. 매질의 탄성으로 전달되는 압력 진동이며 진공에서는 전달되지 않는다.',easy:'박쥐가 내는 소리처럼 너무 높아서 귀로는 못 듣는 소리예요.'},
+ longi:{ko:'종파',en:'Longitudinal wave',gen:'진행 방향으로 밀고 당기며 가는 파동.',tech:'입자의 진동 방향이 파동 진행 방향과 같은 파. 기체·액체·고체 모두에서 전파된다. 압축(밀)과 팽창(소)이 반복된다.',easy:'용수철 장난감을 앞뒤로 밀었다 당기면 촘촘한 부분이 앞으로 가는 모습이에요.'},
+ trans:{ko:'횡파',en:'Transverse wave',gen:'진행 방향에 직각으로 흔들리며 가는 파동.',tech:'입자의 진동 방향이 진행 방향에 수직인 파. 고체에서만 전파되며 종파보다 느리다(전단파).',easy:'줄넘기 줄 한쪽을 위아래로 흔들면 물결이 앞으로 가는 모습이에요.'},
+ bulk:{ko:'체적탄성률',en:'Bulk modulus (B)',gen:'눌렀을 때 부피가 잘 안 줄어드는 정도.',tech:'B = Δp ÷ (ΔV/V). 압력 변화를 부피 변화율로 나눈 값. 단위 Pa. 음속 v = √(B/ρ₀).',easy:'잘 안 눌리는 물질일수록 B가 크고, 소리가 빨리 전달돼요.'},
+ poisson:{ko:'포아송 비',en:'Poisson\'s ratio (ν, 뉴)',gen:'당기면 옆으로 얼마나 가늘어지는가.',tech:'잡아당기는 방향이 아닌 횡방향 변형률의 비. 고체 음속 식에 들어간다.',easy:'고무줄을 길게 당기면 가늘어지죠. 그 가늘어지는 정도예요.'},
+ decibel:{ko:'데시벨',en:'Decibel (dB)',gen:'소리 크기를 나타내는 단위.',tech:'기준값에 대한 비를 로그로 나타낸 값. 세기: 10 log(I/I₀), 압력·진폭: 20 log(P/P₀).',easy:'10 dB 오를 때마다 세기는 10배. 큰 숫자 범위를 작은 숫자로 줄여 쓰는 방법이에요.'},
+ piezo:{ko:'압전 효과',en:'Piezoelectricity',gen:'누르면 전기가 나오고, 전기를 걸면 모양이 변하는 성질.',tech:'비대칭 결정(PZT, BaTiO₃, 수정, PVDF 등)에 응력을 가하면 분극이 생겨 표면 전하가 나타나고(정압전), 전계를 가하면 기계적 변형이 생기는 현상(역압전).',easy:'라이터의 딸깍 불꽃이 압전이에요. 누르면 전기 불꽃이 튀어요.'},
+ poling:{ko:'분극 처리 (폴링)',en:'Poling',gen:'압전 성질을 만들어 주는 처리.',tech:'높은 온도에서 강한 전계를 걸어 쌍극자 방향을 정렬하고, 냉각해 그 방향을 고정하는 공정. 처리 전 PZT는 압전성이 없다.',easy:'제멋대로 서 있는 작은 자석들을 한 방향으로 줄 세워 굳히는 과정이에요.'},
+ dij:{ko:'압전 계수',en:'Piezoelectric coefficient (d₃₃, d₃₁)',gen:'힘이나 전압에 얼마나 민감하게 반응하는가.',tech:'Pᵢ = dᵢⱼTⱼ (C/N) 또는 Sᵢ = dᵢⱼEⱼ (m/V). 첫 숫자 = 반응 방향, 둘째 = 가한 방향. 3은 두께(분극) 방향. pC/N과 pm/V는 같은 크기.',easy:'d₃₃ = 100 pm/V면 1 V 걸 때 두께가 100 pm(0.1 nm) 변해요.'},
+ transducer:{ko:'트랜스듀서',en:'Transducer',gen:'한 에너지를 다른 에너지로 바꾸는 장치.',tech:'초음파에서는 전기 ↔ 기계(음향) 에너지를 변환하는 소자. 압전형, 정전형, 전자기형, 레이저형이 있다.',easy:'스피커(전기→소리)와 마이크(소리→전기)를 합친 것 같은 부품이에요.'},
+ unimorph:{ko:'유니모르프',en:'Unimorph',gen:'압전판 + 금속판을 붙인 구조.',tech:'늘고 줄지 않는 금속 다이어프램 한쪽 면에 압전 세라믹 원판을 붙여 굽힘 진동을 만드는 구조. 출력 전압이 크고 강도·온습도 특성이 좋다.',easy:'한쪽만 늘어나는 두 겹 판이라 휘어요. 바이메탈과 비슷해요.'},
+ acz:{ko:'음향 임피던스',en:'Acoustic impedance (Z)',gen:'물질이 초음파를 얼마나 "막는가".',tech:'Z = ρ × v (밀도 × 음속). 단위 Rayl = Pa·s/m = kg/(m²·s). 두 매질의 Z가 같을수록 많이 투과하고, 차이가 클수록 많이 반사한다.',easy:'문턱 높이 차이 같은 거예요. 차이가 크면 소리가 걸려 튕겨 나와요.'},
+ matching:{ko:'정합층',en:'Matching layer',gen:'센서와 대상 사이에 끼우는 중간층.',tech:'압전체와 대상의 중간 Z를 갖는 층. 두께는 그 재료 속 파장의 λ/4. 반사를 줄여 에너지 전달을 높인다.',easy:'높은 단과 낮은 단 사이에 놓는 중간 계단이에요.'},
+ backing:{ko:'백킹재',en:'Backing material',gen:'뒤쪽 흡음재.',tech:'압전체 뒷면에 붙여 뒤로 가는 초음파를 흡수하고 잔류 진동을 줄이는 감쇠재(에폭시 등). 펄스를 짧게 만든다.',easy:'종을 친 뒤 손으로 잡아 울림을 멈추게 하는 역할이에요.'},
+ tof:{ko:'비행시간',en:'Time of Flight (ToF)',gen:'보내고 돌아오는 데 걸린 시간.',tech:'송신 후 반사파 수신까지의 시간 t. 왕복이므로 2 × 거리 = c × t.',easy:'산에서 "야호" 하고 메아리가 돌아오는 시간이에요.'},
+ blind:{ko:'블라인드 존',en:'Blind zone',gen:'너무 가까워서 못 재는 구간.',tech:'송신 버스트 지속 시간, 송신 후 잔류 진동, 수신 회로 회복 시간 때문에 가까운 물체의 반사파를 구분하지 못하는 거리 범위(보통 수~수십 cm).',easy:'내가 소리치는 동안에는 메아리를 못 들어요.'},
+ nearfar:{ko:'근거리장·원거리장',en:'Near field · Far field',gen:'센서 가까운 곳과 먼 곳의 빔 모양.',tech:'근거리장: 평면파, 빔 폭 거의 일정. 원거리장: 구면파, 빔이 발산(퍼짐). 주파수·크기가 클수록 덜 퍼진다.',easy:'손전등 빛이 가까이선 동그라미 크기 그대로, 멀리선 넓게 퍼지는 것과 비슷해요.'},
+ sidelobe:{ko:'사이드 로브',en:'Side lobe',gen:'옆으로 새는 원치 않는 빔.',tech:'주 빔 밖으로 방출되는 불필요한 초음파. 두께 진동 중 반경 방향 진동 때문. 완만한 형상, 큰 크기, 높은 주파수, 렌즈로 줄인다.',easy:'스피커 옆에 서도 소리가 조금 들리는 것처럼 옆으로 새는 부분이에요.'},
+ qf:{ko:'Q 값',en:'Q (quality) factor',gen:'얼마나 한 주파수로만 울리는가.',tech:'Q = f₀ / BW. 높은 Q: 좁은 대역, 긴 펄스(감쇠 약함). 낮은 Q: 넓은 대역, 짧은 펄스(감쇠 강함, 거리 분해능 좋음).',easy:'맑게 오래 울리는 종(높은 Q)과 "탁" 하고 짧게 끝나는 북(낮은 Q).'},
+ tgc:{ko:'시간 이득 보상',en:'TGC (Time Gain Compensation)',gen:'깊은 곳 신호를 더 키워 주기.',tech:'깊이에 따라 감쇠된 에코를 보상하려고 송신 후 시간에 따라 수신 증폭기 이득을 높이는 기법. 영상 밝기를 고르게 한다.',easy:'멀리서 작게 들리는 목소리만 볼륨을 더 올려 주는 거예요.'},
+ amode:{ko:'A-모드 · B-모드',en:'A-mode · B-mode',gen:'초음파 영상 표시 방법.',tech:'A-mode: 한 빔을 따라 에코 진폭을 시간(깊이) 축에 표시. B-mode: 진폭을 밝기로 바꿔 여러 스캔 라인을 모아 2D 단면 영상 생성.',easy:'A는 그래프, B는 그 그래프를 밝기 사진으로 바꾼 것이에요.'},
+ ndt:{ko:'비파괴 검사',en:'NDT (Non-Destructive Testing)',gen:'부수지 않고 속을 검사.',tech:'수직 탐촉자(종파)는 결함·뒷면 반사 시간으로 위치를 찾고, 사각 탐촉자(전단파)는 비스듬히 보내 용접부 결함을 찾는다.',easy:'수박을 두드려 속을 알아보듯, 초음파로 금속 속 금을 찾아요.'},
+ phased:{ko:'위상 배열',en:'Phased array',gen:'여러 소자를 시간차로 울려 빔 방향 조절.',tech:'배열된 소자의 송신 시간 지연·위상을 조절해 빔을 집속(focusing)하거나 방향을 바꾸는(steering) 방식.',easy:'운동장 응원석이 차례로 일어서는 파도타기로 방향을 만드는 것과 같아요.'},
+ fp:{ko:'패브리-페로 간섭계',en:'Fabry–Pérot interferometer',gen:'두 거울 사이 간격으로 색(파장)을 고르는 필터.',tech:'두 반사경 사이 공기층 d에서 mλ = 2d·cosθ를 만족하는 파장만 투과. PZT 액추에이터로 d를 바꿔 투과 파장을 이동시킨다.',easy:'거울 간격을 PZT로 nm 단위로 바꾸면 통과하는 빛의 색이 바뀌어요.'},
+ sonar:{ko:'소나',en:'SONAR (SOund NAvigation And Ranging)',gen:'물속 초음파 거리 측정.',tech:'수중에서 음파를 보내 반사파의 시간으로 거리·지형·물체를 탐지. 물속 음속 약 1500 m/s.',easy:'배가 물속으로 소리를 보내 물고기 떼나 바닥까지 거리를 재는 거예요.'}
+});
+Object.assign(UNIT,{
+ ms:{s:'ms',r:'밀리세컨드',mean:'1 ms = 10⁻³ s (1000분의 1초)'}, us:{s:'μs',r:'마이크로세컨드',mean:'1 μs = 10⁻⁶ s'},
+ dB:{s:'dB',r:'데시벨',mean:'비율의 로그 표현. 세기 10 log, 진폭·압력 20 log'},
+ Wm2:{s:'W/m²',r:'와트 퍼 제곱미터',mean:'소리 세기(I)의 단위. 들을 수 있는 최소 I₀ = 10⁻¹² W/m²'},
+ Nm2:{s:'N/m²',r:'뉴턴 퍼 제곱미터 (= Pa 파스칼)',mean:'압력 단위. 1 N/m² = 1 Pa = 10⁻⁴ N/cm²'},
+ Ncm2:{s:'N/cm²',r:'뉴턴 퍼 제곱센티미터',mean:'1 N/cm² = 10⁴ N/m² (cm² = 10⁻⁴ m²라서)'},
+ Pa:{s:'Pa',r:'파스칼',mean:'압력의 SI 단위. 1 Pa = 1 N/m²'},
+ rayl:{s:'Rayl',r:'레일',mean:'음향 임피던스 단위. 1 Rayl = 1 Pa·s/m = 1 kg/(m²·s)'},
+ Mrayl:{s:'MRayl',r:'메가레일',mean:'1 MRayl = 10⁶ Rayl. 물 1.48, 연조직 1.63, PZT 38'},
+ inps:{s:'inch/s',r:'인치 퍼 세컨드',mean:'1 inch/s = 0.0254 m/s. 13,044 inch/s ≈ 331 m/s'},
+ pmV:{s:'pm/V',r:'피코미터 퍼 볼트',mean:'압전 계수 d 단위. 1 V당 몇 pm 변형'},
+ pCN:{s:'pC/N',r:'피코쿨롬 퍼 뉴턴',mean:'압전 계수 d 단위. 1 N당 몇 pC 전하. pm/V와 같은 크기'},
+ pC:{s:'pC',r:'피코쿨롬',mean:'전하 1 pC = 10⁻¹² C'}, nC:{s:'nC',r:'나노쿨롬',mean:'1 nC = 10⁻⁹ C = 1000 pC'},
+ pm:{s:'pm',r:'피코미터',mean:'1 pm = 10⁻¹² m (1 nm = 1000 pm)'}, MPa:{s:'MPa',r:'메가파스칼',mean:'1 MPa = 10⁶ Pa'},
+ kgm3:{s:'kg/m³',r:'킬로그램 퍼 세제곱미터',mean:'밀도 단위. 물 1000 kg/m³ = 1 g/cm³'},
+ degC:{s:'°C',r:'섭씨 도',mean:'온도. 절대온도 K = °C + 273'}
+});
+FORM.push(
+ {eq:'2d = c × t',read:'2 디는 씨 곱하기 티',name:'초음파 거리 (왕복)',page:'ultra',sec:2,syms:[['d','거리','m'],['c','음속','mps'],['t','왕복 시간','s']]},
+ {eq:'c(T) = 331.3√(1 + T/273)',read:'씨는 331.3 루트 1 더하기 티 나누기 273',name:'공기 중 음속',page:'ultra',sec:2,syms:[['T','기온','degC'],['c','m/s (슬라이드: 13,044 inch/s)','mps']]},
+ {eq:'v = √(B/ρ₀)',read:'브이는 루트 비 나누기 로',name:'매질 속 음속',page:'ultra',sec:1,syms:[['B','체적탄성률','Pa'],['ρ₀','밀도','kgm3']]},
+ {eq:'λ = v / f',read:'람다는 브이 나누기 에프',name:'파장',page:'ultra',sec:4,syms:[['λ','파장','m'],['v','음속','mps'],['f','주파수','Hz']]},
+ {eq:'압전체 = λ/2 · 정합층 = λ/4',read:'람다 2분의 1, 4분의 1',name:'두께 규칙',page:'ultra',sec:4,syms:[]},
+ {eq:'Z = ρ × v',read:'제트는 로 곱하기 브이',name:'음향 임피던스',page:'ultra',sec:5,syms:[['ρ','밀도','kgm3'],['v','음속','mps'],['Z','임피던스','rayl']]},
+ {eq:'R = ((Z₂−Z₁)/(Z₂+Z₁))²',read:'반사율은 차 나누기 합의 제곱',name:'반사율 [AI 보충]',page:'ultra',sec:5,syms:[]},
+ {eq:'β = 10 log(I / I₀)',read:'베타는 10 로그 아이 나누기 아이 제로',name:'소리 세기 dB',page:'ultra',sec:6,syms:[['I₀','10⁻¹² W/m²','Wm2']]},
+ {eq:'Π = 20 log(P / P₀)',read:'20 로그 피 나누기 피 제로',name:'음압 dB',page:'ultra',sec:6,syms:[['P₀','2×10⁻⁵ N/m²','Nm2']]},
+ {eq:'Q = f₀ / BW',read:'큐는 에프 제로 나누기 대역폭',name:'Q 값',page:'ultra',sec:4,syms:[]},
+ {eq:'Sᵢ = dᵢⱼ Eⱼ · Pᵢ = dᵢⱼ Tⱼ',read:'변형은 디 곱하기 전계, 분극은 디 곱하기 응력',name:'압전 식',page:'piezo',sec:1,syms:[['d','압전 계수','pmV']]}
+);
+
+/* ───────── 문제 생성기 ───────── */
+const W_LOG='log 키 = 10을 밑으로 하는 로그 · 10ˣ = [SHIFT] 다음 [log]';
+const W_DEG='각도 문제 전에 각도 단위를 도(Deg)로: [SHIFT] [MODE] [3] → 화면 위에 D 표시';
+Object.assign(GEN,{
+ tof(base){const T=base?20:pick([0,10,15,20,25,30,35]),tms=base?5.8:pick([1.2,2,2.9,3.5,5,6.4,8,11.7]);const c=cT(T),t=tms/1000,d=c*t/2;
+  return {kind:base?'기본':'유사',title:'반사 시간으로 거리 구하기',fig:FIG.pTof({t:`t = ${tms} ms`,T:`기온 ${T} °C`,d:'d = ?'}),
+   q:`주차 센서가 초음파를 보낸 뒤 ${tms} {{ms}} 만에 반사파를 받았다. 기온은 ${T} {{degC}}이다. 물체까지 거리는 몇 {{m}}(몇 {{cm}})인가?`,
+   first:['ms → s','c = 331.3√(1+T/273)','왕복이라 ÷ 2'],
+   steps:[{h:'단위 먼저 맞추기',b:`<div class="ln">t = ${tms} ms = ${tms} × 10⁻³ s = ${t} s</div><div class="rd">밀리 = 1000분의 1</div>`},
+    {h:'기온으로 음속 구하기',b:`<div class="ln">c = 331.3 × √(1 + ${T}/273)</div><div class="ln">= 331.3 × √${(1+T/273).toFixed(4)} = ${c.toFixed(1)} m/s</div><div class="rd">슬라이드 식 13,044 inch/s × 0.0254 = 331.3 m/s (0 °C 음속)</div>`},
+    {h:'왕복 생각하기',b:`<div class="ln">2 × d = c × t → d = c × t ÷ 2</div><div class="rd">소리는 갔다가 돌아오니까 시간의 절반만 "가는 길"</div>`},
+    {h:'계산',b:`<div class="ln">d = ${c.toFixed(1)} × ${t} ÷ 2 = ${fx(d,3)} m</div><div class="ln">= ${fx(d*100,3)} cm</div>`},
+    {h:'검산',b:`<div class="rd">간이식 t × 340 ÷ 2 = ${fx(t*340/2,3)} m → 비슷하면 ✓ (기온 차이만큼 조금 다름)</div>`}],
+   ans:`d ≈ ${fx(d,3)} m = ${fx(d*100,3)} cm`,ansRead:`${fxR(d)} 미터`,
+   calc:calcBlock([[['3','3','1','.','3','×','√■','1','+',...ks(T),'÷','2','7','3','▶'],`331.3×√(1+${T}÷273)`,'√ 안을 다 넣고 [▶]로 빠져나오기'],[['='],casioDec(c),'음속 c'],[['×',...ks(tms),'×10ˣ','(−)','3','÷','2','='],casioDec(d),'거리 m']],[W_NEG,'[√■]를 누르면 루트 안으로 들어가요. 다 쓰면 [▶]']),
+   easy:'메아리 원리예요. 소리가 갔다 오는 데 걸린 시간에 소리 빠르기를 곱하면 왕복 거리, 그 절반이 진짜 거리예요.'}},
+ tofInch(){const T=pick([0,10,20,30]),tms=pick([2,3,4.5,6]);const ci=13044*Math.sqrt(1+T/273),cm=ci*0.0254,t=tms/1000,din=ci*t/2,dm=din*0.0254;
+  return {kind:'응용',title:'inch/s 식으로 계산하기',fig:FIG.pTof({t:`t = ${tms} ms`,T:`기온 ${T} °C`,d:'d = ? inch, ? m'}),
+   q:`슬라이드 식 c(T) = 13,044 √(1 + T/273) {{inps}}를 쓰자. 기온 ${T} {{degC}}에서 반사파가 ${tms} {{ms}} 뒤에 왔다. (1) 음속을 inch/s와 m/s로, (2) 거리를 inch와 m로 구하라.`,
+   first:['1 inch = 0.0254 m','ms → s','d = c·t ÷ 2'],
+   steps:[{h:'inch/s 음속',b:`<div class="ln">c = 13,044 × √(1 + ${T}/273) = ${fx(ci,5)} inch/s</div>`},
+    {h:'inch/s → m/s',b:`<div class="ln">${fx(ci,5)} × 0.0254 = ${fx(cm,4)} m/s</div><div class="rd">1 inch = 2.54 cm = 0.0254 m · 큰 숫자가 작은 숫자로 (inch가 m보다 작은 단위)</div>`},
+    {h:'시간 단위',b:`<div class="ln">${tms} ms = ${t} s</div>`},
+    {h:'거리',b:`<div class="ln">d = ${fx(ci,5)} × ${t} ÷ 2 = ${fx(din,3)} inch</div><div class="ln">= ${fx(din,3)} × 0.0254 = ${fx(dm,3)} m</div>`},
+    {h:'검산',b:`<div class="ln">m/s로 바로: ${fx(cm,4)} × ${t} ÷ 2 = ${fx(cm*t/2,3)} m ✓</div>`}],
+   ans:`c ≈ ${fx(ci,5)} inch/s = ${fx(cm,4)} m/s · d ≈ ${fx(din,3)} inch = ${fx(dm,3)} m`,ansRead:`${fxR(dm)} 미터`,
+   calc:calcBlock([[['1','3','0','4','4','×','√■','1','+',...ks(T),'÷','2','7','3','▶','='],casioDec(ci),'inch/s'],[['×','0','.','0','2','5','4','='],casioDec(cm),'m/s'],[['×',...ks(tms),'×10ˣ','(−)','3','÷','2','='],casioDec(dm),'거리 m']],['inch → m는 × 0.0254, m → inch는 ÷ 0.0254']),
+   easy:'미국식 단위(inch)로 된 식이라도 마지막에 0.0254만 곱하면 미터가 돼요.'}},
+ lambda(base){const f=base?1:pick([1,2,2.5,3.5,5,7.5,10]),v=4000,vm=pick([2500,3000]),lam=v/(f*1e6),lm=vm/(f*1e6);
+  return {kind:base?'기본':'유사',title:'파장과 두께 정하기',fig:FIG.pLayer(f),
+   q:`PZT 속 음속 ${v} {{mps}}, 공진 주파수 ${f} {{MHz}}인 트랜스듀서를 만든다. (1) PZT 속 파장 λ, (2) PZT 두께(λ/2), (3) 음속 ${vm} m/s인 정합층의 두께(λ/4)는?`,
+   first:['MHz → Hz','λ = v / f','PZT λ/2 · 정합층 λ/4'],
+   steps:[{h:'단위 먼저',b:`<div class="ln">f = ${f} MHz = ${f} × 10⁶ Hz</div>`},
+    {h:'PZT 속 파장',b:`<div class="ln">λ = ${v} ÷ (${f} × 10⁶) = ${sciT(sci(lam))} m</div><div class="ln">= ${fx(lam*1000,3)} mm</div><div class="rd">m → mm: × 1000</div>`},
+    {h:'PZT 두께 = λ/2',b:`<div class="ln">${fx(lam*1000,3)} ÷ 2 = ${fx(lam*500,3)} mm${lam*500<1?` = ${fx(lam*5e5,3)} μm`:''}</div>`},
+    {h:'정합층 두께 = λ/4 (그 재료의 음속으로)',b:`<div class="ln">λₘ = ${vm} ÷ (${f} × 10⁶) = ${fx(lm*1000,3)} mm</div><div class="ln">÷ 4 = ${fx(lm*250,3)} mm = ${fx(lm*2.5e5,3)} μm</div>`},
+    {h:'검산',b:`<div class="rd">주파수가 높을수록 파장이 짧아져 두께도 얇아짐 ✓ (1 MHz → 2 mm, 5 MHz → 0.4 mm)</div>`}],
+   ans:`λ = ${fx(lam*1000,3)} mm · PZT ${fx(lam*500,3)} mm · 정합층 ${fx(lm*250,3)} mm`,ansRead:`람다 ${fxR(lam*1000)} 밀리미터`,
+   calc:calcBlock([[[...ks(v),'÷',...K(f,6),'='],casioDec(lam),'λ (m)'],[['×','1','0','0','0','='],casioDec(lam*1000),'mm'],[['÷','2','='],casioDec(lam*500),'PZT 두께 mm']],['분수로 나오면 [S⇔D]',W_NEG]),
+   easy:'파장은 "물결 한 개의 길이"예요. 압전판 두께를 물결 반 개로 맞추면 앞뒤로 튕긴 물결이 딱 맞아 크게 울려요(공진).'}},
+ dB(){const mode=pick(['I','beta','P']);
+  if(mode==='I'){const m=pick([1,2,3,5]),e=pick([-9,-8,-6,-5,-4,-2]);const I=m*10**e,b=10*Math.log10(I/1e-12);
+   return {kind:'응용',title:'소리 세기 → 데시벨',q:`어떤 소리의 세기가 ${N(m,e)} {{Wm2}}이다. 소리 세기 레벨 β는 몇 {{dB}}인가? (I₀ = 10⁻¹² W/m²)`,first:['β = 10 log(I/I₀)','지수 빼기'],
+    steps:[{h:'공식',b:`<div class="ln">β = 10 × log(I ÷ I₀)</div><div class="rd">"베타는 10 로그 아이 나누기 아이 제로"</div>`},
+     {h:'비율 먼저',b:`<div class="ln">I ÷ I₀ = ${N(m,e)} ÷ 10⁻¹² = ${N(m,e+12)}</div><div class="rd">나눗셈은 지수 빼기: ${e} − (−12) = ${e+12}</div>`},
+     {h:'로그',b:`<div class="ln">log(${N(m,e+12)}) = log ${m} + ${e+12} = ${(Math.log10(m)).toFixed(3)} + ${e+12} = ${(Math.log10(m)+e+12).toFixed(3)}</div><div class="rd">log(10ⁿ) = n · log 1 = 0, log 2 ≈ 0.301, log 3 ≈ 0.477, log 5 ≈ 0.699</div>`},
+     {h:'× 10',b:`<div class="ln">β = 10 × ${(Math.log10(m)+e+12).toFixed(3)} = ${b.toFixed(1)} dB</div>`},
+     {h:'검산',b:`<div class="rd">표: 10⁻⁴ W/m² ≈ 80 dB(도로 소음), 1 W/m² = 120 dB(통증) — 지수 하나당 10 dB ✓</div>`}],
+    ans:`β ≈ ${b.toFixed(1)} dB`,ansRead:`${b.toFixed(1)} 데시벨`,
+    calc:calcBlock([[['1','0','×','log',...K(m,e),'÷','1','×10ˣ','(−)','1','2',')'],`10×log(${NS(m,e)}÷1×10⁻¹²)`,'log를 누르면 괄호가 열려요'],[['='],casioDec(b)]],[W_LOG,W_NEG]),
+    easy:'세기가 10배 될 때마다 10 dB씩 올라가요. 그래서 10⁻¹²부터 지수를 세면 dB가 나와요.'}}
+  if(mode==='beta'){const b=pick([30,45,60,65,85,95,110]);const I=1e-12*10**(b/10);const s=sci(I,3);
+   return {kind:'응용',title:'데시벨 → 소리 세기',q:`소리 세기 레벨이 ${b} {{dB}}이다. 소리 세기 I는 몇 {{Wm2}}인가?`,first:['β = 10 log(I/I₀)','I = I₀ × 10^(β/10)'],
+    steps:[{h:'식 뒤집기',b:`<div class="ln">β ÷ 10 = log(I/I₀)</div><div class="ln">I ÷ I₀ = 10^(β/10)</div><div class="rd">log를 없애려면 10의 거듭제곱으로</div>`},
+     {h:'지수 계산',b:`<div class="ln">${b} ÷ 10 = ${b/10}</div>`},
+     {h:'곱하기',b:`<div class="ln">I = 10⁻¹² × 10^${b/10} = ${sciT(s)} W/m²</div><div class="rd">지수 더하기: −12 + ${b/10} = ${(-12+b/10).toFixed(1)}</div>`},
+     {h:'검산',b:`<div class="rd">${b} dB는 0 dB(10⁻¹²)보다 ${b/10}자리 위 ✓</div>`}],
+    ans:`I ≈ ${sciT(s)} W/m²`,ansRead:`${sciR(s)} 와트 퍼 제곱미터`,
+    calc:calcBlock([[['1','×10ˣ','(−)','1','2','×','SHIFT','log',...ks(b),'÷','1','0',')','='],casioDec(I),'10ˣ = SHIFT + log']],[W_LOG,W_NEG]),
+    easy:'85 dB면 8.5칸 위. 한 칸 = 10배라서 10⁻¹²에서 10^8.5배 커진 세기예요.'}}
+  const useCm=Math.random()<.5;const Pm=pick([0.02,0.2,0.63,2,6.3,20]);const Pi=20*Math.log10(Pm/2e-5);const Pc=Pm*1e-4;
+  return {kind:'응용',title:'음압 → 데시벨',q:`음압이 ${useCm?sciT(sci(Pc))+' {{Ncm2}}':Pm+' {{Nm2}}'}이다. 음압 레벨 Π는 몇 {{dB}}인가? (P₀ = 2 × 10⁻⁵ N/m²)`,first:useCm?['N/cm² → N/m²: × 10⁴','Π = 20 log(P/P₀)']:['Π = 20 log(P/P₀)','압력은 20 log'],
+   steps:[...(useCm?[{h:'단위 먼저 맞추기',b:`<div class="ln">1 cm² = 10⁻⁴ m² → 1 N/cm² = 10⁴ N/m²</div><div class="ln">${sciT(sci(Pc))} × 10⁴ = ${Pm} N/m²</div><div class="rd">⚠ 넓이 분모가 작아지면 압력 숫자는 커져요</div>`}]:[]),
+    {h:'비율',b:`<div class="ln">P ÷ P₀ = ${Pm} ÷ (2 × 10⁻⁵) = ${fx(Pm/2e-5,3)}</div>`},
+    {h:'20 log',b:`<div class="ln">Π = 20 × log(${fx(Pm/2e-5,3)}) = ${Pi.toFixed(1)} dB</div><div class="rd">압력·진폭은 세기의 제곱근이라 10이 아니라 20</div>`},
+    {h:'검산',b:`<div class="rd">사람이 듣는 범위 0~130 dB 안 ✓</div>`}],
+   ans:`Π ≈ ${Pi.toFixed(1)} dB`,ansRead:`${Pi.toFixed(1)} 데시벨`,
+   calc:calcBlock([[['2','0','×','log',...ks(Pm),'÷','2','×10ˣ','(−)','5',')','='],casioDec(Pi)]],[W_LOG,'세기는 10 log, 압력·진폭은 20 log']),
+   easy:'압력은 세기와 달리 20을 곱해요. 압력이 10배면 20 dB 올라가요.'}},
+ amp(){const toDb=Math.random()<.5;
+  if(toDb){const r=pick([0.5,0.25,0.1,0.05,0.01]);const db=20*Math.log10(r);
+   return {kind:'응용',title:'진폭 비 → dB (감쇠)',q:`초음파가 조직을 지나며 진폭이 처음의 ${r}배(A/A₀ = ${r})가 되었다. 몇 {{dB}} 감쇠인가?`,first:['dB = 20 log(A/A₀)','1보다 작으면 음수'],
+    steps:[{h:'공식',b:`<div class="ln">진폭 비(dB) = 20 × log(A ÷ A₀)</div>`},{h:'계산',b:`<div class="ln">20 × log(${r}) = 20 × (${Math.log10(r).toFixed(3)}) = ${db.toFixed(1)} dB</div>`},{h:'의미',b:`<div class="rd">음수 = 줄어듦 → ${Math.abs(db).toFixed(1)} dB 감쇠. 진폭이 반이면 약 −6 dB, 10분의 1이면 −20 dB</div>`}],
+    ans:`${db.toFixed(1)} dB (${Math.abs(db).toFixed(1)} dB 감쇠)`,ansRead:`마이너스 ${Math.abs(db).toFixed(1)} 데시벨`,
+    calc:calcBlock([[['2','0','×','log',...ks(r),')','='],casioDec(db)]],[W_LOG]),easy:'진폭이 반으로 줄 때마다 약 6 dB씩 깎여요.'}}
+  const db=pick([-6,-12,-20,-30,-40]);const r=10**(db/20);
+  return {kind:'응용',title:'dB → 진폭 비',q:`초음파가 ${Math.abs(db)} {{dB}} 감쇠했다(${db} dB). 진폭은 처음의 몇 배인가?`,first:['A/A₀ = 10^(dB/20)'],
+   steps:[{h:'식 뒤집기',b:`<div class="ln">${db} = 20 log(A/A₀) → log(A/A₀) = ${db/20}</div>`},{h:'10의 거듭제곱',b:`<div class="ln">A/A₀ = 10^(${db/20}) = ${fx(r,3)}</div>`},{h:'검산',b:`<div class="rd">−20 dB = 10분의 1, −40 dB = 100분의 1 ✓</div>`}],
+   ans:`A/A₀ ≈ ${fx(r,3)}`,ansRead:`처음의 ${fxR(r)}배`,
+   calc:calcBlock([[['SHIFT','log','(−)',...ks(Math.abs(db)),'÷','2','0',')','='],casioDec(r),'10ˣ = SHIFT + log']],[W_LOG,W_NEG]),easy:'−20 dB면 10분의 1, −40 dB면 100분의 1이에요.'}},
+ refl(){const pairs=[['soft','air'],['fat','soft'],['bone','soft'],['soft','water'],['water','air'],['bone','fat'],['lung','soft']];const [a,b]=pick(pairs);
+  const A=MAT[a],B=MAT[b],Z1=A[1]*A[2],Z2=B[1]*B[2],R=((Z2-Z1)/(Z2+Z1))**2;
+  return {kind:'응용',title:'경계에서 얼마나 반사될까',fig:FIG.pRefl(A[0],B[0]),
+   q:`${A[0]}(밀도 ${A[1]} {{kgm3}}, 음속 ${A[2]} {{mps}})에서 ${B[0]}(밀도 ${B[1]} kg/m³, 음속 ${B[2]} m/s)으로 초음파가 수직으로 들어간다. 두 [[acz|음향 임피던스]]와 반사율 R을 구하라.`,
+   first:['Z = ρ × v','R = ((Z₂−Z₁)/(Z₂+Z₁))²','Rayl → MRayl: ÷ 10⁶'],
+   steps:[{h:'Z₁',b:`<div class="ln">Z₁ = ${A[1]} × ${A[2]} = ${fx(Z1,4)} Rayl = ${fx(Z1/1e6,3)} MRayl</div><div class="rd">kg/m³ × m/s = kg/(m²·s) = Rayl</div>`},
+    {h:'Z₂',b:`<div class="ln">Z₂ = ${B[1]} × ${B[2]} = ${fx(Z2,4)} Rayl = ${fx(Z2/1e6,3)} MRayl</div>`},
+    {h:'반사율 [AI 보충 식]',b:`<div class="ln">R = ((${fx(Z2/1e6,3)} − ${fx(Z1/1e6,3)}) ÷ (${fx(Z2/1e6,3)} + ${fx(Z1/1e6,3)}))²</div><div class="ln">= ${(R*100).toFixed(R<0.01?2:1)} %</div><div class="rd">MRayl끼리 나누면 단위가 지워져 그대로 써도 돼요</div>`},
+    {h:'투과',b:`<div class="ln">T = 1 − R = ${((1-R)*100).toFixed(1)} %</div>`},
+    {h:'검산',b:`<div class="rd">Z 차이가 ${Math.abs(Z2-Z1)/Math.max(Z1,Z2)>0.5?'크니까 반사가 커야 함 ✓':'작으니까 반사가 작아야 함 ✓'}</div>`}],
+   ans:`Z₁ ≈ ${fx(Z1/1e6,3)} MRayl, Z₂ ≈ ${fx(Z2/1e6,3)} MRayl, R ≈ ${(R*100).toFixed(R<0.01?2:1)} %`,ansRead:`반사율 ${(R*100).toFixed(1)} 퍼센트`,
+   calc:calcBlock([[['(','(',...ks(+(Z2/1e6).toPrecision(4)),'−',...ks(+(Z1/1e6).toPrecision(4)),')','÷','(',...ks(+(Z2/1e6).toPrecision(4)),'+',...ks(+(Z1/1e6).toPrecision(4)),')',')','x²','='],casioDec(((+(Z2/1e6).toPrecision(4)-+(Z1/1e6).toPrecision(4))/(+(Z2/1e6).toPrecision(4)+ +(Z1/1e6).toPrecision(4)))**2),'MRayl 4자리로 입력 · × 100 하면 %']],['분자·분모를 각각 괄호로, 전체를 또 괄호로 묶고 [x²]']),
+   easy:'두 물질의 "단단함×무게감"(Z)이 비슷하면 술술 통과, 많이 다르면 벽에 부딪힌 공처럼 튕겨요.'}},
+ q(){const f0=pick([2,3.5,5,7.5,10]),bw=pick([0.5,1,2,3,5]).valueOf();const Q=f0/bw;
+  return {kind:'응용',title:'Q 값과 대역폭',fig:FIG.qfactor(),q:`중심 주파수 ${f0} {{MHz}}, 대역폭 ${bw} MHz인 트랜스듀서의 [[qf|Q 값]]은? 펄스는 긴 편인가 짧은 편인가?`,first:['Q = f₀ / BW','같은 단위면 단위 변환 불필요'],
+   steps:[{h:'공식',b:`<div class="ln">Q = f₀ ÷ BW</div><div class="rd">둘 다 MHz라 그대로 나누면 단위가 지워져요</div>`},{h:'계산',b:`<div class="ln">Q = ${f0} ÷ ${bw} = ${fx(Q,3)}</div>`},{h:'해석',b:`<div>${Q>=4?'Q가 커서 좁은 대역 → 펄스가 길고 순수한 주파수 (감쇠 약함)':'Q가 작아 넓은 대역 → 펄스가 짧음 → 거리 분해능 좋음 (백킹재로 강하게 감쇠)'}</div>`}],
+   ans:`Q ≈ ${fx(Q,3)} · ${Q>=4?'긴 펄스':'짧은 펄스'}`,ansRead:`큐 ${fxR(Q)}`,calc:calcBlock([[[...ks(f0),'÷',...ks(bw),'='],casioDec(Q)]],[]),easy:'Q가 크면 종처럼 길게 울리고, 작으면 북처럼 짧게 끝나요.'}},
+ ndt(){const T=pick([10,12,15,20,25]),th=pick([45,60,70]);const r=th*Math.PI/180,leg=T/Math.cos(r),skip=2*T*Math.tan(r);
+  return {kind:'응용',title:'사각 탐상 경로 계산',fig:FIG.ndt({T:`T = ${T} mm`,th:`θ = ${th}°`}),
+   q:`두께 T = ${T} {{mm}}인 강판을 굴절각 θ = ${th}°인 사각 탐촉자로 검사한다. 한 번 내려가는 경로(Leg)와 도약거리(2T·tanθ)는 몇 mm인가?`,
+   first:['Leg = T / cosθ','도약거리 = 2T·tanθ','계산기 Deg 모드'],
+   steps:[{h:'그림 읽기',b:`<div>빔은 θ만큼 기울어 바닥까지 갔다가(Leg) 다시 위로 올라와요(V자). 위 표면에 다시 닿는 곳까지의 가로 거리가 도약거리.</div>`},
+    {h:'Leg',b:`<div class="ln">Leg = ${T} ÷ cos ${th}° = ${T} ÷ ${Math.cos(r).toFixed(4)} = ${fx(leg,4)} mm</div>`},
+    {h:'도약거리',b:`<div class="ln">2 × ${T} × tan ${th}° = ${2*T} × ${Math.tan(r).toFixed(4)} = ${fx(skip,4)} mm</div>`},
+    {h:'V경로',b:`<div class="ln">2T / cosθ = 2 × ${fx(leg,4)} = ${fx(2*leg,4)} mm</div>`},
+    {h:'검산',b:`<div class="rd">각도가 클수록(더 눕힐수록) 경로가 길어짐 ✓ · 단위는 처음부터 mm라 변환 불필요</div>`}],
+   ans:`Leg ≈ ${fx(leg,4)} mm · 도약거리 ≈ ${fx(skip,4)} mm`,ansRead:`레그 ${fxR(leg,4)} 밀리미터`,
+   calc:calcBlock([[['SHIFT','MODE','3'],'D (Deg)','각도 단위 = 도'],[[...ks(T),'÷','cos',...ks(th),')','='],casioDec(leg),'Leg'],[['2','×',...ks(T),'×','tan',...ks(th),')','='],casioDec(skip),'도약거리']],[W_DEG]),
+   easy:'당구공을 쿠션에 비스듬히 치면 V자로 튕기죠. 그 경로 길이를 삼각형으로 구하는 거예요.'}},
+ blind(){const f=pick([40,48,58]),Nc=pick([8,10,12,16]);const c=343,tau=Nc/(f*1e3),dmin=c*tau/2;
+  return {kind:'응용',title:'버스트 길이로 보는 블라인드 존',q:`${f} {{kHz}} 초음파를 ${Nc}주기 버스트로 보낸다(공기 음속 343 m/s). (1) 버스트 지속 시간은 몇 {{ms}}? (2) 버스트만 고려할 때 못 재는 최소 거리는 몇 {{cm}}?`,
+   first:['한 주기 = 1/f','왕복이라 ÷ 2'],
+   steps:[{h:'한 주기 시간',b:`<div class="ln">1 ÷ (${f} × 10³) = ${fx(1/(f*1e3)*1e6,3)} μs</div>`},{h:'버스트 시간',b:`<div class="ln">τ = ${Nc} × ${fx(1/(f*1e3)*1e6,3)} μs = ${fx(tau*1e3,3)} ms</div>`},
+    {h:'최소 거리 [AI 보충]',b:`<div class="ln">d = c × τ ÷ 2 = 343 × ${fx(tau,3)} ÷ 2 = ${fx(dmin,3)} m = ${fx(dmin*100,3)} cm</div><div class="rd">보내는 동안 돌아온 반사파는 구분 못 함. 실제로는 잔류 진동·회로 회복 시간 때문에 더 길어요(6~80 cm)</div>`}],
+   ans:`τ ≈ ${fx(tau*1e3,3)} ms · 최소 ≈ ${fx(dmin*100,3)} cm`,ansRead:`${fxR(dmin*100)} 센티미터`,
+   calc:calcBlock([[[...ks(Nc),'÷',...K(f,3),'='],casioDec(tau),'τ (s)'],[['×','3','4','3','÷','2','='],casioDec(dmin),'m']],['분수로 나오면 [S⇔D]']),easy:'내가 말하는 동안엔 메아리를 못 들어요. 말하는 시간만큼 가까운 곳은 못 재요.'}},
+ piezoDisp(base){const d=base?100:pick([60,100,130,3.9,5.9]),V=base?100:pick([10,50,100,200]);const dpm=d*V;const mat=d===3.9?'AlN':d===5.9?'ZnO':'PZT';
+  return {kind:base?'기본':'유사',title:'전압을 걸면 얼마나 변할까',fig:FIG.pPiezo(`d₃₃ = ${d} pm/V`,`V = ${V} V`,'Δt = ?'),
+   q:`${mat} 박막(d₃₃ = ${d} {{pmV}})의 두께 방향으로 ${V} {{V}}를 걸었다. 두께 변화 Δt는 몇 {{nm}}인가?`,
+   first:['S = d·E, E = V/t','→ Δt = d₃₃ × V','pm → nm: ÷ 1000'],
+   steps:[{h:'식 정리',b:`<div class="ln">S = d₃₃ × E,  E = V ÷ t,  Δt = S × t</div><div class="ln">→ Δt = d₃₃ × V</div><div class="rd">두께 t가 지워져요 [AI 보충 정리]</div>`},
+    {h:'계산',b:`<div class="ln">Δt = ${d} pm/V × ${V} V = ${fx(dpm,4)} pm</div><div class="rd">V끼리 지워지고 pm만 남아요</div>`},
+    {h:'단위 바꾸기',b:`<div class="ln">${fx(dpm,4)} pm = ${fx(dpm/1000,4)} nm</div><div class="rd">1 nm = 1000 pm</div>`},
+    {h:'검산',b:`<div class="rd">원자 몇 개 크기(0.1~1 nm) ~ 수십 nm 수준 → 압전 변형은 아주 작다 ✓ (그래서 정밀 위치 조절에 씀)</div>`}],
+   ans:`Δt ≈ ${fx(dpm/1000,4)} nm (= ${fx(dpm,4)} pm)`,ansRead:`${fxR(dpm/1000,4)} 나노미터`,
+   calc:calcBlock([[[...ks(d),'×',...ks(V),'='],String(+dpm.toFixed(4)),'pm'],[['÷','1','0','0','0','='],casioDec(dpm/1000),'nm']],[]),
+   easy:'100 V를 걸어도 머리카락 굵기의 수천분의 1만 움직여요. 대신 아주 정확하게 움직여서 광필터 간격 조절 같은 데 써요.'}},
+ piezoQ(){const d=pick([100,200,300]),F=pick([1,2,5,10]),C=pick([0.5,1,2]);const Q=d*F,V=Q/(C*1000);
+  return {kind:'응용',title:'누르면 전압이 얼마나 나올까',fig:FIG.pPiezo(`d₃₃ = ${d} pC/N`,`F = ${F} N`,'V = ?'),
+   q:`d₃₃ = ${d} {{pCN}}인 압전 소자를 ${F} {{N}}의 힘으로 눌렀다. 소자의 정전용량이 ${C} {{nF}}일 때 (1) 생긴 전하 Q, (2) 전압 V는?`,
+   first:['Q = d₃₃ × F','V = Q / C','pC ↔ nC 맞추기'],
+   steps:[{h:'전하',b:`<div class="ln">Q = ${d} pC/N × ${F} N = ${Q} pC</div>`},{h:'단위 맞추기',b:`<div class="ln">${Q} pC = ${fx(Q/1000,3)} nC</div><div class="rd">C가 nF라서 전하도 nC로 맞추면 편해요</div>`},
+    {h:'전압',b:`<div class="ln">V = Q ÷ C = ${fx(Q/1000,3)} nC ÷ ${C} nF = ${fx(V,3)} V</div><div class="rd">n끼리 지워져요 [AI 보충: 축전기 V = Q/C]</div>`},
+    {h:'검산',b:`<div class="rd">힘이 2배면 전압도 2배 (비례) ✓</div>`}],
+   ans:`Q = ${Q} pC (${fx(Q/1000,3)} nC) · V ≈ ${fx(V,3)} V`,ansRead:`${fxR(V)} 볼트`,
+   calc:calcBlock([[[...ks(d),'×',...ks(F),'='],String(Q),'pC'],[['÷','1','0','0','0','÷',...ks(C),'='],casioDec(V),'V']],[]),
+   easy:'라이터 딸깍처럼 누르는 힘이 전하를 만들고, 그 전하가 작은 그릇(C)에 담기면 전압이 돼요.'}}
+});
+Object.assign(FIG,{
+ pTof(o){return svgFig(340,130,`<rect x="10" y="30" width="22" height="56" rx="4" style="fill:var(--ink)"/>${tx(21,102,'센서','small2','middle')}
+   <rect x="290" y="16" width="14" height="86" style="fill:var(--muted)"/>${tx(297,118,'물체','small2','middle')}
+   ${ar(36,48,284,48,'a',2.2)}${ar(284,70,36,70,'u',2.2)}${tx(160,40,'보내기','a small2','middle')}${tx(160,88,'반사파','u small2','middle')}
+   ${tx(160,112,`${o.t} · ${o.T}`,'b2','middle')}${tx(160,128,o.d,'b b2','middle')}`,'초음파 거리 문제 그림')},
+ pLayer(f){return svgFig(340,130,`<rect x="60" y="20" width="110" height="80" style="fill:var(--warn-soft);stroke:var(--warn);stroke-width:2"/>${tx(115,64,'PZT','b2','middle')}
+   <rect x="170" y="20" width="44" height="80" style="fill:var(--unit-soft);stroke:var(--unit);stroke-width:2"/>${tx(192,64,'정합','u small2','middle')}
+   ${ar(60,112,170,112,'i',1.4,'2')}${tx(115,126,'λ/2 = ?','b small2','middle')}${ar(170,112,214,112,'i',1.4,'2')}${tx(192,126,'λ/4','b small2','middle')}
+   ${ar(220,60,300,60,'u',2.2)}${tx(300,50,`f = ${f} MHz`,'b2','end')}`,'두께 문제 그림')},
+ pRefl(a,b){return svgFig(340,130,`<rect x="10" y="20" width="160" height="90" style="fill:var(--accent-soft)"/><rect x="170" y="20" width="160" height="90" style="fill:var(--unit-soft)"/>
+   <line x1="170" y1="14" x2="170" y2="116" style="stroke:var(--ink);stroke-width:2"/>${tx(90,40,a,'b2','middle')}${tx(250,40,b,'b2','middle')}
+   ${ar(40,70,166,70,'i',2.4)}${ar(166,84,60,98,'b',2.2)}${ar(174,70,300,70,'a',2.2)}${tx(100,112,'반사 R','b small2','middle')}${tx(250,62,'투과 1−R','a small2','middle')}`,'반사 문제 그림')},
+ pPiezo(a,b,c){return svgFig(340,120,`<rect x="110" y="30" width="120" height="8" style="fill:var(--ink)"/><rect x="110" y="38" width="120" height="44" style="fill:var(--warn-soft);stroke:var(--warn);stroke-width:2"/><rect x="110" y="82" width="120" height="8" style="fill:var(--ink)"/>
+   ${tx(170,65,'압전체','b2','middle')}${tx(10,40,a,'b2')}${tx(10,62,b,'b2')}${tx(330,62,c,'b b2','end')}${ar(170,6,170,28,'b',2.4)}${ar(170,114,170,92,'b',2.4)}`,'압전 문제 그림')}
+});
+PSET.ultra=[['tof',true],['tof'],['tofInch'],['lambda',true],['dB'],['amp'],['refl'],['q'],['ndt'],['blind']];
+PSET.piezo=[['piezoDisp',true],['piezoDisp'],['piezoQ']];
+TOPICS.ultra={name:'초음파',g:['tof','tofInch','lambda','dB','amp','refl','q','ndt','blind']};
+TOPICS.piezo={name:'압전',g:['piezoDisp','piezoQ']};
+const BASICG=new Set(['coriolis','cap','tof','lambda','piezoDisp']);
+
+/* ───────── 본문 ───────── */
+PAGES.ultra={title:'초음파센서',part:'제3편 6장',secs:[
+ {k:'정의',h:'초음파센서란?',b:`<p class="big">사람이 못 듣는 <b>20 kHz 이상의 소리</b>를 보내고, 돌아오는 소리로 거리·물체·내부를 알아내는 센서</p>
+   ${FIG.freqBand()}
+   <div class="rel">소리 = 매질(기체·액체·고체)의 압력 진동 → <b>진공에서는 전달 안 됨</b></div>
+   <p>[[ultrasound]] · 핵심 부품은 전기 ↔ 진동을 바꾸는 [[transducer]]예요(대부분 [[piezo|압전]]).</p>`,
+  easy:'산에서 "야호" 하면 메아리가 돌아오죠. 초음파센서는 아주 높은 소리로 "야호"를 하고 메아리 시간으로 거리를 재요.',
+  src:'【Sound waves with frequencies above 20 kHz are called ultrasound】 【Sound can travel through any kind of matter, but not through a vacuum】'},
+ {k:'음파의 성질',h:'종파·횡파와 음속',b:`<div data-anim="wave"></div>
+   <div class="tblwrap"><table><tr><th>매질 (20 °C)</th><th>음속 m/s</th></tr><tr><td>공기</td><td>343 (0 °C: 331)</td></tr><tr><td>물</td><td>약 1440~1480</td></tr><tr><td>유리</td><td>약 4500</td></tr><tr><td>강철</td><td>약 5000</td></tr><tr><td>PZT</td><td>약 4000</td></tr></table></div>
+   <div class="key">기체 &lt; 액체 &lt; 고체 순으로 빨라요. 온도가 1 K 오르면 약 0.17 % 빨라져요.</div>
+   <div class="eqn">v = √(B / ρ₀)<small>"브이는 루트 비 나누기 로" · [[bulk|B 체적탄성률]], ρ₀ 밀도</small></div>
+   <p class="small">고체에서는 [[poisson|포아송 비]] ν까지 들어가요: v = √( B(1−ν) ÷ (ρ₀(1+ν)(1−2ν)) )</p>`,
+  easy:'잘 안 눌리는 단단한 물질일수록(B↑) 소리가 빨라요. 무거우면(ρ↑) 느려져요.',
+  src:'【Longitudinal waves propagate in all kind of materials】 【Transverse waves only propagate in solid】 【Sonic wave speed changes by 0.17%/°K】'},
+ {k:'거리 측정',h:'메아리 시간(ToF)으로 거리 재기',b:`<div data-anim="tof"></div>
+   <div class="eqn">2 × 거리 = c(T) × t<small>"2 디는 씨 곱하기 티" · 왕복이라 2배</small></div>
+   <div class="f4"><div><div class="h">음속은 기온에 따라 변함</div><div class="ln">c(T) = 13,044 √(1 + T/273) inch/s</div><div class="ln">= 331.3 √(1 + T/273) m/s</div><div class="rd">13,044 inch/s × 0.0254 = 331.3 m/s · 간이식: 거리 ≈ t × 340 ÷ 2</div></div>
+    <div><div class="h">시간 t 뽑는 법</div>① 임계값 검출 (정해 둔 크기 넘으면 도착) ② 포락선(envelope) 검출</div>
+    <div><div class="h">버스트</div>한 번에 8~16 주기를 묶어 보내요.</div></div>`,
+  easy:'소리가 갔다 오는 시간의 절반 × 소리 빠르기 = 거리. 날이 더우면 소리가 빨라져서 같은 거리도 시간이 짧아져요.',
+  src:'【2·거리 = c(T)·t】 【c(T) = 13,044 √(1 + T/273) [inch/s]】 【검출거리 ≈ t × 340 / 2】'},
+ {k:'구조',h:'트랜스듀서 구조',b:`${FIG.transducer()}
+   <ul class="clean"><li>[[piezo|압전체]] PZT: d₃₃가 커서 많이 씀. 두께 = λ/2 → 공진</li><li>[[matching|정합층]] λ/4 + 겔: 공기층 없애고 반사 줄이기</li><li>[[backing|백킹재]]: 뒤로 가는 파동 흡수, 펄스를 짧게</li><li>하우징·보호막: 물·먼지·돌 튐 보호 (재질·두께도 음향 특성에 영향)</li></ul>
+   ${FIG.unimorph()}<button class="ghost" data-goto="piezo">↗ 압전 원리 보기 (제2편 5장)</button>`,
+  easy:'압전판이 "스피커 겸 마이크", 앞에 붙인 정합층과 겔은 "소리가 잘 넘어가게 하는 다리", 뒤의 백킹재는 "울림 멈춤 장치"예요.',
+  src:'【It consists of a piezoelectric material, electrodes, acoustic matching layer, backing material, and housing case】 【Thickness of the material is equal to ½ wavelength】 【The matching layer thickness is equal to ¼ the wavelength】'},
+ {k:'파장·주파수',h:'λ = v / f 와 주파수의 효과',b:`<div class="eqn">λ = v / f<small>"람다는 브이 나누기 에프"</small></div>
+   <div class="f4"><div><div class="h">숫자 예 (PZT 음속 4000 m/s)</div><div class="ln">1 MHz → λ = 4000 ÷ 10⁶ = 4 × 10⁻³ m = 4 mm → PZT 2 mm</div><div class="ln">5 MHz → λ = 8 × 10⁻⁴ m = 0.80 mm → PZT 0.4 mm</div></div>
+    <div><div class="h">주파수를 높이면</div><ul class="clean"><li>감도↑ · 분해능↑ · 빔 퍼짐↓ (직진성↑)</li><li>하지만 <b>감쇠↑ · 탐지 깊이↓</b></li></ul></div></div>
+   ${FIG.beam()}${FIG.qfactor()}
+   <p>[[qf|Q 값]] = f₀ / BW. [[sidelobe|사이드 로브]]는 완만한 형상, 큰 크기, 높은 주파수, 렌즈로 줄여요.</p>`,
+  easy:'높은 소리(고주파)는 레이저처럼 곧게 가고 자세히 보이지만, 멀리 못 가요. 낮은 소리는 멀리 가지만 흐릿해요.',
+  src:'【λ = c/f = 4000 m/sec ÷ 5×10⁶/sec = 8×10⁻⁴ meters = 0.80 mm】 【Q = center frequency / bandwidth】'},
+ {k:'임피던스',h:'음향 임피던스와 반사',b:`<div class="eqn">Z = ρ × v<small>"제트는 로 곱하기 브이" · 단위 Rayl = Pa·s/m</small></div>
+   <div data-anim="refl"></div>
+   <div class="tblwrap"><table><tr><th>재료</th><th>밀도 kg/m³</th><th>음속 m/s</th><th>Z MRayl</th></tr>
+   <tr><td>공기</td><td>1.2</td><td>330</td><td>0.0004*</td></tr><tr><td>물</td><td>1000</td><td>1480</td><td>1.48</td></tr><tr><td>지방</td><td>952</td><td>1459</td><td>1.38</td></tr><tr><td>연조직</td><td>1060</td><td>1540</td><td>1.63</td></tr><tr><td>뼈</td><td>1912</td><td>4080</td><td>7.8</td></tr><tr><td>PZT</td><td>—</td><td>4000</td><td>38</td></tr></table></div>
+   <p class="small muted">* 1.2 × 330 = 396 Rayl ≈ 0.0004 MRayl. 강의자료 표의 0.004는 자릿수 표기 차이로 보여요(추정). 어느 값이든 연조직/공기 반사 99.9 %는 같아요.</p>
+   <div class="key">Z가 같을수록 많이 투과, 다를수록 많이 반사. 반사율 R = ((Z₂−Z₁)/(Z₂+Z₁))² [AI 보충]</div>`,
+  easy:'Z는 "소리가 넘어가기 어려운 정도"예요. 높이가 다른 계단을 오르면 걸려 넘어지듯, Z 차이가 크면 소리가 튕겨 나와요.',
+  src:'【Acoustic impedance Z = material density × wave velocity】 【The transmission becomes maximum when the acoustic impedances of the two media are equal】 【Soft tissue / air 99.9 %】'},
+ {k:'dB·감쇠',h:'데시벨과 감쇠',b:`<div class="f4"><div><div class="h">소리 세기</div><div class="ln">β = 10 log(I / I₀) [dB],  I₀ = 10⁻¹² W/m²</div><div class="rd">세기 10배 → +10 dB · 사람이 듣는 범위 0~130 dB</div></div>
+    <div><div class="h">음압</div><div class="ln">Π = 20 log(P / P₀) [dB],  P₀ = 2 × 10⁻⁵ N/m² = 2 × 10⁻⁹ N/cm²</div><div class="rd">⚠ N/m² → N/cm²: 분모 cm²가 10⁻⁴ m²라서 숫자에 10⁻⁴</div></div>
+    <div><div class="h">감쇠</div><div class="ln">I ∝ 1/r²,  A = A₀·e^(−αx),  진폭비(dB) = 20 log(A/A₀)</div><div class="rd">흡수·반사·산란·굴절 때문에 줄어듦</div></div></div>`,
+  easy:'dB는 "10배를 한 칸"으로 세는 눈금이에요. 세기는 10 log, 압력·진폭은 20 log를 써요.',
+  src:'【β = 10 log₁₀(I/I₀)】 【Π = 20 log₁₀(P/P₀), P₀ = 2×10⁻⁵ N/m² = 2×10⁻⁹ N/cm²】 【Amplitude ratio (dB) = 20 log₁₀(A/A₀)】'},
+ {k:'문제',h:'',b:'__PROBS__'},
+ {k:'한계',h:'블라인드 존과 환경 간섭',b:`<div class="f4"><div><div class="h">[[blind|블라인드 존]] (보통 6~80 cm)</div><ol class="clean"><li>송신 버스트가 이어지는 시간</li><li>송신 후 남는 잔류 진동</li><li>큰 송신 신호 뒤 수신 회로 회복 시간</li></ol></div>
+    <div><div class="h">환경 간섭</div><ul class="clean"><li>온도 → 음속 변화 (0.17 %/K) → 보정 필요</li><li>습도↑ → 음속 최대 2 %↑ → 실제보다 가깝게 측정</li><li>바람 50~100 km/h 불안정, 100 km/h 이상 반사파 없음</li><li>스펀지 같은 흡음 물체는 검출 불가 · 먼지는 범위 25~33 % 감소 · 진공 불가</li></ul></div></div>`,
+  easy:'너무 가까우면 못 재고(블라인드 존), 덥거나 습하거나 바람이 불면 소리 빠르기가 바뀌어 오차가 생겨요.',
+  src:'【Blind zone 6-80 cm】 【스폰지와 같은 흡음물체는 검출이 불가능하다】'},
+ {k:'응용',h:'어디에 쓰나',b:`<div class="appchips"><span>🚗 주차 센서</span><span>🏥 의료 영상</span><span>🔩 비파괴 검사</span><span>🚢 소나</span><span>🌈 광필터</span></div>
+   <div class="f4"><div><div class="h">의료 영상</div>체내 음속을 1540 m/s로 가정해 반사 시간 → 깊이. [[amode|A-mode]]·B-mode, [[tgc|TGC]]로 깊은 곳 보상.</div></div>
+   <div data-anim="amode"></div>
+   <div class="f4"><div><div class="h">[[ndt|비파괴 검사]]</div>수직 탐촉자: 종파, 결함·뒷면 반사 시간 · 사각 탐촉자: 전단파(횡파), 용접부</div></div>
+   ${FIG.ndt()}
+   <div class="f4"><div><div class="h">빔 집속·조향</div>[[phased|위상 배열]]로 소자마다 시간 지연 → 원하는 곳에 집속·방향 전환</div>
+    <div><div class="h">[[fp|패브리-페로 광필터]]</div>PZT로 거울 간격 d를 바꿔 mλ = 2d·cosθ인 파장(예: 850 nm)만 통과</div>
+    <div><div class="h">[[sonar|소나]]</div>배에서 물속으로 음파 → 바닥·물고기·잠수함 탐지</div></div>
+   <p class="small"><b>[현업]</b> 탱크 레벨 측정, 배관 두께·용접부 검사, 로봇·AGV 근접 감지에 써요.</p>`,
+  easy:'주차할 때 "삐삐삐" 소리, 병원 초음파 사진, 다리·배관 속 금 찾기가 모두 같은 메아리 원리예요.',
+  src:'【자동차 후면 감지 센서는 하나의 트랜스듀서가 송신과 수신을 모두 담당】 【일반적으로 속도는 1540 m/s로 assume】'},
+ {k:'외울 것',h:'이것만은 외우기',b:`<ol class="clean"><li><b>정의</b>: 20 kHz 이상 음파, 진공 불가. 거리 = c·t ÷ 2</li><li><b>두께</b>: λ = v/f, 압전체 λ/2, 정합층 λ/4</li><li><b>임피던스</b>: Z = ρv. 같으면 투과, 다르면 반사 → 겔·정합층</li></ol>
+   <div class="eyebrow">백지 복원 순서</div><ol class="clean small"><li>센서 → 물체로 가는 화살표, 돌아오는 화살표, t 표시</li><li>2d = c(T)·t, c(T) 식</li><li>층 구조: 백킹 | PZT(λ/2) | 정합층(λ/4) | 겔 | 대상</li><li>주파수↑ 장점 3개 + 단점(감쇠↑ 깊이↓)</li></ol>
+   <div class="eyebrow">스스로 점검</div>
+   <details class="qa"><summary>왜 시간에 c를 곱하고 2로 나누나?</summary><div>t는 갔다 온 왕복 시간이라서. 편도 거리 = c·t/2.</div></details>
+   <details class="qa"><summary>의료 초음파에 겔을 바르는 이유는?</summary><div>피부와 센서 사이 공기층은 Z 차이가 커서 99.9 % 반사. 겔이 공기를 없애 투과시킴.</div></details>
+   <details class="qa"><summary>주파수를 높이면 무엇이 좋아지고 무엇이 나빠지나?</summary><div>감도·분해능↑, 빔 퍼짐↓ / 감쇠↑, 탐지 깊이↓.</div></details>
+   <details class="qa"><summary>블라인드 존이 생기는 이유 3가지는?</summary><div>송신 버스트 지속 시간, 잔류 진동, 수신 회로 회복 시간.</div></details>
+   <button class="primary" data-goto="cards">카드로 외우기</button>`}
+]};
+PAGES.piezo={title:'압전형',part:'제2편 5장',secs:[
+ {k:'정의',h:'압전 효과란?',b:`<p class="big">누르면 <b>전압</b>이 생기고(정압전), 전압을 걸면 <b>모양이 변하는</b>(역압전) 성질</p>
+   <div data-anim="piezo"></div>
+   <p>비대칭 결정에서만 생겨요: PZT, BaTiO₃(티탄산바륨), 수정(Quartz), PVDF, AlN, ZnO.</p>
+   <div class="key">센서(받기) = 정압전 · 액추에이터·송신(내기) = 역압전. 초음파 트랜스듀서는 하나로 둘 다.</div>`,
+  easy:'라이터를 딸깍 누르면 불꽃이 튀죠(정압전). 반대로 전기를 주면 판이 떨려서 "삐" 소리가 나요(역압전, 전자 부저).',
+  src:'【결정에 힘(압력)을 가하면 내부에서 전기 분극(polarization)이 발생하여 결정 표면에 전하가 나타난다】 【역으로 전계를 가하면 결정이 기계적 변형을 일으킨다】'},
+ {k:'압전 계수',h:'d₃₃ · d₃₁ 읽기',b:`<div class="f4"><div><div class="h">정압전 (힘 → 분극)</div><div class="ln">Pᵢ = dᵢⱼ × Tⱼ</div><div class="rd">T 응력(힘), P 분극 · d 단위 C/N (보통 pC/N)</div></div>
+    <div><div class="h">역압전 (전계 → 변형)</div><div class="ln">Sᵢ = dᵢⱼ × Eⱼ</div><div class="rd">E 전계, S 변형률 · d 단위 m/V (보통 pm/V)</div></div>
+    <div><div class="h">아래 첨자 읽는 법</div>d₃₃: 3방향(두께)으로 걸고 3방향으로 반응 · d₃₁: 3방향으로 걸고 1방향(옆)으로 반응. 3 = 분극 방향.</div></div>
+   <div class="tblwrap"><table><tr><th>재료</th><th>d (pm/V)</th><th>음속 m/s</th><th>저항률 Ω·cm</th></tr><tr><td>PZT</td><td>d₃₃ 60~130, d₃₁ −120~−170</td><td>3,900</td><td>10⁹</td></tr><tr><td>LiNbO₃</td><td>d₃₁ −7.4</td><td>3,980</td><td>2 × 10¹⁰</td></tr><tr><td>AlN</td><td>d₃₃ 3.9</td><td>10,127</td><td>10¹¹</td></tr><tr><td>ZnO</td><td>d₃₃ 5.9</td><td>5,700</td><td>10⁷</td></tr></table></div>
+   <p class="small">[AI 보충] pC/N과 pm/V는 같은 크기의 단위예요 (C/N = m/V).</p>`,
+  easy:'d₃₃ = 100 pm/V면 1 V마다 두께가 100 pm(0.1 nm) 변해요. PZT가 다른 재료보다 수십 배 민감해요.',
+  src:'【Pᵢ = dᵢⱼ Tⱼ, dᵢⱼ [Coulombs/Newton]】 【Sᵢ = dᵢⱼ Eⱼ, dᵢⱼ unit: Meters/Volt】'},
+ {k:'만들기·주의',h:'분극 처리와 DC·AC',b:`<div class="f4"><div><div class="h">[[poling|분극 처리]] 순서</div><ol class="clean"><li>합성</li><li>가열(어닐링)</li><li>높은 온도에서 전압 걸어 쌍극자 정렬</li><li>냉각해 방향 고정</li><li>모양대로 자르기</li></ol><div class="rd">처리 전 PZT는 압전성이 없음</div></div>
+    <div><div class="h">DC를 계속 걸면</div>저항이 매우 커서 전류는 거의 안 흐르지만, 이온·산소 공공이 이동해 균열·박리, 절연 파괴·누설 전류 증가 가능</div>
+    <div><div class="h">AC를 걸면</div>수축·팽창이 반복되어 진동 → 초음파 발생. 너무 크면 균열·박리</div>
+    <div><div class="h">박막 PZT (MEMS)</div>1 MHz면 λ/2 = 2 mm → 스퍼터링으로는 너무 두꺼움. 고주파일수록 얇아도 됨</div></div>`,
+  easy:'구워서 전기로 줄 세우고 식혀서 굳혀야 압전이 생겨요. 직류를 오래 걸면 상하고, 교류를 걸면 떨려요.',
+  src:'【For PZT in its natural state, no piezoelectric properties are exhibited】 【λ/2 = 2mm (too thick, 불가능 by rf sputtering)】'},
+ {k:'문제',h:'',b:'__PROBS__'}
+]};
+CARDS.push(
+ {id:'us1',tag:'초음파',f:'초음파의 주파수 기준은?',a:'20 kHz 이상',r:'20 킬로헤르츠',e:'사람 귀 한계를 넘는 소리'},
+ {id:'us2',tag:'초음파',f:'초음파 거리 측정 식은?',a:'2 × 거리 = c(T) × t',r:'왕복이라 2배',e:'메아리 시간의 절반 × 음속'},
+ {id:'us3',tag:'초음파',f:'공기 중 음속의 기온 식은?',a:'c = 331.3√(1+T/273) m/s',r:'슬라이드: 13,044√(1+T/273) inch/s',e:'1 inch = 0.0254 m'},
+ {id:'us4',tag:'초음파',f:'종파와 횡파의 차이는?',a:'종파: 진행 방향으로 진동, 모든 매질 · 횡파: 직각 진동, 고체만, 더 느림',r:'',e:''},
+ {id:'us5',tag:'초음파',f:'압전체 두께와 정합층 두께 규칙은?',a:'압전체 = λ/2, 정합층 = λ/4',r:'λ = v/f',e:''},
+ {id:'us6',tag:'초음파',f:'음향 임피던스 식과 단위는?',a:'Z = ρ × v · Rayl (Pa·s/m)',r:'제트는 로 곱하기 브이',e:'같으면 투과, 다르면 반사'},
+ {id:'us7',tag:'초음파',f:'의료 초음파에 겔을 쓰는 이유는?',a:'공기층 제거 (연조직/공기 99.9 % 반사)',r:'',e:''},
+ {id:'us8',tag:'초음파',f:'주파수를 높이면?',a:'감도·분해능↑, 빔 퍼짐↓ / 감쇠↑, 깊이↓',r:'',e:''},
+ {id:'us9',tag:'초음파',f:'블라인드 존이 생기는 이유 3가지',a:'송신 버스트 시간, 잔류 진동, 수신 회로 회복 시간',r:'보통 6~80 cm',e:''},
+ {id:'us10',tag:'초음파',f:'세기 dB와 음압 dB 식은?',a:'β = 10 log(I/I₀), Π = 20 log(P/P₀)',r:'I₀ = 10⁻¹² W/m², P₀ = 2×10⁻⁵ N/m²',e:'압력은 20'},
+ {id:'us11',tag:'초음파',f:'Q 값 식과 낮은 Q의 특징은?',a:'Q = f₀/BW · 넓은 대역, 짧은 펄스',r:'',e:''},
+ {id:'us12',tag:'초음파',f:'TGC란?',a:'시간(깊이)에 따라 수신 이득을 높여 깊은 곳 약한 에코 보상',r:'Time Gain Compensation',e:''},
+ {id:'pz1',tag:'압전',f:'정압전과 역압전은?',a:'정: 힘 → 전하(전압) · 역: 전압 → 변형',r:'센서 / 액추에이터',e:''},
+ {id:'pz2',tag:'압전',f:'d₃₃의 두 가지 단위는?',a:'pC/N (힘→전하), pm/V (전압→변형)',r:'같은 크기',e:''},
+ {id:'pz3',tag:'압전',f:'분극 처리(poling)란?',a:'고온에서 전계를 걸어 쌍극자를 정렬하고 냉각해 고정',r:'처리 전 PZT는 압전성 없음',e:''}
+);
+
+/*@@CHAPTERS@@*/
+/* ───────── 움직이는 그림: MEMS 자이로 ───────── */
+function gyroFigure(host){
+  host.innerHTML=`<svg viewBox="0 0 340 250" role="img" aria-label="MEMS 진동형 자이로: 질량이 x로 진동하고 회전 시 y로 코리올리 힘">
+   <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--accent)"/></marker>
+   <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--bad)"/></marker></defs>
+   <rect x="8" y="22" width="324" height="206" rx="10" fill="none" stroke-dasharray="4 4" style="stroke:var(--line)"/>
+   <text x="16" y="16" font-size="11" font-family="var(--f-body)" style="fill:var(--muted)">기판 (고정)</text>
+   <rect x="110" y="34" width="120" height="12" rx="3" style="fill:var(--unit)"/><text x="236" y="44" font-size="12" font-weight="700" style="fill:var(--unit)">C₁ 전극</text>
+   <rect x="110" y="204" width="120" height="12" rx="3" style="fill:var(--unit)"/><text x="236" y="214" font-size="12" font-weight="700" style="fill:var(--unit)">C₂ 전극</text>
+   <g id="combL">${[0,1,2,3,4].map(k=>`<rect x="24" y="${92+k*14}" width="40" height="5" style="fill:var(--muted)"/>`).join('')}<rect x="18" y="86" width="8" height="72" style="fill:var(--muted)"/></g>
+   <g id="combR">${[0,1,2,3,4].map(k=>`<rect x="276" y="${92+k*14}" width="40" height="5" style="fill:var(--muted)"/>`).join('')}<rect x="314" y="86" width="8" height="72" style="fill:var(--muted)"/></g>
+   <text x="16" y="178" font-size="11" style="fill:var(--muted)">콤 드라이브</text>
+   <g id="mass">
+     <path id="sprL" d="" fill="none" stroke-width="1.5" style="stroke:var(--muted)"/>
+     <rect x="125" y="95" width="90" height="60" rx="6" stroke-width="2" style="fill:var(--surface);stroke:var(--ink)"/>
+     ${[0,1,2,3].map(k=>`<rect x="72" y="${99+k*14}" width="53" height="5" transform="translate(0,0)" style="fill:var(--ink)"/><rect x="215" y="${99+k*14}" width="53" height="5" style="fill:var(--ink)"/>`).join('')}
+     <text x="170" y="130" text-anchor="middle" font-size="13" font-weight="800" style="fill:var(--ink)">질량 m</text>
+   </g>
+   <line id="vArr" x1="170" y1="170" x2="210" y2="170" stroke-width="3" marker-end="url(#ah)" style="stroke:var(--accent)"/>
+   <text id="vLb" x="170" y="190" font-size="13" font-weight="800" text-anchor="middle" style="fill:var(--accent)">v</text>
+   <line id="fArr" x1="250" y1="125" x2="250" y2="95" stroke-width="3" marker-end="url(#ah2)" style="stroke:var(--bad)"/>
+   <text id="fLb" x="258" y="96" font-size="13" font-weight="800" style="fill:var(--bad)">F</text>
+   <g id="omega"><circle cx="300" cy="50" r="12" fill="none" stroke-width="2" style="stroke:var(--ink)"/><circle cx="300" cy="50" r="3" style="fill:var(--ink)"/><text x="294" y="80" font-size="12" font-weight="800" style="fill:var(--ink)">Ω</text></g>
+   <text x="24" y="240" font-size="11" style="fill:var(--muted)">x → 구동 방향 · y ↑ 감지 방향 · ⊙ = 종이 밖으로 나오는 회전축</text>
+  </svg>
+  <div class="figctl"><button class="tbtn" id="omBtn" aria-pressed="false">회전 Ω 켜기</button><button class="tbtn" id="playBtn">일시정지</button></div>
+  <div class="cbar"><span>C₁</span><i id="c1"></i><span id="c1v">1.00</span><span>C₂</span><i id="c2"></i><span id="c2v">1.00</span></div>
+  <div class="small muted" id="figMsg">회전이 없으면 질량은 좌우로만 흔들려요. C₁ = C₂ → 출력 0</div>`;
+  const q=s=>host.querySelector(s);const mass=q('#mass'),vA=q('#vArr'),vL=q('#vLb'),fA=q('#fArr'),fL=q('#fLb'),om=q('#omega');
+  let on=false,run=!matchMedia('(prefers-reduced-motion: reduce)').matches,t0=performance.now(),tp=0,raf;
+  const Ax=26,Ay=12,w=2*Math.PI*0.6;
+  function frame(now){if(run)tp+=(now-t0)/1000;t0=now;const x=Ax*Math.sin(w*tp),vx=Math.cos(w*tp);const y=on?-Ay*Math.cos(w*tp):0;
+    mass.setAttribute('transform',`translate(${x},${y})`);
+    vA.setAttribute('x1',170+x);vA.setAttribute('x2',170+x+38*vx);vA.setAttribute('y1',170+y);vA.setAttribute('y2',170+y);vL.setAttribute('x',170+x);vL.setAttribute('y',190+y);
+    const fl=on?-32*vx:0;fA.style.display=on&&Math.abs(fl)>3?'':'none';fL.style.display=on?'':'none';
+    fA.setAttribute('x1',250+x);fA.setAttribute('x2',250+x);fA.setAttribute('y1',125+y);fA.setAttribute('y2',125+y+fl);fL.setAttribute('x',258+x);fL.setAttribute('y',125+y+fl);
+    om.style.opacity=on?1:.25;
+    const g1=49+(-y),g2=49+y;const c1=49/g1,c2=49/g2; // C ∝ 1/d
+    q('#c1').style.width=(c1*45)+'%';q('#c2').style.width=(c2*45)+'%';q('#c1v').textContent=c1.toFixed(2);q('#c2v').textContent=c2.toFixed(2);
+    raf=requestAnimationFrame(frame)}
+  raf=requestAnimationFrame(frame);
+  q('#omBtn').onclick=e=>{on=!on;e.target.setAttribute('aria-pressed',on);e.target.setAttribute('aria-expanded',on);e.target.textContent=on?'회전 Ω 끄기':'회전 Ω 켜기';
+    q('#figMsg').textContent=on?'회전이 들어오자 y 방향 힘 F가 생겼어요. v 방향이 바뀌면 F 방향도 바뀌어요. C₁ ≠ C₂ → 차이가 출력':'회전이 없으면 질량은 좌우로만 흔들려요. C₁ = C₂ → 출력 0'};
+  q('#playBtn').onclick=e=>{run=!run;e.target.textContent=run?'일시정지':'재생'};
+  if(!run)q('#playBtn').textContent='재생';
+  return()=>cancelAnimationFrame(raf);
+}
+
+/* ───────── 암기 카드 화면 ───────── */
+let deck=null;
+function cardsTop(){const n=MY.cards().length,f=LS.get('deckf','all');
+  return `<div class="seg" role="tablist"><button role="tab" aria-selected="${f==='all'}" data-df="all">전체 카드</button><button role="tab" aria-selected="${f==='mine'}" data-df="mine">내 카드 ${n}장</button></div>
+  <div class="btnrow"><button class="tbtn" id="newCard">＋ 내 카드 만들기</button>${n?'<button class="tbtn" id="myList">내 카드 고치기</button>':''}</div>`}
+function wireCardsTop(){V.querySelectorAll('[data-df]').forEach(b=>b.onclick=()=>{LS.set('deckf',b.dataset.df);deck=null;vCards()});
+  V.querySelector('#newCard').onclick=()=>cardForm(null,null);const ml=V.querySelector('#myList');if(ml)ml.onclick=myCardsSheet}
+function vCards(){TT.textContent='암기';
+  const pool=deckPool();
+  if(!pool.length){V.innerHTML=cardsTop()+`<section class="card"><h2 style="font-size:20px">아직 내 카드가 없어요</h2><p>헷갈리는 용어, 자주 틀리는 단위, 시험에 나올 것 같은 문장을 직접 카드로 만들어 두세요. 다른 카드와 똑같이 반복해서 나와요.</p></section>`;wireCardsTop();return}
+  if(!deck){const due=dueCards();deck={list:(due.length?due:pool.slice()).sort(()=>Math.random()-.5),i:0,stat:[0,0,0],extra:!due.length}}
+  const c=deck.list[deck.i];
+  if(!c){V.innerHTML=cardsTop()+`<section class="card"><div class="eyebrow">이번 묶음 끝</div><h2 style="font-size:22px">수고했어요</h2>
+    <div class="syms"><span class="s" style="color:var(--good)">${deck.stat[2]}</span><span>알았음 → 며칠 뒤</span><span class="s" style="color:var(--warn)">${deck.stat[1]}</span><span>헷갈림 → 내일 다시</span><span class="s" style="color:var(--bad)">${deck.stat[0]}</span><span>몰랐음 → 10분 뒤 다시</span></div>
+    <button class="primary" id="again">한 묶음 더</button></section>`;wireCardsTop();
+    V.querySelector('#again').onclick=()=>{deck=null;vCards()};return}
+  const tot=deck.list.length;
+  V.innerHTML=cardsTop()+`<div class="bar"><i style="width:${deck.i/tot*100}%"></i></div>
+  <div class="small muted">${deck.extra?'지금 복습할 카드가 없어서 전체를 섞었어요 · ':''}${deck.i+1} / ${tot}</div>
+  <section class="card fc"><div class="pk"><span class="chip${c.mine?' mine':''}">${esc(c.tag)}</span>${c.mine?`<button class="regen" id="editC">✎ 고치기</button>`:''}</div><div class="front">${c.mine?esc(c.f).replace(/\n/g,'<br>'):md(c.f)}</div>
+   <div id="back" class="back" hidden><div class="a">${c.mine?esc(c.a).replace(/\n/g,'<br>'):md(c.a)}</div>${c.r?`<div class="rd">${md(c.r)}</div>`:''}${c.e?`<div class="panel easy"><span class="lb">${c.mine?'내 메모':'쉽게'}</span><div>${c.mine?esc(c.e).replace(/\n/g,'<br>'):md(c.e)}</div></div>`:''}</div>
+   <div id="act"><button class="showbtn" id="show">떠올렸으면 답 보기</button></div></section>
+  <p class="small muted">먼저 머릿속으로 답을 말해 본 뒤 뒤집으세요. 그냥 읽는 것보다 오래 남아요.</p>`;
+  wireCardsTop();
+  const ec=V.querySelector('#editC');if(ec)ec.onclick=()=>cardForm(MY.cards().find(x=>x.id===c.id),null);
+  V.querySelector('#show').onclick=()=>{V.querySelector('#back').hidden=false;
+    V.querySelector('#act').innerHTML=`<div class="rate"><button class="r0" data-g="0">몰랐음<small>10분 뒤</small></button><button class="r1" data-g="1">헷갈림<small>내일</small></button><button class="r2" data-g="2">알았음<small>며칠 뒤</small></button></div>`;
+    V.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{const g=+b.dataset.g;rateCard(c.id,g);deck.stat[g]++;deck.i++;vCards()})};
+}
+/* 내 카드 만들기·고치기 */
+function cardForm(card,page){const ed=!!card&&MY.cards().some(x=>x.id===card.id);card=card||{id:'my'+Date.now(),f:'',a:'',e:'',page:page||''};
+  const opts=[['','어느 장도 아님'],...Object.entries(PAGES).map(([k,P])=>[k,P.title])];
+  openSheet(`<div><h3>${ed?'내 카드 고치기':'내 카드 만들기'}</h3><div class="small muted">이 폰에만 저장 · 다른 카드와 함께 반복돼요</div></div>
+   <label class="fl" for="cf-f">앞면 · 질문</label><textarea id="cf-f" placeholder="예: 1 μm는 몇 nm?">${esc(card.f)}</textarea>
+   <label class="fl" for="cf-a">뒷면 · 답</label><textarea id="cf-a" placeholder="예: 1000 nm (10³ nm)">${esc(card.a)}</textarea>
+   <label class="fl" for="cf-e">내 메모 (선택)</label><textarea id="cf-e" placeholder="외우는 요령, 쉬운 말 설명">${esc(card.e||'')}</textarea>
+   <label class="fl" for="cf-p">연결할 장</label><select id="cf-p">${opts.map(([k,t])=>`<option value="${k}" ${k===card.page?'selected':''}>${t}</option>`).join('')}</select>
+   <p class="small" id="cf-msg" style="color:var(--bad)"></p>
+   <button class="primary" id="cf-save">${ed?'고친 내용 저장':'카드 저장'}</button>${ed?'<button class="ghost" id="cf-del" style="color:var(--bad)">이 카드 삭제</button>':''}`,h=>{
+    h.querySelector('#cf-save').onclick=()=>{const f=h.querySelector('#cf-f').value.trim(),a=h.querySelector('#cf-a').value.trim();
+      if(!f||!a){h.querySelector('#cf-msg').textContent='앞면과 뒷면을 모두 적어 주세요.';return}
+      const list=MY.cards().filter(x=>x.id!==card.id);list.push({id:card.id,f,a,e:h.querySelector('#cf-e').value.trim(),page:h.querySelector('#cf-p').value,at:Date.now()});MY.setCards(list);
+      closeSheet();toast(ed?'고쳤어요':'카드를 만들었어요');deck=null;if(cur.v==='cards')vCards()};
+    const d=h.querySelector('#cf-del');if(d){let armed=false;d.onclick=()=>{if(!armed){armed=true;d.textContent='한 번 더 누르면 삭제';return}
+      MY.setCards(MY.cards().filter(x=>x.id!==card.id));const st=srs();delete st[card.id];LS.set('srs',st);closeSheet();toast('삭제했어요');deck=null;if(cur.v==='cards')vCards()}}})}
+function myCardsSheet(){const L=MY.cards();
+  openSheet(`<div><h3>내 카드 ${L.length}장</h3><div class="small muted">눌러서 고치거나 지워요</div></div>
+   <div class="dlist">${L.map(c=>`<button class="drow" data-mc="${c.id}"><b>${esc(c.f)}</b><span class="dgen">${esc(c.a)}</span></button>`).join('')}</div>`,
+   h=>h.querySelectorAll('[data-mc]').forEach(b=>b.onclick=()=>cardForm(L.find(x=>x.id===b.dataset.mc),null)))}
+function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),1800)}
+
+/* ───────── 단위 훈련 화면 ───────── */
+let US=null;
+function vUnits(arg){TT.textContent='연습';
+  const sel=new Set(LS.get('ucats',['len','mass','ratio','mag']));
+  if(!US||(arg&&arg.n&&(!US.fixed||US.done>=US.n))){US={n:arg&&arg.n?arg.n:0,done:0,ok:0,fixed:!!(arg&&arg.n),p:null,picked:null}}
+  if(!US.p){const ust=LS.get('ustat',{});const cs=[...sel];
+    // 약한 범주에 가중치
+    const wts=cs.map(k=>1+((ust[k]&&ust[k].ng)||0)*2/(((ust[k]&&ust[k].ok)||0)+1));let r=Math.random()*wts.reduce((a,b)=>a+b,0);let ck=cs[0];for(let i=0;i<cs.length;i++){r-=wts[i];if(r<=0){ck=cs[i];break}}
+    US.p=genUnit(ck);US.opts=options(US.p);US.picked=null}
+  const p=US.p;
+  if(US.n&&US.done>=US.n){LS.set('udone',today());V.innerHTML=`<section class="card"><div class="eyebrow">오늘의 단위 ${US.n}문제 끝</div><h2 style="font-size:24px">${US.ok} / ${US.n} 맞음</h2>
+    <p>${US.ok===US.n?'전부 맞았어요. 내일은 2군(넓이·각도·피트)도 섞어 보세요.':'틀린 종류는 다음에 더 자주 나와요.'}</p>
+    <button class="primary" id="more">계속 풀기</button></section>`;V.querySelector('#more').onclick=()=>{US={n:0,done:0,ok:0,p:null};vUnits()};return}
+  V.innerHTML=segPractice('unit')+`<section class="card"><div class="eyebrow">범위 고르기 · 1군 먼저</div><div class="cats">${Object.entries(DIM).map(([k,d])=>`<button class="cat" data-c="${k}" aria-pressed="${sel.has(k)}">${d.lv}군 · ${d.name}</button>`).join('')}</div></section>
+  <section class="card"><div style="display:flex;justify-content:space-between;align-items:center"><span class="chip">${DIM[p.dim].name}</span><span class="score">${US.n?`${US.done+1} / ${US.n}`:`맞음 ${US.ok} · 푼 문제 ${US.done}`}</span></div>
+   <div class="uq">${esc(p.q)}</div><div class="uqr">${esc(p.qr)}</div>
+   <div class="opts">${US.opts.map((o,i)=>`<button class="opt" data-o="${i}">${esc(o)}</button>`).join('')}</div>
+   <div id="after" hidden></div></section>`;wirePM();
+  V.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{const k=b.dataset.c;if(sel.has(k)){if(sel.size>1)sel.delete(k)}else sel.add(k);LS.set('ucats',[...sel]);US.p=null;vUnits();wireCommon(V)});
+  V.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>{if(US.picked!=null)return;US.picked=+b.dataset.o;const okI=US.opts.indexOf(p.ans);const ok=US.picked===okI;
+    V.querySelectorAll('[data-o]').forEach((x,i)=>{x.disabled=true;if(i===okI)x.classList.add('ok');else if(i===US.picked)x.classList.add('ng')});
+    const st=LS.get('ustat',{});st[p.dim]=st[p.dim]||{ok:0,ng:0};st[p.dim][ok?'ok':'ng']++;LS.set('ustat',st);markStudy();
+    if(!ok){const wl=LS.get('uwrong',[]);wl.unshift(p.key);LS.set('uwrong',wl.slice(0,30))}
+    US.done++;if(ok)US.ok++;
+    const af=V.querySelector('#after');af.hidden=false;
+    af.innerHTML=`<p class="verdict ${ok?'ok':'ng'}">${ok?'맞았어요':'아쉬워요 — 풀이를 따라가 보세요'}</p>
+     <div class="ans"><span class="lb">정답</span><span class="v">${esc(p.ans)}</span><span class="rd">읽기: ${esc(p.ansRead)}</span></div>
+     <div class="stepbox">${p.steps.map((s,i)=>`<div class="st"><div class="h"><i>${i+1}</i>${s.h}</div><div class="b">${s.b}</div></div>`).join('')}</div>
+     <div class="btnrow"><button class="tbtn" data-tg="calc">🔢 계산기</button><button class="tbtn" data-tg="easy">쉽게</button></div>
+     <div data-tp="calc" hidden>${p.calc}</div><div class="panel easy" data-tp="easy" hidden><span class="lb">쉽게 보기</span><div>${p.easy}</div></div>
+     <button class="primary" id="nextQ">다음 문제 ›</button>`;
+    wireToggles(af);af.querySelector('#nextQ').onclick=()=>{US.p=null;vUnits();wireCommon(V);window.scrollTo(0,0)};
+    if(!ok)af.scrollIntoView({behavior:'smooth',block:'start'})});
+}
+
+/* ───────── 용어·단위 시트 ───────── */
+const SH=document.getElementById('sheetHost');
+function openSheet(html,after){SH.innerHTML=`<div class="scrim" data-close></div><div class="sheet" role="dialog" aria-modal="true"><div class="sheet-in"><div class="grab"></div>${html}<button class="ghost" data-close>닫기</button></div></div>`;
+  SH.querySelectorAll('[data-close]').forEach(b=>b.onclick=closeSheet);document.addEventListener('keydown',escClose);if(after)after(SH)}
+function closeSheet(){SH.innerHTML='';document.removeEventListener('keydown',escClose)}
+function escClose(e){if(e.key==='Escape')closeSheet()}
+function termSheet(k){const T=TERM[k];if(!T)return;
+  openSheet(`<div><h3>${T.ko}</h3><div class="en">${T.en}</div></div>
+   <div class="defs"><div class="def"><div class="h">일반 정의</div>${md(T.gen)}</div><div class="def"><div class="h">전공 정의</div>${md(T.tech)}</div></div>
+   <button class="tbtn" id="ez" aria-expanded="false">쉽게 (중학생 눈높이)</button><div class="panel easy" id="ezp" hidden><span class="lb">쉽게</span><div>${md(T.easy)}</div></div>`,
+   h=>{const b=h.querySelector('#ez');b.onclick=()=>{const p=h.querySelector('#ezp');p.hidden=!p.hidden;b.setAttribute('aria-expanded',String(!p.hidden))}})}
+function unitSheet(k){const U=UNIT[k];if(!U)return;
+  openSheet(`<div><h3 class="mono">${U.s}</h3></div><div class="readas">읽는 법: <b>${U.r}</b></div><div class="def"><div class="h">뜻 · 관계</div>${U.mean}</div>
+   <button class="primary" id="toUnits">단위 변환 연습하기</button>`,h=>{h.querySelector('#toUnits').onclick=()=>{closeSheet();go('practice',{mode:'unit'})}})}
+document.addEventListener('click',e=>{
+  const tb=e.target.closest('.t');if(tb){e.preventDefault();termSheet(tb.dataset.t);return}
+  const ub=e.target.closest('.u');if(ub){e.preventDefault();unitSheet(ub.dataset.u)}
+});
+
+/* ───────── 내 사진·메모 (이 폰에만 저장, IndexedDB) ───────── */
+const IDB={db:null,open(){return new Promise((res,rej)=>{if(this.db)return res(this.db);try{const r=indexedDB.open('skn-photos',1);r.onupgradeneeded=()=>r.result.createObjectStore('p',{keyPath:'id'});r.onsuccess=()=>{this.db=r.result;res(this.db)};r.onerror=()=>rej(r.error)}catch(e){rej(e)}})},
+  async all(page){const db=await this.open();return new Promise(res=>{const out=[];const c=db.transaction('p').objectStore('p').openCursor();c.onsuccess=()=>{const cur=c.result;if(cur){if(!page||cur.value.page===page)out.push(cur.value);cur.continue()}else res(out)}})},
+  async put(v){const db=await this.open();return new Promise((res,rej)=>{const tx=db.transaction('p','readwrite');tx.objectStore('p').put(v);tx.oncomplete=res;tx.onerror=()=>rej(tx.error)})},
+  async del(id){const db=await this.open();return new Promise(res=>{const tx=db.transaction('p','readwrite');tx.objectStore('p').delete(id);tx.oncomplete=res})}};
+function shrink(file){return new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const M=1280,s=Math.min(1,M/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.82))};im.onerror=rej;im.src=fr.result};fr.onerror=rej;fr.readAsDataURL(file)})}
+PB.onclick=()=>noteSheet(cur.arg.id);
+async function noteSheet(page){
+  let list=[];try{list=await IDB.all(page)}catch(e){}
+  openSheet(`<div><h3>내 노트</h3><div class="small muted">${PAGES[page].title} · 이 폰에만 저장돼요 (공개되지 않음)</div></div>
+   <textarea id="nt" class="note-ta" placeholder="이 장에서 내가 정리하고 싶은 것, 헷갈린 점, 교수님이 강조한 말…">${esc(MY.note(page))}</textarea>
+   <div class="nt-bar"><span class="small muted" id="ntst">${MY.note(page)?'저장돼 있어요':'쓰면 바로 저장돼요'}</span><button class="tbtn" id="nt2c">＋ 카드로 만들기</button></div>
+   <div class="eyebrow">사진</div>
+   ${list.length?`<div class="photos">${list.map(p=>`<button class="ph" data-ph="${p.id}" aria-label="사진 보기"><img src="${p.img}" alt=""></button>`).join('')}</div>`:'<p class="small muted">필기나 칠판을 찍어 이 장에 붙여 두세요.</p>'}
+   <label class="ghost filebtn" style="text-align:center">📷 사진 추가<input type="file" accept="image/*" id="pin"></label>
+   <div class="eyebrow">백업</div>
+   <div class="btnrow"><button class="tbtn" id="exp">백업 내보내기</button><label class="tbtn filebtn">백업 불러오기<input type="file" accept="application/json,.json" id="imp"></label></div>
+   <p class="small muted" id="pmsg">노트·내 카드·사진·암기 기록을 한 파일로 저장해요. 이 파일을 채팅에 보내 주면 앱 본문에 정식으로 넣어 드릴 수도 있어요.</p>`,h=>{
+    const ta=h.querySelector('#nt');let tm;ta.oninput=()=>{clearTimeout(tm);h.querySelector('#ntst').textContent='저장 중…';tm=setTimeout(()=>{MY.setNote(page,ta.value);h.querySelector('#ntst').textContent='저장했어요';if(cur.v==='page')refreshNote()},400)};
+    h.querySelector('#nt2c').onclick=()=>{MY.setNote(page,ta.value);const sel=(ta.value.substring(ta.selectionStart,ta.selectionEnd)||'').trim();cardForm({id:'my'+Date.now(),f:sel,a:'',e:'',page},page)};
+    h.querySelector('#pin').onchange=async e=>{MY.setNote(page,ta.value);const f=e.target.files[0];if(!f)return;try{const img=await shrink(f);await IDB.put({id:'p'+Date.now(),page,img,memo:'',at:Date.now()});noteSheet(page)}catch(err){h.querySelector('#pmsg').textContent='사진을 저장하지 못했어요. 브라우저 저장 공간이 꺼져 있을 수 있어요.'}};
+    h.querySelectorAll('[data-ph]').forEach(b=>b.onclick=()=>{MY.setNote(page,ta.value);photoView(list.find(x=>x.id===b.dataset.ph))});
+    h.querySelector('#exp').onclick=async()=>{try{const all=await IDB.all();const blob=new Blob([JSON.stringify({app:'sensor-notes',v:2,notes:MY.notes(),mycards:MY.cards(),srs:LS.get('srs',{}),ustat:LS.get('ustat',{}),photos:all})],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='센서노트-백업.json';document.body.appendChild(a);a.click();a.remove();h.querySelector('#pmsg').textContent='저장을 시도했어요. 시안(미리보기)에서는 파일 저장이 막혀 있고, 폰 앱 버전에서 동작해요.'}catch(e){h.querySelector('#pmsg').textContent='내보내기에 실패했어요.'}};
+    h.querySelector('#imp').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.app!=='sensor-notes')throw 0;for(const p of d.photos||[])await IDB.put(p);
+      if(d.srs)LS.set('srs',d.srs);if(d.ustat)LS.set('ustat',d.ustat);if(d.notes)LS.set('notes',{...MY.notes(),...d.notes});
+      if(d.mycards){const ids=new Set(MY.cards().map(c=>c.id));MY.setCards(MY.cards().concat(d.mycards.filter(c=>!ids.has(c.id))))}
+      deck=null;noteSheet(page);if(cur.v==='page')refreshNote()}catch(err){h.querySelector('#pmsg').textContent='센서노트 백업 파일이 아니에요. 내보내기로 만든 .json 파일을 골라 주세요.'}};
+  });
+}
+function refreshNote(){const box=V.querySelector('#myNoteBox');if(box)box.outerHTML=noteBox(cur.arg.id);wireNoteBox()}
+function noteBox(id){const t=MY.note(id);return t?`<button class="mynote" id="myNoteBox"><span class="lb">✎ 내 노트</span><span class="nt-tx">${esc(t.length>220?t.slice(0,220)+'…':t)}</span></button>`:`<button class="mynote empty" id="myNoteBox">✎ 이 장에 내 노트·사진 붙이기</button>`}
+function wireNoteBox(){const b=V.querySelector('#myNoteBox');if(b)b.onclick=()=>noteSheet(cur.arg.id)}
+function photoView(p){openSheet(`<div class="phfull"><img src="${p.img}" alt="내 사진"></div><label class="small muted" for="memo">메모</label><textarea id="memo" placeholder="이 사진에서 기억할 점">${esc(p.memo||'')}</textarea>
+  <div class="btnrow"><button class="tbtn" id="save">메모 저장</button><button class="tbtn" id="del" style="color:var(--bad)">사진 삭제</button></div><p class="small muted" id="vmsg"></p>`,h=>{
+  h.querySelector('#save').onclick=async()=>{p.memo=h.querySelector('#memo').value;await IDB.put(p);h.querySelector('#vmsg').textContent='저장했어요'};
+  let armed=false;h.querySelector('#del').onclick=async e=>{if(!armed){armed=true;e.target.textContent='한 번 더 누르면 삭제';return}await IDB.del(p.id);noteSheet(p.page)}})}
+
+/* 시작 */
+const h=(location.hash||'').slice(1);
+if(PAGES[h])cur={v:'page',arg:{id:h,i:0}};else if(['dict','cards','practice'].includes(h))cur={v:h};
+render();
+})();
+</script>

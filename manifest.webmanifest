@@ -1,7 +1,7 @@
 {
-  "name": "센서 및 응용 중간고사 문제집",
-  "short_name": "센서 문제집",
-  "description": "작년 기출·HW1·HW2 유형별 문제집, 상세 풀이와 fx-570ES PLUS 입력 순서",
+  "name": "센서 핵심노트",
+  "short_name": "센서노트",
+  "description": "센서 및 응용 학습 바이블 — 용어·단위·공식·계산기 사용법·문제·암기 카드",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
