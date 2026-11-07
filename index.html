@@ -361,6 +361,7 @@ select{width:100%;font:inherit;font-size:15px;color:var(--ink);background:var(--
 .cchips{display:flex;flex-wrap:wrap;gap:6px}.cchips.soft{margin-top:6px;opacity:.75}.cchip{font:inherit;font-size:12.5px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--ink);border-radius:999px;padding:4px 10px;min-height:32px;cursor:pointer}.cchip b{color:var(--accent);margin-right:2px}.cchip.here{border-style:dashed}
 .cstrand{margin:12px 0}.cstrand .h{margin-bottom:6px}.cstage{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0}.cstage summary{cursor:pointer;font-weight:700}.cstage.done{border-color:var(--good)}.cst-i{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--bg);font-size:12px;margin-right:4px}.cstage.done .cst-i{background:var(--good)}
 .cpass{list-style:none;padding:0;margin:10px 0 0}.cpass li{margin:8px 0}.cpass label{display:flex;gap:8px;align-items:flex-start}.cpass input{width:20px;height:20px;flex:0 0 20px;margin-top:1px}.ctab td{vertical-align:top}.linkb{font:inherit;font-size:13px;background:none;border:0;color:var(--accent);padding:0;text-align:left;cursor:pointer;white-space:nowrap}
+.arow{border-bottom:1px solid var(--line);padding:10px 0}.arow:last-child{border-bottom:0}.ar-h{font-size:15px}.ar-s{color:var(--accent);font-weight:700}.ar-b{font-size:13.5px;color:var(--muted);margin:3px 0 6px}
 </style>
 </head>
 <body>
@@ -1122,7 +1123,7 @@ const TOC=[
  {n:'제1편',h:'센서 공통',d:'어떤 센서든 같은 기준으로',items:[['signal','센서와 신호의 흐름'],['char','센서 특성'],['calib','오차와 보정 — 최소제곱']]},
  {n:'제2편',h:'감지 원리',d:'원리 몇 개로 센서 여러 개',items:[['resist','저항형'],['cap','정전용량형'],['induct','전자기 유도·와전류'],['hall','홀 효과·자기저항'],['piezo','압전형'],['optic','광학']]},
  {n:'제3편',h:'센서별',d:'측정 대상마다 한 장씩',items:[['gas','가스센서'],['mag','자기센서'],['speed','속도센서·금속탐지기'],['accel','가속도·진동센서'],['gyro','자이로센서'],['ultra','초음파센서'],['saw','SAW 센서'],['temp','온도센서'],['press','압력센서'],['flow','유량·레벨센서'],['prox','근접·광센서']]},
- {n:'제4편',h:'현업 연결',d:'센서 데이터의 큰 그림',items:[['plant','공장 데이터 흐름 — PLC·SCADA·MES'],['pdm','예지보전']]}
+ {n:'제4편',h:'현업 연결',d:'센서 데이터의 큰 그림',items:[['plant','공장 데이터 흐름 — PLC·SCADA·MES'],['pdm','예지보전'],['around','생활 속 센서 — 어디에 무엇이']]}
 ];
 const APX=[['A','공식 모음','form'],['B','용어 사전','term'],['C','단위 읽는 법','unit'],['D','회로 기호','sym'],['E','계산기 키','key'],['F','기초 커리큘럼','@curri']];
 function vHome(){
@@ -5137,6 +5138,81 @@ CARDS.push(
  {id:'s8',tag:'예지보전',f:'1×, 2× 진동이 크면',a:'1× 불균형 · 2× 정렬불량',r:'',e:''},
  {id:'s9',tag:'예지보전',f:'실무 샘플링 주파수와 FFT 분해능',a:'f_s = 2.56 f_max · Δf = f_s/N',r:'',e:''},
  {id:'s10',tag:'예지보전',f:'이상 판정 3σ',a:'평균 + 3σ 초과 → 이상 징후',r:'정상이 넘을 확률 약 0.13 %',e:''}
+);
+
+/* ═════════ 제4편 3장 생활 속 센서 — 어디에 무엇이 쓰이나 (상식 수준) ═════════ */
+Object.assign(TERM,{
+ radar:{ko:'레이더',en:'RADAR (Radio Detection And Ranging)',gen:'전파를 쏘아 돌아오는 신호로 거리와 속도를 재는 센서.',tech:'거리: 왕복 시간(ToF) 또는 FMCW 비트 주파수. 속도: 도플러 f_d = 2v/λ. 차량용 77 GHz(λ ≈ 3.9 mm). 비·안개·어둠에 강하고 해상도는 라이다보다 낮음.',easy:'초음파 주차 센서와 같은 메아리 원리인데, 소리 대신 전파를 써서 훨씬 멀리, 날씨와 상관없이 재요.',ex:'77 GHz 레이더에 100 km/h(27.8 m/s)로 다가오는 차가 있으면 도플러 주파수는 2 × 27.8 ÷ 0.0039 ≈ 14 kHz예요. 이 값으로 상대 속도를 바로 알아요.',sum:'전파 메아리로 거리(ToF)와 속도(도플러)'},
+ imgsensor:{ko:'이미지센서',en:'Image sensor (CCD / CMOS)',gen:'빛을 픽셀마다 전기 신호로 바꿔 영상을 만드는 센서.',tech:'포토다이오드 수백만 개 배열. 빛 → 전하 축적(노출) → 전압 → ADC → 디지털 영상. CCD는 전하를 한쪽으로 옮겨 읽고, CMOS는 픽셀마다 증폭기가 있어 빠르고 전력이 적음(현재 대부분 CMOS).',easy:'포토다이오드를 바둑판처럼 촘촘히 깔아 놓고, 칸마다 받은 빛의 양을 숫자로 적으면 사진이 돼요.',ex:'1200만 화소 폰 카메라는 포토다이오드 약 1200만 개가 동시에 빛을 받아요. 각 칸의 값이 0~255(8비트) 숫자로 저장돼요.',sum:'포토다이오드 배열 → 픽셀 값 → 영상'},
+ pir:{ko:'인체 감지 센서 (PIR)',en:'Passive Infrared sensor',gen:'사람 몸에서 나오는 적외선의 변화로 움직임을 감지.',tech:'초전(焦電) 효과: 온도 변화 → 결정의 분극 변화 → 전하 발생. 변화에만 반응하므로 움직이는 사람만 감지. 프레넬 렌즈로 감지 영역 분할.',easy:'사람 몸의 열(적외선)이 왔다 갔다 하는 걸 느끼는 센서예요. 가만히 있으면 못 느껴요.',ex:'현관 센서등은 들어설 때 켜지지만, 오래 가만히 서 있으면 꺼져요. 변화가 없어서 감지가 끊기기 때문이에요.',sum:'적외선 열의 변화(초전 효과)로 움직임 감지'}
+});
+const AR=(rows)=>rows.map(([fn,sen,how,pg,i,tag])=>`<div class="arow"><div class="ar-h"><b>${fn}</b> <span class="ar-s">${sen}</span>${tag?` <span class="chip">${tag}</span>`:''}</div><div class="ar-b">${how}</div>${pg&&PAGES[pg]?`<button class="cchip" data-goto="${pg}" data-i="${i||0}">↗ ${PAGES[pg].title.split(' — ')[0]}</button>`:''}</div>`).join('');
+PAGES.around={title:'생활 속 센서 — 어디에 무엇이',part:'제4편 3장',secs:[
+ {k:'스마트폰',h:'스마트폰 한 대에 든 센서',get b(){return `<p class="small muted">[AI 보충] 상식 수준 정리예요. 센서 이름과 한 줄 원리만 보고, 궁금하면 ↗로 원리 장에 가요.</p>${AR([
+   ['화면 회전·걸음 수','가속도','MEMS 질량이 움직여 정전용량이 바뀜','accel',2],
+   ['손떨림 보정·게임','자이로','진동하는 질량에 코리올리 힘','gyro',2],
+   ['나침반·지도 방향','지자기','지구 자기장을 홀·자기저항으로 측정','mag',3],
+   ['통화 중 화면 꺼짐','근접','적외선 LED를 쏘고 반사를 포토다이오드로','optic',4],
+   ['자동 밝기','조도','포토다이오드 광전류','optic',3],
+   ['층수·고도','기압','MEMS 막의 압저항 (한 층 ≈ 0.36 hPa)','press',2],
+   ['터치 화면','정전용량','손가락이 전극 사이 용량을 바꿈','cap',1],
+   ['지문 인식','정전용량·광학·초음파','지문 골과 마루의 차이를 픽셀로','cap',1],
+   ['카메라','[[imgsensor|이미지센서]]','포토다이오드 배열 (CMOS)','optic',2],
+   ['무선 충전','코일','전자기 유도 — 센서와 같은 원리','induct',0]])}`},
+  easy:'폰 하나에 센서가 열 가지쯤 들어 있어요. 대부분 이 앱에서 배운 원리 그대로예요.',
+  ex:'엘리베이터를 타면 지도 앱의 층 표시가 바뀌는 건 기압센서 덕분이에요. 한 층(약 3 m)에 기압이 약 0.36 hPa 줄어요.',sum:'폰 센서 = 가속도·자이로·지자기·근접·조도·기압·터치·카메라'},
+ {k:'자동차',h:'자동차의 센서',get b(){return AR([
+   ['주차 보조 (삑삑)','초음파','ToF 메아리, 수 m 이내','ultra',2],
+   ['앞차 거리 유지·사각지대','[[radar|레이더]]','77 GHz 전파 ToF + 도플러로 상대 속도','ultra',2],
+   ['차선·표지판 인식','카메라','이미지센서 + 영상 인식 AI','optic',2],
+   ['자율주행 3D 지도','[[lidar|라이다]]','레이저 ToF, d = c·t/2','optic',5],
+   ['ABS 바퀴 속도','홀·유도형','톤휠 이빨이 지나갈 때 펄스','speed',1],
+   ['에어백','가속도','충돌 순간 큰 감속을 감지','accel',0],
+   ['미끄럼 방지 (ESC)','자이로','차가 도는 각속도(요 레이트)','gyro',9],
+   ['타이어 공기압 (TPMS)','압력','바퀴 안 MEMS 압력 + 무선 송신','press',2],
+   ['엔진 배기','산소센서','지르코니아 전기화학식','gas',0],
+   ['냉각수 온도','서미스터','온도↑ 저항↓ (NTC)','temp',2]])},
+  easy:'자동차는 "보는 센서"(초음파·레이더·라이다·카메라)와 "차 상태를 재는 센서"(속도·가속도·압력·온도)로 나눠 보면 쉬워요.',
+  ex:'고속도로 크루즈 컨트롤은 레이더로 앞차까지 거리와 상대 속도를 재서 간격을 유지해요. 비나 밤에도 동작하는 이유가 전파를 쓰기 때문이에요.',sum:'보는 센서 4종 + 차 상태 센서'},
+ {k:'집·생활',h:'집과 생활 속 센서',get b(){return AR([
+   ['화재 감지기','광전식 연기','연기가 빛을 산란시키면 수광부가 감지','optic',4],
+   ['가스 경보기','반도체식 가스','SnO₂ 저항 변화','gas',6],
+   ['현관 센서등·자동문','[[pir|PIR]]·마이크로파','사람 열(적외선)의 변화 / 전파 도플러','piezo',0],
+   ['문·창문 열림 감지','자석 + 리드·홀','자석이 멀어지면 스위치 변화','hall',6],
+   ['체중계','로드셀 (스트레인 게이지)','무게 → 미세 변형 → 저항 변화 → 브리지','resist',1],
+   ['에어컨·냉장고','서미스터','온도 → 저항','temp',2],
+   ['습도계·제습기','정전용량형 습도','수분이 유전율을 바꿈','cap',1],
+   ['공항 검색대','금속탐지기','와전류 → 코일 변화','speed',5],
+   ['스마트워치 심박','광학 (PPG)','혈류에 따라 반사광이 변함','optic',4]])},
+  easy:'집 안 센서도 대부분 저항·정전용량·빛·자기 중 하나로 동작해요.',
+  ex:'현관 센서등 아래 오래 서 있으면 꺼지는 건, PIR 센서가 열의 "변화"에만 반응하기 때문이에요. 손을 흔들면 다시 켜져요.',sum:'생활 센서도 저항·용량·빛·자기 원리'},
+ {k:'공장',h:'공장의 센서',get b(){return AR([
+   ['비전 검사','산업용 카메라','이미지센서 + 조명 + 판정 AI','optic',2],
+   ['부품 유무·위치','유도형 근접','금속이 오면 와전류로 발진 변화','prox',1],
+   ['컨베이어 통과 감지','광전 센서','빛이 가려지거나 반사됨','prox',3],
+   ['탱크 레벨','레이더·초음파 레벨계','위에서 ToF','flow',4],
+   ['설비 진동','압전 가속도계','진동 → 전하 → FFT','accel',7],
+   ['공정 온도','열전대·RTD','열기전력 / 백금 저항','temp',3],
+   ['배관 압력·유량','압력·차압 유량계','압저항 / 차압','flow',1],
+   ['AGV 충돌 방지','라이다 스캐너','레이저로 주변 2D 스캔','optic',5],
+   ['신호 전송','4~20 mA·필드버스','측정값을 PLC로','plant',2]])},
+  easy:'공장 센서는 측정값이 4~20 mA나 통신으로 PLC에 들어가고, 그 위로 SCADA·MES·AI까지 이어져요.',
+  ex:'진동 센서 값이 히스토리안에 쌓이면, 예지보전에서 RMS 추세와 FFT로 베어링 이상을 미리 찾아요.',sum:'공장 센서 → 4~20 mA → PLC → MES·AI'},
+ {k:'거리 센서 비교',h:'초음파·레이더·라이다·카메라 — 무엇이 다른가',b:`<div class="tblwrap fit"><table><tr><th>센서</th><th>쏘는 것</th><th>잘하는 것</th><th>약한 것</th></tr>
+   <tr><td>초음파</td><td class="small">소리</td><td class="small">싸고 가까운 거리, 투명체도 감지</td><td class="small">수 m까지, 온도·바람 영향</td></tr>
+   <tr><td>레이더</td><td class="small">전파</td><td class="small">멀리, 비·안개·어둠, 속도 직접</td><td class="small">모양 구분이 흐림</td></tr>
+   <tr><td>라이다</td><td class="small">레이저 빛</td><td class="small">정밀한 3D 모양</td><td class="small">비·안개, 가격</td></tr>
+   <tr><td>카메라</td><td class="small">안 쏨 (받기만)</td><td class="small">색·글자·차선 인식</td><td class="small">거리 직접 못 잼, 어둠·역광</td></tr></table></div>
+   <div class="rel">셋은 모두 "쏘고 → 돌아온 시간 × 속도 ÷ 2" (ToF). 다른 건 쏘는 파동의 종류뿐 · 카메라만 수동형</div>
+   <p class="small">그래서 자율주행차는 서로의 약점을 메우려고 넷을 같이 써요 (센서 융합).</p>`,
+  easy:'초음파·레이더·라이다는 모두 메아리 원리예요. 소리냐, 전파냐, 빛이냐만 달라요. 카메라는 쏘지 않고 보기만 해요.',
+  ex:'안개 낀 밤에는 카메라와 라이다가 약해지지만 레이더는 그대로 앞차를 봐요. 대신 레이더는 앞에 있는 게 사람인지 표지판인지 구분을 잘 못해서 카메라와 함께 써요.',sum:'같은 ToF, 다른 파동 — 약점을 서로 메운다'}
+]};
+CARDS.push(
+ {id:'ar1',tag:'생활 센서',f:'초음파·레이더·라이다의 공통 원리',a:'ToF: 거리 = 속도 × 왕복 시간 ÷ 2',r:'소리 / 전파 / 빛',e:''},
+ {id:'ar2',tag:'생활 센서',f:'레이더가 속도를 바로 재는 원리',a:'도플러 f_d = 2v/λ',r:'',e:''},
+ {id:'ar3',tag:'생활 센서',f:'폰 화면 회전과 손떨림 보정 센서',a:'가속도(회전) · 자이로(손떨림)',r:'',e:''},
+ {id:'ar4',tag:'생활 센서',f:'PIR 센서가 가만히 있는 사람을 못 보는 이유',a:'초전 효과는 온도 "변화"에만 반응',r:'',e:''}
 );
 
 /* ═════════ 부록 F 기초 커리큘럼 + 장마다 「이 장에 필요한 기초」 ═════════ */
