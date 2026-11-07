@@ -1106,6 +1106,8 @@ const THEME={get(){return LS.get('theme','dark')},set(t){LS.set('theme',t);this.
   const dark=t==='dark'||(t==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);let m=document.querySelector('meta[name="theme-color"]');if(!m){m=document.createElement('meta');m.name='theme-color';document.head.appendChild(m)}m.content=dark?'#111512':'#1c7449';
   document.querySelectorAll('[data-theme-set]').forEach(x=>x.setAttribute('aria-selected',String(x.dataset.themeSet===t)))}};
 function wireCommon(root){
+  const he=root.querySelector('#hexp');if(he)he.onclick=()=>exportAll(root.querySelector('#hmsg'));
+  const ne=root.querySelector('#nexp');if(ne)ne.onclick=()=>exportAll(root.querySelector('#nmsg'));
   root.querySelectorAll('[data-theme-set]').forEach(b=>b.onclick=()=>THEME.set(b.dataset.themeSet));
   root.querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>{const g=b.dataset.goto;if(PAGES[g])go('page',{id:g,i:+(b.dataset.i||0)});else if(g.startsWith('dict:'))go('dict',{seg:g.slice(5)});else if(g==='units')go('practice',{mode:'unit'});else if(g==='pfx'){PD=null;go('practice',{mode:'pfx'})}else if(g==='calc')go('practice',{mode:'calc',topic:b.dataset.topic});else go(g)});
 }
@@ -1122,7 +1124,8 @@ const APX=[['A','공식 모음','form'],['B','용어 사전','term'],['C','단�
 function vHome(){
   TT.textContent='센서 핵심노트';
   const mark=LS.get('last',null);const mp=mark&&PAGES[mark.id];
-  V.innerHTML=`<section class="cover">
+  const hasData=Object.keys(MY.notes()).length||MY.cards().length||Object.keys(LS.get('srs',{})).length;const bkOld=Date.now()-LS.get('lastbk',0)>14*864e5;
+  V.innerHTML=`${hasData&&bkOld?`<section class="card" style="border-color:var(--warn)"><div class="eyebrow" style="color:var(--warn)">백업 알림</div><p style="margin:4px 0 8px">${LS.get('lastbk',0)?'마지막 백업이 2주가 넘었어요.':'아직 백업한 적이 없어요.'} 노트·카드·복습 기록은 이 폰에만 있어요.</p><div class="btnrow"><button class="primary" id="nexp">💾 지금 백업하기</button></div><p class="small" id="nmsg"></p></section>`:''}<section class="cover">
     <div class="cv-eyebrow">SENSOR ENGINEERING · 학습 바이블</div>
     <h2 class="cv-title">센서 핵심노트</h2>
     <p class="cv-sub">원리에서 계산까지, 내 손에 맞춘 한 권</p>
@@ -1138,7 +1141,9 @@ function vHome(){
   </section>
   <section class="card"><div class="eyebrow">설정</div><div class="h" style="margin-bottom:6px">화면 모드</div>
     <div class="seg" role="tablist">${[['dark','다크'],['light','라이트'],['auto','기기 설정 따름']].map(([k,l])=>`<button role="tab" aria-selected="${THEME.get()===k}" data-theme-set="${k}">${l}</button>`).join('')}</div>
-    <p class="small muted" style="margin:8px 0 0">기본은 다크 모드예요. 「기기 설정 따름」은 폰의 라이트·다크 설정을 그대로 써요.</p></section>
+    <p class="small muted" style="margin:8px 0 0">기본은 다크 모드예요. 「기기 설정 따름」은 폰의 라이트·다크 설정을 그대로 써요.</p>
+    <div class="h" style="margin:14px 0 6px">내 기록 백업</div><p class="small muted" style="margin:0 0 8px">노트·사진·내 카드·복습 일정·연습 기록은 이 폰 안에만 저장돼요. 폰을 바꾸거나 앱 데이터를 지우기 전에 백업하세요. ${LS.get('lastbk',0)?'마지막 백업: '+new Date(LS.get('lastbk',0)).toLocaleDateString('ko-KR'):'아직 백업한 적 없어요.'}</p>
+    <div class="btnrow"><button class="tbtn" id="hexp">💾 지금 백업하기</button></div><p class="small" id="hmsg"></p></section>
   <p class="colophon">센서 핵심노트 · ${Object.keys(PAGES).length}장 · 용어 ${Object.keys(TERM).length} · 단위 ${Object.keys(UNIT).length} · 공식 ${FORM.length} · 카드 ${CARDS.length}</p>`;
   V.querySelectorAll('[data-dict]').forEach(b=>b.onclick=()=>go('dict',{seg:b.dataset.dict}));
   const qi=V.querySelector('#q'),qr=V.querySelector('#qres');
@@ -5016,6 +5021,10 @@ function cheatSheet(dimKey){
    <button class="ghost" data-goto="unitbasic" data-close>↗ 0편 1장 전체 보기</button>`,h=>wireCommon(h));
 }
 function ezHTML(e,x){x=x||{};return `<span class="lb">쉽게 말하면</span><div>${md(e)}</div>${x.ex?`<div class="ezx"><span class="lb">예를 들면</span><div>${md(x.ex)}</div></div>`:''}${x.sum?`<div class="ezs"><span class="lb">한 줄 정리</span><div>${md(x.sum)}</div></div>`:''}`}
+async function exportAll(msg){try{const all=await IDB.all();const blob=new Blob([JSON.stringify({app:'sensor-notes',v:3,at:new Date().toISOString(),notes:MY.notes(),mycards:MY.cards(),srs:LS.get('srs',{}),ustat:LS.get('ustat',{}),pstat:LS.get('pstat',{}),phist:LS.get('phist',[]),uwrong:LS.get('uwrong',[]),photos:all})],{type:'application/json'});
+  const name='센서노트-백업-'+today()+'.json';const file=new File([blob],name,{type:'application/json'});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:'센서노트 백업'});LS.set('lastbk',Date.now());if(msg)msg.textContent='백업 파일을 보냈어요. 드라이브·메일 등 폰 밖에 꼭 보관하세요.';return}catch(e){if(e&&e.name==='AbortError')return}}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();LS.set('lastbk',Date.now());if(msg)msg.textContent='다운로드 폴더에 저장했어요. 드라이브 등 폰 밖에도 한 부 보관하세요.'}catch(e){if(msg)msg.textContent='내보내기에 실패했어요.'}}
 function closeSheet(){SH.innerHTML='';document.removeEventListener('keydown',escClose)}
 function escClose(e){if(e.key==='Escape')closeSheet()}
 function termSheet(k){const T=TERM[k];if(!T)return;
@@ -5053,9 +5062,9 @@ async function noteSheet(page){
     h.querySelector('#nt2c').onclick=()=>{MY.setNote(page,ta.value);const sel=(ta.value.substring(ta.selectionStart,ta.selectionEnd)||'').trim();cardForm({id:'my'+Date.now(),f:sel,a:'',e:'',page},page)};
     h.querySelector('#pin').onchange=async e=>{MY.setNote(page,ta.value);const f=e.target.files[0];if(!f)return;try{const img=await shrink(f);await IDB.put({id:'p'+Date.now(),page,img,memo:'',at:Date.now()});noteSheet(page)}catch(err){h.querySelector('#pmsg').textContent='사진을 저장하지 못했어요. 브라우저 저장 공간이 꺼져 있을 수 있어요.'}};
     h.querySelectorAll('[data-ph]').forEach(b=>b.onclick=()=>{MY.setNote(page,ta.value);photoView(list.find(x=>x.id===b.dataset.ph))});
-    h.querySelector('#exp').onclick=async()=>{try{const all=await IDB.all();const blob=new Blob([JSON.stringify({app:'sensor-notes',v:2,notes:MY.notes(),mycards:MY.cards(),srs:LS.get('srs',{}),ustat:LS.get('ustat',{}),photos:all})],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='센서노트-백업.json';document.body.appendChild(a);a.click();a.remove();h.querySelector('#pmsg').textContent='저장을 시도했어요. 시안(미리보기)에서는 파일 저장이 막혀 있고, 폰 앱 버전에서 동작해요.'}catch(e){h.querySelector('#pmsg').textContent='내보내기에 실패했어요.'}};
+    h.querySelector('#exp').onclick=()=>exportAll(h.querySelector('#pmsg'));
     h.querySelector('#imp').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.app!=='sensor-notes')throw 0;for(const p of d.photos||[])await IDB.put(p);
-      if(d.srs)LS.set('srs',d.srs);if(d.ustat)LS.set('ustat',d.ustat);if(d.notes)LS.set('notes',{...MY.notes(),...d.notes});
+      if(d.srs)LS.set('srs',d.srs);if(d.ustat)LS.set('ustat',d.ustat);if(d.pstat)LS.set('pstat',d.pstat);if(d.phist)LS.set('phist',d.phist);if(d.uwrong)LS.set('uwrong',d.uwrong);if(d.notes)LS.set('notes',{...MY.notes(),...d.notes});
       if(d.mycards){const ids=new Set(MY.cards().map(c=>c.id));MY.setCards(MY.cards().concat(d.mycards.filter(c=>!ids.has(c.id))))}
       deck=null;noteSheet(page);if(cur.v==='page')refreshNote()}catch(err){h.querySelector('#pmsg').textContent='센서노트 백업 파일이 아니에요. 내보내기로 만든 .json 파일을 골라 주세요.'}};
   });
@@ -5072,6 +5081,7 @@ function photoView(p){openSheet(`<div class="phfull"><img src="${p.img}" alt="�
 const h=(location.hash||'').slice(1);
 if(PAGES[h])cur={v:'page',arg:{id:h,i:0}};else if(['dict','cards','practice'].includes(h))cur={v:h};
 window.__T={PAGES,GEN,TOPICS,TERM,go};THEME.apply();render();
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persisted().then(p=>{if(!p)navigator.storage.persist()})}catch(e){}
 })();
 </script>
 
