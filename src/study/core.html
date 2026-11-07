@@ -136,6 +136,7 @@ b{font-weight:700}
 table{border-collapse:collapse;width:100%;font-size:14px;min-width:460px}
 .tblwrap.fit table{min-width:0;font-size:13px}.tblwrap.fit th,.tblwrap.fit td{padding:7px 6px}
 .tblwrap.fit td:first-child{white-space:nowrap}
+.panel.easy .ezx,.panel.easy .ezs{border-top:1px dashed var(--line);padding-top:8px;margin-top:4px;display:flex;flex-direction:column;gap:4px}.panel.easy .ezs div{font-weight:700}
 .dots{display:inline-flex;gap:4px;vertical-align:middle;margin-right:6px}.dots i{width:10px;height:10px;border-radius:50%;border:1.5px solid var(--line);display:inline-block}.dots i.ok{background:var(--good);border-color:var(--good)}.dots i.ng{background:var(--bad);border-color:var(--bad)}.dots i.now{border-color:var(--accent);box-shadow:inset 0 0 0 2px var(--accent-soft)}
 .setlog{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:8px 0}.setlog .row{display:grid;grid-template-columns:24px 1fr auto 20px;gap:8px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line);font-size:14px}.setlog .row:last-child{border-bottom:0}.setlog .no{color:var(--muted);font-size:12px}.setlog .q{min-width:0;overflow-wrap:anywhere}.setlog .a{color:var(--muted);font-size:13px}.setlog .ok .mk{color:var(--good);font-weight:800}.setlog .ng .mk{color:var(--bad);font-weight:800}
 .symgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.sym{border:1px solid var(--line);border-radius:12px;padding:8px;background:var(--surface);display:flex;flex-direction:column;gap:2px;min-width:0}.sym svg{width:100%;height:auto;background:var(--surface2);border-radius:8px;margin-bottom:4px}.sym b{font-size:14px}.sym small{font-size:11px;color:var(--muted)}.sym .dgen{font-size:12.5px}
@@ -466,7 +467,7 @@ function probHTML(p,regen){const id='p'+(++PID);
     <button class="ghost" data-more style="margin-top:10px">다음 단계 ▾ (${p.steps.length>1?`1 / ${p.steps.length}`:'끝'})</button></div>
   <div data-pn="ans" hidden><div class="ans"><span class="lb">정답</span><span class="v">${p.ans}</span><span class="rd">읽기: ${p.ansRead}</span></div></div>
   <div data-pn="calc" hidden>${p.calc}</div>
-  ${p.easy?`<div data-pn="easy" hidden><div class="panel easy"><span class="lb">쉽게 보기</span><div>${md(p.easy)}</div></div></div>`:''}
+  ${p.easy?`<div data-pn="easy" hidden><div class="panel easy">${ezHTML(p.easy,{sum:p.steps&&p.steps.length?'풀이 순서: '+p.steps.map(x=>x.h).join(' → '):''})}</div></div>`:''}
   ${p.more?`<details class="qa"><summary>더 알아보기</summary><div>${md(p.more)}</div></details>`:''}
   </div>`}
 function wireProb(root){
@@ -1171,7 +1172,7 @@ function vPage(arg){const P=PAGES[arg.id];const i=Math.min(arg.i||0,P.secs.lengt
      <button class="ghost" data-goto="calc" data-topic="${arg.id}">연습 탭에서 계속 풀기 ›</button>`:
   `<section class="card sec">${head}<h2>${s.h}</h2>${md(s.b)}
    ${(s.easy||s.src)?`<div class="btnrow">${s.easy?'<button class="tbtn" data-tg="easy">쉽게</button>':''}${s.src?'<button class="tbtn" data-tg="src">원문</button>':''}</div>`:''}
-   ${s.easy?`<div class="panel easy" data-tp="easy" hidden><span class="lb">쉽게 보기 · 중학생 눈높이</span><div>${md(s.easy)}</div></div>`:''}
+   ${s.easy?`<div class="panel easy" data-tp="easy" hidden>${ezHTML(s.easy,s)}</div>`:''}
    ${s.src?`<div class="panel src" data-tp="src" hidden><span class="lb">강의자료 원문 · 【 】</span><div class="small">${md(s.src)}</div></div>`:''}
   </section>`}
   ${noteBox(arg.id)}
@@ -1829,7 +1830,7 @@ function vUnits(arg){TT.textContent='연습';
      <div class="ans"><span class="lb">정답</span><span class="v">${esc(p.ans)}</span><span class="rd">읽기: ${esc(p.ansRead)}</span></div>
      <div class="stepbox">${p.steps.map((s,i)=>`<div class="st"><div class="h"><i>${i+1}</i>${s.h}</div><div class="b">${s.b}</div></div>`).join('')}</div>
      <div class="btnrow"><button class="tbtn" data-tg="calc">🔢 계산기</button><button class="tbtn" data-tg="easy">쉽게</button></div>
-     <div data-tp="calc" hidden>${p.calc}</div><div class="panel easy" data-tp="easy" hidden><span class="lb">쉽게 보기</span><div>${p.easy}</div></div>
+     <div data-tp="calc" hidden>${p.calc}</div><div class="panel easy" data-tp="easy" hidden>${ezHTML(p.easy,{sum:'풀이 순서: '+p.steps.map(x=>x.h).join(' → ')})}</div>
      <button class="primary" id="nextQ">${US.done>=US.n?'결과 보기 ›':`다음 문제 (${US.done+1} / ${US.n}) ›`}</button>`;
     wireToggles(af);af.querySelector('#nextQ').onclick=()=>{US.p=null;vUnits();wireCommon(V);window.scrollTo(0,0)};
     if(!ok)af.scrollIntoView({behavior:'smooth',block:'start'})});
@@ -1854,12 +1855,13 @@ function cheatSheet(dimKey){
    <div class="rel mono" style="margin-top:8px">1 % = 10⁴ ppm · 1 ppm = 10³ ppb · 1 G = 10⁻⁴ T · 1 ft = 0.3048 m · 180° = π rad</div>
    <button class="ghost" data-goto="unitbasic" data-close>↗ 0편 1장 전체 보기</button>`,h=>wireCommon(h));
 }
+function ezHTML(e,x){x=x||{};return `<span class="lb">쉽게 말하면</span><div>${md(e)}</div>${x.ex?`<div class="ezx"><span class="lb">예를 들면</span><div>${md(x.ex)}</div></div>`:''}${x.sum?`<div class="ezs"><span class="lb">한 줄 정리</span><div>${md(x.sum)}</div></div>`:''}`}
 function closeSheet(){SH.innerHTML='';document.removeEventListener('keydown',escClose)}
 function escClose(e){if(e.key==='Escape')closeSheet()}
 function termSheet(k){const T=TERM[k];if(!T)return;
   openSheet(`<div><h3>${T.ko}</h3><div class="en">${T.en}</div></div>
    <div class="defs"><div class="def"><div class="h">일반 정의</div>${md(T.gen)}</div><div class="def"><div class="h">전공 정의</div>${md(T.tech)}</div></div>
-   <button class="tbtn" id="ez" aria-expanded="false">쉽게 (중학생 눈높이)</button><div class="panel easy" id="ezp" hidden><span class="lb">쉽게</span><div>${md(T.easy)}</div></div>`,
+   <button class="tbtn" id="ez" aria-expanded="false">쉽게 · 예시</button><div class="panel easy" id="ezp" hidden>${ezHTML(T.easy,T)}</div>`,
    h=>{const b=h.querySelector('#ez');b.onclick=()=>{const p=h.querySelector('#ezp');p.hidden=!p.hidden;b.setAttribute('aria-expanded',String(!p.hidden))}})}
 function unitSheet(k){const U=UNIT[k];if(!U)return;
   openSheet(`<div><h3 class="mono">${U.s}</h3></div><div class="readas">읽는 법: <b>${U.r}</b></div><div class="def"><div class="h">뜻 · 관계</div>${U.mean}</div>
@@ -1909,6 +1911,6 @@ function photoView(p){openSheet(`<div class="phfull"><img src="${p.img}" alt="�
 /* 시작 */
 const h=(location.hash||'').slice(1);
 if(PAGES[h])cur={v:'page',arg:{id:h,i:0}};else if(['dict','cards','practice'].includes(h))cur={v:h};
-window.__T={PAGES,GEN,TOPICS,go};THEME.apply();render();
+window.__T={PAGES,GEN,TOPICS,TERM,go};THEME.apply();render();
 })();
 </script>
