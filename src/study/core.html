@@ -341,6 +341,10 @@ select{width:100%;font:inherit;font-size:15px;color:var(--ink);background:var(--
 .figctl select{min-width:0}
 .mx2{display:inline-flex;flex-direction:column;vertical-align:middle;border-left:2px solid var(--ink);border-right:2px solid var(--ink);padding:0 6px;border-radius:4px;margin:0 2px}.mx2 span{white-space:nowrap;text-align:center}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;scroll-behavior:auto!important}}
+.needbox{margin:4px 0 12px;border:1px solid var(--line);border-radius:12px;padding:8px 12px;background:var(--surface2)}.needbox summary{cursor:pointer;font-weight:700}.nb-r{display:flex;gap:8px;align-items:flex-start;margin-top:8px}.nb-l{flex:0 0 74px;font-size:12px;color:var(--muted);padding-top:4px}
+.cchips{display:flex;flex-wrap:wrap;gap:6px}.cchips.soft{margin-top:6px;opacity:.75}.cchip{font:inherit;font-size:12.5px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--ink);border-radius:999px;padding:4px 10px;min-height:32px;cursor:pointer}.cchip b{color:var(--accent);margin-right:2px}.cchip.here{border-style:dashed}
+.cstrand{margin:12px 0}.cstrand .h{margin-bottom:6px}.cstage{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0}.cstage summary{cursor:pointer;font-weight:700}.cstage.done{border-color:var(--good)}.cst-i{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--bg);font-size:12px;margin-right:4px}.cstage.done .cst-i{background:var(--good)}
+.cpass{list-style:none;padding:0;margin:10px 0 0}.cpass li{margin:8px 0}.cpass label{display:flex;gap:8px;align-items:flex-start}.cpass input{width:20px;height:20px;flex:0 0 20px;margin-top:1px}.ctab td{vertical-align:top}.linkb{font:inherit;font-size:13px;background:none;border:0;color:var(--accent);padding:0;text-align:left;cursor:pointer;white-space:nowrap}
 </style>
 
 <header class="top"><div class="top-in">
@@ -1095,13 +1099,13 @@ function wireCommon(root){
 
 /* 목차 */
 const TOC=[
- {n:'제0편',h:'기초 도구',d:'모든 계산의 바탕',items:[['unitbasic','단위·접두어·읽는 법'],['numsense','숫자 감각 — 지수·로그·유효숫자'],['calcbasic','공학용 계산기 기본'],['elec','전기 기초 — 전압·전류·저항'],['circuit','회로 기초 — 전압 분배·브리지·증폭기']]},
+ {n:'제0편',h:'기초 도구',d:'모든 계산의 바탕',items:[['unitbasic','단위·접두어·읽는 법'],['numsense','숫자 감각 — 지수·로그·유효숫자'],['calcbasic','공학용 계산기 기본'],['elec','전기 기초 — 전압·전류·저항'],['circuit','회로 기초 — 전압 분배·브리지·증폭기'],['kirch','회로 법칙과 시간 응답 — KVL·KCL·RC'],['semi','반도체 기초 — 도핑·다이오드·트랜지스터'],['sigbase','신호 기초 — 변화율·샘플링·잡음']]},
  {n:'제1편',h:'센서 공통',d:'어떤 센서든 같은 기준으로',items:[['signal','센서와 신호의 흐름'],['char','센서 특성'],['calib','오차와 보정 — 최소제곱']]},
  {n:'제2편',h:'감지 원리',d:'원리 몇 개로 센서 여러 개',items:[['resist','저항형'],['cap','정전용량형'],['induct','전자기 유도·와전류'],['hall','홀 효과·자기저항'],['piezo','압전형'],['optic','광학']]},
  {n:'제3편',h:'센서별',d:'측정 대상마다 한 장씩',items:[['gas','가스센서'],['mag','자기센서'],['speed','속도센서·금속탐지기'],['accel','가속도·진동센서'],['gyro','자이로센서'],['ultra','초음파센서'],['saw','SAW 센서'],['temp','온도센서'],['press','압력센서'],['flow','유량·레벨센서'],['prox','근접·광센서']]},
  {n:'제4편',h:'현업 연결',d:'센서 데이터의 큰 그림',items:[['plant','공장 데이터 흐름 — PLC·SCADA·MES'],['pdm','예지보전']]}
 ];
-const APX=[['A','공식 모음','form'],['B','용어 사전','term'],['C','단위 읽는 법','unit'],['D','회로 기호','sym'],['E','계산기 키','key']];
+const APX=[['A','공식 모음','form'],['B','용어 사전','term'],['C','단위 읽는 법','unit'],['D','회로 기호','sym'],['E','계산기 키','key'],['F','기초 커리큘럼','@curri']];
 function vHome(){
   TT.textContent='센서 핵심노트';
   const mark=LS.get('last',null);const mp=mark&&PAGES[mark.id];
@@ -1118,7 +1122,7 @@ function vHome(){
   ${TOC.map(p=>`<div class="pt"><div class="pt-h"><span class="pt-n">${p.n}</span><span class="pt-t">${p.h}</span></div><div class="pt-d">${p.d}</div>
     <ol class="chs">${p.items.map(([id,nm],k)=>`<li><button class="ch" ${PAGES[id]?`data-goto="${id}"`:'disabled'}><span class="ch-n">${k+1}</span><span class="ch-t">${nm}</span><span class="lead"></span><span class="ch-p">${PAGES[id]?PAGES[id].secs.length+'쪽':'준비 중'}</span></button></li>`).join('')}</ol></div>`).join('')}
   <div class="pt"><div class="pt-h"><span class="pt-n">부록</span><span class="pt-t">찾아보기</span></div>
-    <ol class="chs">${APX.map(([n,t,m])=>`<li><button class="ch" data-dict="${m}"><span class="ch-n">${n}</span><span class="ch-t">${t}</span><span class="lead"></span><span class="ch-p">›</span></button></li>`).join('')}</ol></div>
+    <ol class="chs">${APX.map(([n,t,m])=>`<li><button class="ch" ${m[0]==='@'?`data-goto="${m.slice(1)}"`:`data-dict="${m}"`}><span class="ch-n">${n}</span><span class="ch-t">${t}</span><span class="lead"></span><span class="ch-p">›</span></button></li>`).join('')}</ol></div>
   </section>
   <section class="card"><div class="eyebrow">설정</div><div class="h" style="margin-bottom:6px">화면 모드</div>
     <div class="seg" role="tablist">${[['dark','다크'],['light','라이트'],['auto','기기 설정 따름']].map(([k,l])=>`<button role="tab" aria-selected="${THEME.get()===k}" data-theme-set="${k}">${l}</button>`).join('')}</div>
@@ -1175,7 +1179,7 @@ function vPage(arg){const P=PAGES[arg.id];const i=Math.min(arg.i||0,P.secs.lengt
   V.innerHTML=`<div class="steps">${P.secs.map((x,j)=>`<button class="stp${seen.has(j)?' seen':''}" data-j="${j}" aria-current="${j===i}">${x.k}</button>`).join('')}</div>
   ${mtm?`${head}<p class="small muted">작년 중간고사·숙제 문제를 그대로 옮겼어요. 상세 풀이, 계산기 입력, 새 문제 버튼이 함께 들어 있어요.</p>${mtHTML(mtm[1].split(','))}`:isProb?`${head}<p class="small muted">기본 문제로 감을 잡고, 유사 문제는 <b>↻ 새 숫자</b>로 계속 바꿔 풀어요. 응용은 같은 원리를 다른 상황에 써 보는 문제예요.</p>${PSET[arg.id].map(([g,b])=>probSlot(g,!!b)).join('')}
      <button class="ghost" data-goto="calc" data-topic="${arg.id}">연습 탭에서 계속 풀기 ›</button>`:
-  `<section class="card sec">${head}<h2>${s.h}</h2>${md(s.b)}
+  `<section class="card sec">${head}<h2>${s.h}</h2>${typeof needBox==='function'?needBox(arg.id,i):''}${md(s.b)}
    ${(s.easy||s.src)?`<div class="btnrow">${s.easy?'<button class="tbtn" data-tg="easy">쉽게</button>':''}${s.src?'<button class="tbtn" data-tg="src">원문</button>':''}</div>`:''}
    ${s.easy?`<div class="panel easy" data-tp="easy" hidden>${ezHTML(s.easy,s)}</div>`:''}
    ${s.src?`<div class="panel src" data-tp="src" hidden><span class="lb">강의자료 원문 · 【 】</span><div class="small">${md(s.src)}</div></div>`:''}

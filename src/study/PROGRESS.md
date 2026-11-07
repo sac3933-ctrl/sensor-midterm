@@ -32,3 +32,4 @@
 - [x] 배포: sensor-midterm 루트 = 새 앱(PWA, 캐시 sensor-note-vN), /midterm/ = 옛 문제집
 - 재배포: python3 build.py → python3 pwa_build.py → sensor-midterm에서 commit/push
 - 테스트: scratchpad tch.js(장·생성기), stf.js(홈·사전·연습·검색) — srv는 8765 포트
+- 2026-11-07: 커리큘럼 반영 — 제0편 6~8장(회로 법칙·RC / 반도체 기초 / 신호 기초) 신설로 빈칸 8개 채움, 부록 F 기초 커리큘럼(38개 기초 지도·장별 필요 기초·7단계 통과 체크), 장 첫 쪽 「이 장에 필요한 기초」 상자
