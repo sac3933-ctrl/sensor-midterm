@@ -1,4 +1,4 @@
-/* ═════════ 제3편 7~10장 온도·압력·유량레벨·근접광 (확장 장) ═════════ */
+/* ═════════ 제3편 8~11장 온도·압력·유량레벨·근접광 (확장 장) ═════════ */
 Object.assign(TERM,{
  rtd:{ko:'측온저항체 (RTD)',en:'RTD (Resistance Temperature Detector)',gen:'온도가 오르면 저항이 비례해서 커지는 금속 센서.',tech:'주로 백금 Pt100(0 °C에서 100 Ω). R(T) ≈ R₀(1 + αT), α = 0.00385 /°C. 선형·정밀·안정, 범위 약 −200~600 °C. 3선·4선식으로 리드선 오차 제거.',easy:'백금선은 1 °C 오를 때마다 저항이 0.385 Ω씩 늘어나요(Pt100).'},
  thermistor:{ko:'서미스터',en:'Thermistor (NTC / PTC)',gen:'온도에 따라 저항이 크게 변하는 반도체 소자.',tech:'NTC: 온도↑ → R 지수적으로↓. R = R₀·exp[B(1/T − 1/T₀)], T는 K. 감도 매우 큼, 비선형, 좁은 범위(약 −50~150 °C). PTC: 특정 온도에서 R 급증 → 과전류 보호.',easy:'조금만 데워져도 저항이 확 줄어요. 민감하지만 곧은 직선은 아니에요.'},
@@ -176,7 +176,7 @@ TOPICS.temp={name:'온도',g:['tConv','rtdR','ntcR','tcV','tauResp']};TOPICS.pre
 ['tConv','rtdR','tcV','pConv','headP','pSens','qAv','dpFlow','magE','levelToF','snEff','respF'].forEach(g=>BASICG.add(g));
 
 const AIX='<p class="small muted">[AI 보충] 강의 밖 확장 장 — 산업 현장 표준 지식 중심.</p>';
-PAGES.temp={title:'온도센서',part:'제3편 7장',secs:[
+PAGES.temp={title:'온도센서',part:'제3편 8장',secs:[
  {k:'단위',h:'온도와 단위',b:`${AIX}<div class="rel mono">T[K] = t[°C] + 273.15 · °F = 1.8·°C + 32</div><div class="warnbox">T⁴, 1/T가 들어간 식(슈테판-볼츠만, 서미스터)에는 반드시 <b>K</b></div>
    <div class="flow"><div>온도</div><div>저항(RTD·서미스터) / 전압(열전대) / 복사(IR)</div><div>브리지·증폭</div><div>ADC → PLC</div></div>`,
   easy:'켈빈은 절대영도(−273 °C)를 0으로 잡은 온도예요.'},
@@ -200,7 +200,7 @@ PAGES.temp={title:'온도센서',part:'제3편 7장',secs:[
    <button class="primary" data-goto="cards">카드로 외우기</button>`}
 ]};
 
-PAGES.press={title:'압력센서',part:'제3편 8장',secs:[
+PAGES.press={title:'압력센서',part:'제3편 9장',secs:[
  {k:'단위',h:'압력과 단위',b:`${AIX}<div class="eqn">P = F/A<small>[[pressure|압력]] {{Pa}} = N/m²</small></div>
    <div class="rel mono">1 kPa = 10³ Pa · 1 bar = 100 kPa · 1 atm = 101.325 kPa<br>1 psi ≈ 6.895 kPa · 1 mmHg ≈ 133.3 Pa · 1 MPa = 10 bar</div>`,
   easy:'1 bar는 대략 1기압. 타이어 30 psi ≈ 207 kPa ≈ 2 bar예요.'},
@@ -218,7 +218,7 @@ PAGES.press={title:'압력센서',part:'제3편 8장',secs:[
  {k:'외울 것',h:'이것만은 외우기',b:`<ol class="clean"><li>1 bar = 100 kPa, 1 atm = 101.325 kPa, 1 psi ≈ 6.9 kPa</li><li>P_abs = P_g + P_atm · P = ρgh</li><li>MEMS: 다이어프램 + 압저항 풀 브리지 · 압전형은 정압 불가</li></ol><button class="primary" data-goto="cards">카드로 외우기</button>`}
 ]};
 
-PAGES.flow={title:'유량·레벨센서',part:'제3편 9장',secs:[
+PAGES.flow={title:'유량·레벨센서',part:'제3편 10장',secs:[
  {k:'유량',h:'유량이란',b:`${AIX}<div data-anim="pipe"></div><div class="eqn">Q = A·v,  ṁ = ρQ<small>[[flowrate|유량]] {{m3h}} · {{Lmin}} · 질량유량 {{kgs}}</small></div><div class="rel mono">1 m³/h = 16.67 L/min · 1 m³ = 1000 L</div>`,
   easy:'관 단면적 × 속도 = 1초에 지나가는 부피.'},
  {k:'차압식',h:'차압식 — 가장 오래된 방식',b:`<div class="eqn">Q ∝ √ΔP<small>[[dpflow|오리피스·벤투리]] · 베르누이</small></div><ul class="clean"><li>유량 2배 → 차압 4배 → 저유량 정밀도↓ (측정 범위비 약 3~4:1)</li><li>구조 간단·표준화, 압력 손실</li></ul>`,
@@ -236,7 +236,7 @@ PAGES.flow={title:'유량·레벨센서',part:'제3편 9장',secs:[
  {k:'외울 것',h:'이것만은 외우기',b:`<ol class="clean"><li>Q = A·v · 1 m³/h = 16.67 L/min</li><li>차압 Q ∝ √ΔP · 전자기 E = BDv(전도성만) · 와류 f = St·v/d</li><li>레벨 h = P/(ρg), h = H − ct/2</li></ol><button class="primary" data-goto="cards">카드로 외우기</button>`}
 ]};
 
-PAGES.prox={title:'근접·광전센서',part:'제3편 10장',secs:[
+PAGES.prox={title:'근접·광전센서',part:'제3편 11장',secs:[
  {k:'종류',h:'근접 센서 — 닿지 않고 감지',b:`${AIX}${FIG.proxKinds()}<p>공장 자동화에서 가장 많이 쓰는 ON/OFF 센서. 물체 유무·위치·개수·회전 감지.</p>`,
   easy:'손대지 않고 "물건이 왔다"를 알려주는 스위치예요.'},
  {k:'유도·정전용량',h:'유도형 vs 정전용량형',b:`<div class="f4"><div><div class="h">[[proximity|유도형]]</div>고주파 자기장 → 금속 와전류 → 발진 감쇠 · 금속만 · 튼튼</div><div><div class="h">[[capprox|정전용량형]]</div>물체 접근 → C 증가 · 플라스틱·물·분말 · 감도 조정</div></div>

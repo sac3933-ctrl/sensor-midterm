@@ -1095,7 +1095,7 @@ const TOC=[
  {n:'제0편',h:'기초 도구',d:'모든 계산의 바탕',items:[['unitbasic','단위·접두어·읽는 법'],['numsense','숫자 감각 — 지수·로그·유효숫자'],['calcbasic','공학용 계산기 기본'],['elec','전기 기초 — 전압·전류·저항'],['circuit','회로 기초 — 전압 분배·브리지·증폭기']]},
  {n:'제1편',h:'센서 공통',d:'어떤 센서든 같은 기준으로',items:[['signal','센서와 신호의 흐름'],['char','센서 특성'],['calib','오차와 보정 — 최소제곱']]},
  {n:'제2편',h:'감지 원리',d:'원리 몇 개로 센서 여러 개',items:[['resist','저항형'],['cap','정전용량형'],['induct','전자기 유도·와전류'],['hall','홀 효과·자기저항'],['piezo','압전형'],['optic','광학']]},
- {n:'제3편',h:'센서별',d:'측정 대상마다 한 장씩',items:[['gas','가스센서'],['mag','자기센서'],['speed','속도센서·금속탐지기'],['accel','가속도·진동센서'],['gyro','자이로센서'],['ultra','초음파센서'],['temp','온도센서'],['press','압력센서'],['flow','유량·레벨센서'],['prox','근접·광센서']]},
+ {n:'제3편',h:'센서별',d:'측정 대상마다 한 장씩',items:[['gas','가스센서'],['mag','자기센서'],['speed','속도센서·금속탐지기'],['accel','가속도·진동센서'],['gyro','자이로센서'],['ultra','초음파센서'],['saw','SAW 센서'],['temp','온도센서'],['press','압력센서'],['flow','유량·레벨센서'],['prox','근접·광센서']]},
  {n:'제4편',h:'현업 연결',d:'센서 데이터의 큰 그림',items:[['plant','공장 데이터 흐름 — PLC·SCADA·MES'],['pdm','예지보전']]}
 ];
 const APX=[['A','공식 모음','form'],['B','용어 사전','term'],['C','단위 읽는 법','unit'],['D','회로 기호','sym'],['E','계산기 키','key']];
@@ -1601,7 +1601,7 @@ PAGES.ultra={title:'초음파센서',part:'제3편 6장',secs:[
   easy:'소리가 갔다 오는 시간의 절반 × 소리 빠르기 = 거리. 날이 더우면 소리가 빨라져서 같은 거리도 시간이 짧아져요.',
   src:'【2·거리 = c(T)·t】 【c(T) = 13,044 √(1 + T/273) [inch/s]】 【검출거리 ≈ t × 340 / 2】'},
  {k:'구조',h:'트랜스듀서 구조',b:`${FIG.transducer()}
-   <ul class="clean"><li>[[piezo|압전체]] PZT: d₃₃가 커서 많이 씀. 두께 = λ/2 → 공진</li><li>[[matching|정합층]] λ/4 + 겔: 공기층 없애고 반사 줄이기</li><li>[[backing|백킹재]]: 뒤로 가는 파동 흡수, 펄스를 짧게</li><li>하우징·보호막: 물·먼지·돌 튐 보호 (재질·두께도 음향 특성에 영향)</li></ul>
+   <ul class="clean"><li>[[piezo|압전체]] PZT: d₃₃가 커서 많이 씀. 두께 = λ/2 → 공진</li><li>[[matching|정합층]] λ/4 + 겔: 공기층 없애고 반사 줄이기</li><li>[[backing|백킹재]]: 뒤로 가는 파동 흡수, 펄스를 짧게</li><li>하우징·보호막: 물·먼지·돌 튐 보호 (재질·두께도 음향 특성에 영향)</li><li>전극: 은(Ag) — 생체 적합성 · 음향 렌즈: 빔을 모으고(초점) 임피던스 정합 역할도 함</li></ul>
    ${FIG.unimorph()}<button class="ghost" data-goto="piezo">↗ 압전 원리 보기 (제2편 5장)</button>`,
   easy:'압전판이 "스피커 겸 마이크", 앞에 붙인 정합층과 겔은 "소리가 잘 넘어가게 하는 다리", 뒤의 백킹재는 "울림 멈춤 장치"예요.',
   src:'【It consists of a piezoelectric material, electrodes, acoustic matching layer, backing material, and housing case】 【Thickness of the material is equal to ½ wavelength】 【The matching layer thickness is equal to ¼ the wavelength】'},
@@ -1666,8 +1666,8 @@ PAGES.piezo={title:'압전형',part:'제2편 5장',secs:[
   src:'【Pᵢ = dᵢⱼ Tⱼ, dᵢⱼ [Coulombs/Newton]】 【Sᵢ = dᵢⱼ Eⱼ, dᵢⱼ unit: Meters/Volt】'},
  {k:'만들기·주의',h:'분극 처리와 DC·AC',b:`<div class="f4"><div><div class="h">[[poling|분극 처리]] 순서</div><ol class="clean"><li>합성</li><li>가열(어닐링)</li><li>높은 온도에서 전압 걸어 쌍극자 정렬</li><li>냉각해 방향 고정</li><li>모양대로 자르기</li></ol><div class="rd">처리 전 PZT는 압전성이 없음</div></div>
     <div><div class="h">DC를 계속 걸면</div>저항이 매우 커서 전류는 거의 안 흐르지만, 이온·산소 공공이 이동해 균열·박리, 절연 파괴·누설 전류 증가 가능</div>
-    <div><div class="h">AC를 걸면</div>수축·팽창이 반복되어 진동 → 초음파 발생. 너무 크면 균열·박리</div>
-    <div><div class="h">박막 PZT (MEMS)</div>1 MHz면 λ/2 = 2 mm → 스퍼터링으로는 너무 두꺼움. 고주파일수록 얇아도 됨</div></div>`,
+    <div><div class="h">AC를 걸면</div>수축·팽창이 반복되어 진동 → 초음파 발생. 너무 크면 균열·박리 · 전압 크기는 항전계 E_c의 약 1/4 수준을 고려</div>
+    <div><div class="h">박막 PZT (MEMS)</div>1 MHz면 λ/2 = 2 mm → 스퍼터링으로는 너무 두꺼움. 고주파일수록 얇아도 됨 · 전극 금속은 산화·상호확산이 없는 재료로</div></div>`,
   easy:'구워서 전기로 줄 세우고 식혀서 굳혀야 압전이 생겨요. 직류를 오래 걸면 상하고, 교류를 걸면 떨려요.',
   src:'【For PZT in its natural state, no piezoelectric properties are exhibited】 【λ/2 = 2mm (too thick, 불가능 by rf sputtering)】'},
  {k:'문제',h:'',b:'__PROBS__'}
@@ -1909,6 +1909,6 @@ function photoView(p){openSheet(`<div class="phfull"><img src="${p.img}" alt="�
 /* 시작 */
 const h=(location.hash||'').slice(1);
 if(PAGES[h])cur={v:'page',arg:{id:h,i:0}};else if(['dict','cards','practice'].includes(h))cur={v:h};
-THEME.apply();render();
+window.__T={PAGES,GEN,TOPICS,go};THEME.apply();render();
 })();
 </script>

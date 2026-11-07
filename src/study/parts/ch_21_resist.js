@@ -72,7 +72,7 @@ PAGES.resist={title:'저항형 센서',part:'제2편 1장',secs:[
    <div class="eqn">ε = ΔL/L,  ΔR/R = GF·ε<small>[[strain|변형률]] {{ue}} · [[gf|게이지율]] 금속 ≈ 2</small></div><p>[[straingauge|스트레인 게이지]]: 로드셀(무게), 압력, 토크, 구조물 건전성 감시.</p>`,
   easy:'고무줄처럼 늘이면 길고 가늘어져 저항이 커져요.'},
  {k:'압저항',h:'압저항 효과 — 반도체는 훨씬 민감',b:`<div class="f4"><div><div class="h">금속 게이지</div>모양 변화(L↑, A↓)가 주원인 · GF ≈ 2 · 온도 안정</div><div><div class="h">[[piezoresist|반도체 압저항]]</div>저항률 ρ 자체가 변함 · GF 50~200 · 온도 영향 큼 → 보상 필요</div></div>
-   <p>MEMS 압력센서: 실리콘 다이어프램 위 압저항 4개 = 풀 브리지.</p><button class="ghost" data-goto="press">↗ 압력센서 (제3편 8장)</button>`,
+   <p>MEMS 압력센서: 실리콘 다이어프램 위 압저항 4개 = 풀 브리지.</p><button class="ghost" data-goto="press">↗ 압력센서 (제3편 9장)</button>`,
   easy:'실리콘은 눌리면 "전기 통하는 성질" 자체가 바뀌어서, 금속보다 수십 배 민감해요.'},
  {k:'브리지',h:'작은 ΔR을 읽는 법',b:`${FIG.loadcell()}<div class="rel mono">1/4 브리지 V_o ≈ V·GF·ε/4 · 하프 ×2 · 풀 ×4</div>
    <p class="small">로드셀 사양 "2 mV/V" = 공급 1 V당 최대 하중에서 2 mV. 10 V 공급이면 20 mV → 계측 증폭기로 증폭.</p><button class="ghost" data-goto="circuit" data-i="2">↗ 휘트스톤 브리지 (제0편 5장)</button>`,

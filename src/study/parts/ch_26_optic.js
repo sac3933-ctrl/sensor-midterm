@@ -98,7 +98,7 @@ PAGES.optic={title:'광학 센서',part:'제2편 6장',secs:[
    <ul class="clean"><li>광도전 모드(역바이어스): 빠름·선형, 암전류↑</li><li>광기전 모드(0 V): 잡음↓, 느림</li></ul>`,
   easy:'빛 세기에 비례하는 아주 작은 전류를 큰 저항으로 전압으로 바꿔요.'},
  {k:'광전센서',h:'포토인터럽터·엔코더',b:`<ul class="clean"><li>[[photoint|광전센서]]: 투과형 · 회귀반사형 · 확산반사형</li><li>[[encoder|광학 엔코더]]: 슬릿 원판, 분해능 360°/PPR, A·B 상으로 방향</li></ul>
-   <p class="small"><b>[현업]</b> 컨베이어 물품 카운트, 모터 위치 피드백(서보), 로봇 관절 각도.</p><button class="ghost" data-goto="prox">↗ 근접·광전센서 (제3편 10장)</button>`,
+   <p class="small"><b>[현업]</b> 컨베이어 물품 카운트, 모터 위치 피드백(서보), 로봇 관절 각도.</p><button class="ghost" data-goto="prox">↗ 근접·광전센서 (제3편 11장)</button>`,
   easy:'빛이 가려지는 횟수를 세면 물건 개수나 바퀴 회전을 알 수 있어요.'},
  {k:'응용',h:'빛으로 재는 것들',b:`<div class="f4"><div><div class="h">[[lidar|라이다]]</div><div class="ln">d = c·t/2</div><div class="rd">1 ns ≈ 15 cm</div></div><div><div class="h">NDIR 가스센서</div><div class="ln">I = I₀·e^(−αcL)</div><div class="rd">[[beerlambert|비어-람베르트]] · CO₂ 4.26 μm</div></div>
     <div><div class="h">광섬유 센서</div>빛의 세기·파장·위상 변화로 온도·변형 측정, 전자기 잡음에 강함</div><div><div class="h">비접촉 온도계</div>물체 적외선 복사 → 써모파일 (슈테판-볼츠만)</div></div>
