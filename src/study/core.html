@@ -1094,6 +1094,7 @@ const THEME={get(){return LS.get('theme','dark')},set(t){LS.set('theme',t);this.
 function wireCommon(root){
   const he=root.querySelector('#hexp');if(he)he.onclick=()=>exportAll(root.querySelector('#hmsg'));
   const ne=root.querySelector('#nexp');if(ne)ne.onclick=()=>exportAll(root.querySelector('#nmsg'));
+  root.querySelectorAll('[data-href]').forEach(b=>b.onclick=()=>{location.href=b.dataset.href});
   root.querySelectorAll('[data-theme-set]').forEach(b=>b.onclick=()=>THEME.set(b.dataset.themeSet));
   root.querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>{const g=b.dataset.goto;if(PAGES[g])go('page',{id:g,i:+(b.dataset.i||0)});else if(g.startsWith('dict:'))go('dict',{seg:g.slice(5)});else if(g==='units')go('practice',{mode:'unit'});else if(g==='pfx'){PD=null;go('practice',{mode:'pfx'})}else if(g==='calc')go('practice',{mode:'calc',topic:b.dataset.topic});else go(g)});
 }
@@ -1119,6 +1120,9 @@ function vHome(){
     <div id="qres" class="qres" hidden></div>
     ${mp?`<button class="ribbon" data-goto="${mark.id}" data-i="${mark.i}"><span>🔖 책갈피</span><b>${mp.title}</b><span class="muted">· ${mp.secs[mark.i]?mp.secs[mark.i].k:''}</span></button>`:''}
   </section>
+  <section class="card"><div class="eyebrow">강의 해설 노트</div><div class="h" style="margin-bottom:6px">슬라이드 옆에 두고 보는 해설</div>
+    <p class="small muted" style="margin:0 0 10px">강의자료 11개 · 슬라이드별 쉬운 설명·그림 읽기·퀴즈, 과제·시험 풀이 모음, 전체 검색</p>
+    <div class="btnrow"><button class="primary" data-href="./notes/">📚 해설 노트 열기</button><button data-href="./notes/#hw">📝 과제·시험 풀이</button></div></section>
   <section class="contents"><div class="ct-h">차례</div>
   ${TOC.map(p=>`<div class="pt"><div class="pt-h"><span class="pt-n">${p.n}</span><span class="pt-t">${p.h}</span></div><div class="pt-d">${p.d}</div>
     <ol class="chs">${p.items.map(([id,nm],k)=>`<li><button class="ch" ${PAGES[id]?`data-goto="${id}"`:'disabled'}><span class="ch-n">${k+1}</span><span class="ch-t">${nm}</span><span class="lead"></span><span class="ch-p">${PAGES[id]?PAGES[id].secs.length+'쪽':'준비 중'}</span></button></li>`).join('')}</ol></div>`).join('')}

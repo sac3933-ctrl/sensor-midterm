@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>센서 및 응용 — 통합 노트</title>
+<style>
+:root{--bg:#f7f8fb;--card:#fff;--ink:#1f2933;--mut:#5f6b7a;--line:#e3e7ee;--acc:#2563eb;--acc2:#e8efff;--amber:#b45309;--sky:#0369a1;--side:300px}
+@media (prefers-color-scheme:dark){:root{--bg:#111418;--card:#1a1f26;--ink:#e6e9ee;--mut:#9aa5b4;--line:#2b323c;--acc:#7aa7ff;--acc2:#1d2a44;--amber:#fcd34d;--sky:#7dd3fc}}
+*{box-sizing:border-box}
+html{scroll-padding-top:16px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Pretendard","Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif}
+a{color:var(--acc)}
+button{font:inherit;color:inherit}
+#side{position:fixed;inset:0 auto 0 0;width:var(--side);background:var(--card);border-right:1px solid var(--line);display:flex;flex-direction:column;z-index:20}
+#side .top{padding:16px 16px 10px;border-bottom:1px solid var(--line)}
+#side h1{font-size:17px;margin:0 0 2px;line-height:1.35}
+#side .sub{font-size:12.5px;color:var(--mut)}
+.qbox{margin-top:10px;position:relative}
+#q{width:100%;padding:9px 34px 9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);font-size:15px}
+#q:focus{outline:2px solid var(--acc);border-color:transparent}
+#qx{position:absolute;right:6px;top:5px;border:0;background:none;cursor:pointer;font-size:18px;color:var(--mut);padding:2px 6px;display:none}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.chip{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:2px 10px;font-size:12.5px;cursor:pointer}
+.chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+#nav{overflow:auto;padding:8px 8px 20px;flex:1}
+.nv{display:flex;align-items:center;gap:8px;width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:8px;cursor:pointer;text-decoration:none;color:var(--ink)}
+.nv:hover{background:var(--acc2)}
+.nv.cur{background:var(--acc2);font-weight:700}
+.nv .wk{font-size:11.5px;color:var(--mut);min-width:62px}
+.nv .wt{flex:1}
+.nv .cnt{font-size:11.5px;color:var(--mut)}
+.navsep{font-size:11.5px;font-weight:700;color:var(--mut);margin:12px 10px 4px;letter-spacing:.04em}
+#main{margin-left:var(--side);padding:26px 34px 80px;max-width:calc(var(--side) + 1040px)}
+#bar{display:none}
+h2{font-size:22px;margin:0 0 4px}
+.lead{color:var(--mut);margin:0 0 18px;font-size:14.5px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.wcard .lab{font-size:12px;color:var(--mut)}
+.wcard .t{font-weight:700;font-size:17px;margin:2px 0 4px}
+.wcard .d{font-size:13.5px;color:var(--mut);min-height:42px}
+.wcard .row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:5px 11px;font-size:13.5px;cursor:pointer;text-decoration:none;color:var(--ink)}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+.quick{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:0 0 26px}
+.quick .card{cursor:pointer}
+.quick .card b{display:block;font-size:15.5px}
+.quick .card span{font-size:13px;color:var(--mut)}
+.sl{display:flex;gap:12px;padding:11px 4px;border-bottom:1px solid var(--line)}
+.sl .n{min-width:44px;font-weight:700;color:var(--mut);font-variant-numeric:tabular-nums}
+.sl .c{flex:1;min-width:0}
+.sl .tt{font-weight:700}
+.sl .ss{font-size:14px;color:var(--mut);margin-top:2px}
+.sl .go{align-self:center;white-space:nowrap}
+.bd{display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:0 6px;margin-left:6px;vertical-align:2px}
+.bB{background:#e0f2fe;color:#075985}.bL{background:#fef3c7;color:#92400e}.bW{background:#fee2e2;color:#991b1b}
+@media (prefers-color-scheme:dark){.bB{background:#0c4a6e;color:#bae6fd}.bL{background:#78350f;color:#fde68a}.bW{background:#7f1d1d;color:#fecaca}}
+.part{font-size:12.5px;font-weight:700;color:var(--mut);margin:16px 0 0;padding:4px 4px;border-bottom:2px solid var(--line)}
+details.wk{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:0 0 10px}
+details.wk>summary{cursor:pointer;padding:11px 16px;font-weight:700;list-style:none}
+details.wk>summary::-webkit-details-marker{display:none}
+details.wk>summary::before{content:"▸ ";color:var(--mut)}
+details.wk[open]>summary::before{content:"▾ "}
+details.wk .in{padding:0 16px 12px}
+.ex{padding:9px 0;border-top:1px solid var(--line);font-size:14.5px}
+.ex .h{font-weight:700;font-size:13.5px}
+.ex .h a{text-decoration:none}
+.lt{padding:10px 0;border-top:1px solid var(--line);font-size:14.5px;white-space:pre-line}
+.res{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:0 0 8px}
+.res .h{font-size:13.5px;display:flex;gap:8px;flex-wrap:wrap;align-items:baseline}
+.res .h b{font-size:15px}
+.res .lab{font-size:12px;color:var(--mut)}
+.res .sn{font-size:14px;margin-top:3px;color:var(--ink)}
+mark{background:#fde68a;color:#111;border-radius:3px;padding:0 1px}
+.rgrp{font-weight:700;margin:18px 0 8px;font-size:15px}
+.note{font-size:13px;color:var(--mut);background:var(--card);border:1px dashed var(--line);border-radius:10px;padding:10px 14px;margin:18px 0}
+.empty{color:var(--mut);padding:30px 0}
+#scrim{display:none}
+@media (max-width:1023px){
+  #side{transform:translateX(-102%);transition:transform .2s;width:min(86vw,320px);box-shadow:0 0 30px rgba(0,0,0,.2)}
+  body.open #side{transform:none}
+  body.open #scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:15}
+  #bar{display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--line);padding:9px 12px}
+  #bar .ttl{font-weight:700;font-size:15px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #main{margin-left:0;padding:18px 14px 70px}
+  .sl .go .tx{display:none}
+}
+.hwq{border-top:1px solid var(--line);padding:12px 0}
+.hwh{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.hwn{font-weight:800;color:var(--acc,#2563eb);min-width:42px}
+.hwp{margin:6px 0;font-size:14.5px}
+.hwa{margin:6px 0;border:1px solid var(--line);border-radius:9px;padding:0 10px}
+.hwa>summary{cursor:pointer;padding:6px 0;font-weight:600;font-size:14px}
+.hwb{padding:2px 0 8px;font-size:14.5px;overflow-wrap:anywhere}
+.hwt{margin:0 0 8px;padding:7px 10px;border-radius:7px;background:color-mix(in srgb,#f59e0b 13%,transparent);font-size:13.8px}
+.hwls{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.hwl{font-size:13px;border:1px solid var(--line);border-radius:14px;padding:2px 9px;text-decoration:none}
+.home{display:inline-block;font-size:13px;margin-bottom:6px;text-decoration:none;opacity:.8}
+</style>
+</head>
+<body>
+<aside id="side" aria-label="통합 목차">
+  <div class="top">
+    <a class="home" href="../">← 센서 핵심노트</a>
+    <h1>센서 및 응용 — 통합 노트</h1>
+    <div class="sub" id="meta"></div>
+    <div class="qbox"><input id="q" type="search" placeholder="전체 주차 검색 — 한글·영어 ( / )" autocomplete="off" aria-label="전체 주차 검색"><button id="qx" aria-label="검색 지우기">×</button></div>
+    <div class="chips" id="cats"></div>
+  </div>
+  <nav id="nav"></nav>
+</aside>
+<div id="scrim"></div>
+<div id="bar"><a class="btn" href="../" aria-label="핵심노트 홈">⌂</a><button class="btn" id="menu" aria-label="목차 열기">☰</button><span class="ttl" id="barT">통합 노트</span><button class="btn" id="bq" aria-label="검색">🔍</button></div>
+<main id="main"></main>
+<script src="data.js"></script>
+<script src="hw.js"></script>
+<script>
+(function(){
+const H=window.HUB, $=s=>document.querySelector(s), main=$("#main");
+const HWL=window.HW||[];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const WK={}; H.weeks.forEach(w=>WK[w.k]=w);
+const BYW={}; H.slides.forEach(s=>(BYW[s.w]=BYW[s.w]||[]).push(s));
+const link=(s,txt)=>`<a class="btn go" href="${WK[s.w].url}#${s.id}" title="노트에서 이 슬라이드 열기">${txt||"↗<span class='tx'> 노트에서 열기</span>"}</a>`;
+const badges=s=>(s.f.includes("B")?'<span class="bd bB">교재</span>':"")+(s.f.includes("L")?'<span class="bd bL">최신</span>':"")+(s.f.includes("W")?'<span class="bd bW">원본 확인</span>':"");
+$("#meta").textContent=`강의 해설 노트 ${H.weeks.length}개 · 슬라이드 ${H.slides.length}장`;
+
+/* ---------- 내비 ---------- */
+function nav(){
+  let h=`<a class="nv" href="#home" data-v="home"><span class="wk">🏠</span><span class="wt">처음 화면</span></a>
+  <a class="nv" href="#exam" data-v="exam"><span class="wk">✍️</span><span class="wt">시험 한 줄 답안 모아보기</span></a>
+  <a class="nv" href="#latest" data-v="latest"><span class="wk">🆕</span><span class="wt">최신 보충 모아보기</span></a>
+  <a class="nv" href="#book" data-v="book"><span class="wk">📖</span><span class="wt">교재 보충 모아보기</span></a>
+  <a class="nv" href="#hw" data-v="hw"><span class="wk">📝</span><span class="wt">과제·시험 모아보기</span></a>
+  <a class="nv" href="#check" data-v="check"><span class="wk">⚠️</span><span class="wt">원본 확인 모아보기</span></a>
+  <div class="navsep">주차별 목차</div>`;
+  H.weeks.forEach(w=>h+=`<a class="nv" href="#${w.k}" data-v="${w.k}"><span class="wk">${esc(w.lab)}</span><span class="wt">${esc(w.t)}</span><span class="cnt">${w.n}</span></a>`);
+  $("#nav").innerHTML=h;
+}
+function mark(v){ document.querySelectorAll(".nv").forEach(a=>a.classList.toggle("cur",a.dataset.v===v)); }
+
+/* ---------- 화면 ---------- */
+function home(){
+  let h=`<h2>센서 및 응용 — 통합 노트</h2><p class="lead">${H.weeks.length}개 강의 해설 노트를 한곳에서 찾고 이동해요. 노트 안의 ★·메모는 각 노트에 그대로 저장돼요. 슬라이드 제목이나 ↗를 누르면 해당 노트의 그 슬라이드가 새 창으로 열려요.</p>
+  <div class="quick">
+   <div class="card" data-go="exam"><b>✍️ 시험 한 줄 답안</b><span>주차별 '시험 대비 한 줄 답안'만 모아서 복습</span></div>
+   <div class="card" data-go="latest"><b>🆕 최신 보충</b><span>슬라이드 이후 바뀐 내용 ${H.slides.filter(s=>s.f.includes("L")).length}곳</span></div>
+   <div class="card" data-go="book"><b>📖 교재 보충</b><span>『센서공학입문』 반영 ${H.slides.filter(s=>s.f.includes("B")).length}곳 (${[...new Set(H.slides.filter(s=>s.f.includes("B")).map(s=>s.w))].map(k=>(H.weeks.find(w=>w.k===k)||{}).lab||k).join(" · ")})</span></div>
+   <div class="card" data-go="hw"><b>📝 과제·시험</b><span>${HWL.map(x=>x.t.replace("Homework #","HW")).join(" · ")||"없음"} — 문제 ${HWL.reduce((a,x)=>a+x.qs.length,0)}개, 정답은 접어 둠</span></div>
+   <div class="card" data-go="check"><b>⚠️ 원본 확인</b><span>슬라이드 표기 불일치·확인 필요 ${H.slides.filter(s=>s.f.includes("W")).length}곳</span></div>
+  </div><div class="grid">`;
+  H.weeks.forEach(w=>h+=`<div class="card wcard"><div class="lab">${esc(w.lab)} · 슬라이드 ${w.n}장</div><div class="t">${esc(w.t)}</div><div class="d">${esc(w.d)}</div>
+   <div class="row"><a class="btn pri" href="${w.url}">노트 열기 ↗</a><a class="btn" href="#${w.k}">목차 보기</a></div></div>`);
+  main.innerHTML=h+`</div><p class="note">이 페이지는 각 노트의 내용을 ${esc(H.asof)}에 모은 색인이에요. 노트를 고치면 이 페이지의 요약·검색은 다시 만들어야 반영돼요.</p>`;
+}
+function week(k){
+  const w=WK[k], arr=BYW[k]||[];
+  let h=`<h2>${esc(w.lab)} · ${esc(w.t)}</h2><p class="lead">${esc(w.d)} · 슬라이드 ${w.n}장 &nbsp;<a class="btn pri" href="${w.url}">노트 열기 ↗</a></p>`;
+  let deck="";
+  arr.forEach(s=>{
+    const dk=(s.num.match(/^[①②]/)||[""])[0]; if(dk&&dk!==deck){ deck=dk; h+=`<div class="part">자료${dk}</div>`; }
+    h+=`<div class="sl"><div class="n">${esc(s.num.replace(/^[📖]\s*/,""))}</div><div class="c"><a class="tt" href="${w.url}#${s.id}">${esc(s.t)}</a>${badges(s)}<div class="ss">${esc(s.s)}</div></div>${link(s)}</div>`;
+  });
+  main.innerHTML=h;
+}
+function grouped(title,lead,pick,render,openAll){
+  let h=`<h2>${title}</h2><p class="lead">${lead}</p>`, any=false;
+  H.weeks.forEach(w=>{ const arr=(BYW[w.k]||[]).filter(pick); if(!arr.length) return; any=true;
+    h+=`<details class="wk"${openAll?" open":""}><summary>${esc(w.lab)} · ${esc(w.t)} <span class="cnt" style="font-weight:400;color:var(--mut)">(${arr.length})</span></summary><div class="in">${arr.map(render).join("")}</div></details>`; });
+  main.innerHTML=h+(any?"":`<p class="empty">해당 항목이 없어요.</p>`);
+}
+const head=s=>`<div class="h"><a href="${WK[s.w].url}#${s.id}">${esc(s.num)} ${esc(s.t)} ↗</a></div>`;
+const partOf=(s,re)=>s.p.filter(p=>re.test(p[1])).map(p=>p[2]).join("\n\n");
+function view(v){
+  document.body.classList.remove("open");
+  if(v==="exam") grouped("✍️ 시험 한 줄 답안 모아보기","각 노트의 '시험 대비 한 줄 답안'을 주차별로 모았어요. 소리 내어 읽거나, 가리고 떠올려 보세요.",s=>s.x,s=>`<div class="ex">${head(s)}${esc(s.x)}</div>`,false);
+  else if(v==="latest") grouped("🆕 최신 보충 모아보기","슬라이드 이후 바뀐 시장·제품·기준을 모았어요(2026-11 기준). 시험에서는 슬라이드 표현을 따르세요.",s=>s.f.includes("L"),s=>`<div class="lt">${head(s)}${esc(partOf(s,/최신/))}</div>`,true);
+  else if(v==="book") grouped("📖 교재 보충 모아보기",`『센서공학입문』 내용을 반영한 칸이에요(현재 ${[...new Set(H.slides.filter(s=>s.f.includes("B")).map(s=>s.w))].map(k=>WK[k].lab).join(" · ")}). 부록(A1~)은 교재에만 있는 주제예요.`,s=>s.f.includes("B"),s=>`<div class="lt">${head(s)}${esc(partOf(s,/교재/))}</div>`,true);
+  else if(v==="check") grouped("⚠️ 원본 확인 모아보기","슬라이드 표기가 교재·관례와 다르거나 강의 중 확인이 필요한 곳이에요.",s=>s.f.includes("W"),s=>`<div class="ex">${head(s)}${esc(partOf(s,/원본 확인/)||s.s)}</div>`,false);
+  else if(v==="hw") hwView();
+  else if(WK[v]) week(v);
+  else { v="home"; home(); }
+  mark(v); $("#barT").textContent=v==="home"?"통합 노트":(WK[v]?WK[v].lab+" · "+WK[v].t:document.querySelector(`.nv[data-v="${v}"] .wt`).textContent);
+  window.scrollTo(0,0);
+}
+
+function hwView(){
+  let h=`<h2>📝 과제·시험 모아보기</h2><p class="lead">교수님 solution 기준이에요(과제 HW1~3, 중간고사). 먼저 문제만 보고 풀어 본 뒤 '정답 보기'를 펼치세요. 연결 슬라이드를 누르면 해당 노트가 새 창으로 열려요.</p>`;
+  if(!HWL.length) h+=`<p class="empty">아직 등록된 과제가 없어요.</p>`;
+  HWL.forEach(hw=>{
+    h+=`<details class="wk" open><summary>${esc(hw.t)} <span class="cnt" style="font-weight:400;color:var(--mut)">· ${esc(hw.d)} · ${hw.qs.length}문제</span></summary><div class="in">`;
+    hw.qs.forEach(q=>{
+      const links=(q.link||[]).map(([w,id,l])=>WK[w]?`<a class="hwl" href="${WK[w].url}#${id}">${esc(WK[w].lab)} ${esc(id.replace("s","Slide "))} · ${esc(l)} ↗</a>`:"").join("");
+      h+=`<div class="hwq" id="${hw.k}-${q.no}"><div class="hwh"><span class="hwn">${esc(q.no)}</span><b>${esc(q.topic)}</b></div>
+       <div class="hwp">${q.q}</div>
+       <details class="hwa"><summary>정답 보기</summary><div class="hwb">${q.a}</div>${q.trap?`<div class="hwt"><b>실수 주의</b> ${q.trap}</div>`:""}</details>
+       ${links?`<div class="hwls">${links}</div>`:""}</div>`;
+    });
+    h+=`</div></details>`;
+  });
+  main.innerHTML=h;
+}
+
+/* ---------- 검색 ---------- */
+const CATS=[["all","전체"],["title","제목"],["body","본문"],["term","용어"],["book","교재"],["latest","최신"],["quiz","퀴즈"]];
+let cat="all", IDX=null, PAIRS=[];
+$("#cats").innerHTML=CATS.map(([k,l])=>`<button class="chip${k==="all"?" on":""}" data-c="${k}">${l}</button>`).join("");
+const norm=s=>s.toLowerCase().normalize("NFC"), nos=s=>s.replace(/[\s\-·_]/g,"");
+function build(){
+  IDX=[];
+  H.slides.forEach(s=>{
+    IDX.push({s,cat:"title",lab:"제목",t:s.num+" "+s.t});
+    IDX.push({s,cat:"body",lab:"본문",t:s.b});
+    s.p.forEach(p=>IDX.push({s,cat:p[0],lab:p[1],t:p[2]}));
+  });
+  const strip=x=>String(x).replace(/<[^>]+>/g,"");
+  HWL.forEach(hw=>hw.qs.forEach(q=>IDX.push({s:{w:"hw",id:hw.k+"-"+q.no,num:hw.t.replace("Homework #","HW")+" "+q.no,t:q.topic},cat:"quiz",lab:"과제",t:strip(q.topic+" — "+q.q+" "+q.a+" "+(q.trap||""))})));
+  IDX.forEach(e=>{e.L=norm(e.t); e.N=nos(e.L);});
+  const all=IDX.map(e=>e.t).join(" \n "), P=new Map();
+  const r1=/(?<![가-힣])([가-힣]{2,10})\s*\(\s*([A-Za-z][A-Za-z\-]*(?: [A-Za-z][A-Za-z\-]*){0,2})\s*[,;:)]/g, r2=/(?<![A-Za-z])([A-Za-z][A-Za-z\-]*(?: [A-Za-z][A-Za-z\-]*){0,2})\s*\(\s*([가-힣]{2,10})\s*[,;:)]/g;
+  let m; while((m=r1.exec(all))&&P.size<6000){const a=norm(m[1]),b=norm(m[2]); if(b.length>=2) P.set(a+"|"+b,[a,b]);}
+  while((m=r2.exec(all))&&P.size<9000){const b=norm(m[1]),a=norm(m[2]); if(b.length>=2) P.set(a+"|"+b,[a,b]);}
+  PAIRS=[...P.values()];
+}
+const STOP=new Set(["센서","소자","신호","측정","방식","장치","물질","구조","회로","원리","효과","출력","입력","전압","전류","시스템","특성","재료","기판","변화","방법","응용","모듈","부품","단위","그림","표","값"]);
+function expand(q){const out=[q]; if(q.length<2) return out; for(const p of PAIRS){ if(p.some(f=>f===q)) for(const f of p) if(!out.includes(f)&&!STOP.has(f)&&f.length>=3&&out.length<5) out.push(f);} return out;}
+function snip(t,i,len){const a=Math.max(0,i-40),b=Math.min(t.length,i+len+60);return (a>0?"…":"")+esc(t.slice(a,i))+"<mark>"+esc(t.slice(i,i+len))+"</mark>"+esc(t.slice(i+len,b))+(b<t.length?"…":"");}
+const W8={title:100,term:60,body:30,book:25,latest:25,quiz:15};
+function search(){
+  const raw=$("#q").value.trim(); $("#qx").style.display=raw?"block":"none";
+  if(!raw){ view(location.hash.slice(1)||"home"); return; }
+  if(!IDX) build();
+  const toks=raw.split(/\s+/).map(norm).filter(Boolean), groups=toks.map(expand);
+  const best=new Map();
+  for(const e of IDX){
+    if(cat!=="all"&&e.cat!==cat) continue;
+    let ok=true, pos=-1, plen=0, sc=0;
+    for(const g of groups){ let hit=-1, hl=0; for(const f of g){ const i=e.L.indexOf(f); if(i>=0){hit=i;hl=f.length;break;} if(e.N.includes(nos(f))){hit=-2;} } if(hit===-1){ok=false;break;} if(pos<0&&hit>=0){pos=hit;plen=hl;} sc+=1; }
+    if(!ok) continue;
+    sc=sc*(W8[e.cat]||20);
+    const key=e.s.w+e.s.id+e.cat+e.lab, prev=best.get(key);
+    if(!prev||prev.sc<sc) best.set(key,{e,sc,pos,plen});
+  }
+  const hits=[...best.values()].sort((a,b)=>b.sc-a.sc);
+  const bw={}; hits.forEach(h=>(bw[h.e.s.w]=bw[h.e.s.w]||[]).push(h));
+  const ex=groups[0].length>1?` <span class="lab">(같이 찾은 말: ${esc(groups[0].slice(1).join(", "))})</span>`:"";
+  let h=`<h2>검색: “${esc(raw)}”</h2><p class="lead">${hits.length}건${ex} · 주차별로 묶었어요</p>`;
+  if(!hits.length) h+=`<p class="empty">찾은 내용이 없어요. 영어/한글로 바꾸거나 단어를 줄여 보세요.</p>`;
+  H.weeks.forEach(w=>{ const arr=bw[w.k]; if(!arr) return; h+=`<div class="rgrp">${esc(w.lab)} · ${esc(w.t)} <span class="lab">${arr.length}건</span></div>`;
+    arr.slice(0,40).forEach(({e,pos,plen})=>{ h+=`<div class="res"><div class="h"><a href="${w.url}#${e.s.id}"><b>${esc(e.s.num)} ${esc(e.s.t)}</b> ↗</a><span class="lab">${esc(e.lab)}</span></div>${e.cat==="title"?"":`<div class="sn">${snip(e.t,pos,plen)}</div>`}</div>`; });
+    if(arr.length>40) h+=`<p class="lab">… ${arr.length-40}건 더 있어요. 단어를 더 넣어 좁혀 보세요.</p>`;
+  });
+  if(bw.hw){ h+=`<div class="rgrp">📝 과제·시험 <span class="lab">${bw.hw.length}건</span></div>`;
+    bw.hw.forEach(({e,pos,plen})=>{ h+=`<div class="res"><div class="h"><a href="#hw"><b>${esc(e.s.num)} ${esc(e.s.t)}</b></a><span class="lab">과제</span></div><div class="sn">${snip(e.t,pos,plen)}</div></div>`; }); }
+  main.innerHTML=h; mark(""); document.body.classList.remove("open");
+}
+let tm; $("#q").addEventListener("input",()=>{clearTimeout(tm);tm=setTimeout(search,180);});
+$("#q").addEventListener("focus",()=>{ if(!IDX) setTimeout(build,0); });
+$("#qx").onclick=()=>{$("#q").value="";search();$("#q").focus();};
+$("#cats").addEventListener("click",e=>{const b=e.target.closest(".chip"); if(!b) return; cat=b.dataset.c; document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",c===b)); search();});
+document.addEventListener("keydown",e=>{ if((e.key==="/"&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName))||(e.key==="k"&&(e.ctrlKey||e.metaKey))){e.preventDefault(); document.body.classList.add("open"); $("#q").focus();} if(e.key==="Escape"){document.body.classList.remove("open");} });
+main.addEventListener("click",e=>{const c=e.target.closest("[data-go]"); if(c) location.hash=c.dataset.go;});
+$("#menu").onclick=()=>document.body.classList.add("open");
+$("#bq").onclick=()=>{document.body.classList.add("open");$("#q").focus();};
+$("#scrim").onclick=()=>document.body.classList.remove("open");
+$("#nav").addEventListener("click",e=>{ if(e.target.closest(".nv")&&$("#q").value){ $("#q").value=""; $("#qx").style.display="none"; setTimeout(()=>view(location.hash.slice(1)||"home"),0);} });
+window.addEventListener("hashchange",()=>{ if(!$("#q").value) view(location.hash.slice(1)||"home"); });
+nav(); view(location.hash.slice(1)||"home");
+})();
+</script>
+</body>
+</html>

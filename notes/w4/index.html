@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week3 자기센서 ② 강의 해설 노트</title>
+<style>
+:root{
+  --bg:#f7f6f2;--card:#ffffff;--ink:#1d2329;--sub:#5b6570;--line:#dfe3e7;--soft:#f0f2f4;
+  --acc:#2f5d9e;--on-acc:#ffffff;--acc-soft:#e6eef9;--star:#c98a00;--q:#7a4fc0;
+  --tip-bg:#e8f5ec;--tip-line:#3c8f5a;--tip-ink:#1f5634;
+  --lec-bg:#fffaf0;--lec-line:#e2c48a;--ok:#2d7d46;--bad:#b23b3b;--tag:#8a5a00;
+  --barH:96px;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#15181c;--card:#1d2127;--ink:#e6e9ec;--sub:#a1abb5;--line:#323941;--soft:#262c33;
+  --acc:#7fa8e6;--acc-soft:#22324a;--star:#f0b429;--q:#b393ef;
+  --on-acc:#0f1a2b;--tip-bg:#183022;--tip-line:#4fae74;--tip-ink:#bfe8cd;
+  --lec-bg:#2a2518;--lec-line:#6e5a2e;--ok:#6cc68a;--bad:#ef8a8a;--tag:#e8b866;
+}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.7 "Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;overflow-x:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:980px;margin:0 auto;padding:12px 14px 80px}
+/* top bar */
+#bar{position:sticky;top:0;z-index:50;background:var(--card);border-bottom:1px solid var(--line);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+#head{display:flex;align-items:center;gap:10px;padding:8px 12px 4px;flex-wrap:wrap}
+#ttl{font-weight:800;font-size:16px;flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tools{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+#tools button{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:4px 12px;font-size:14px}
+#tools button.on{background:var(--acc);border-color:var(--acc);color:var(--on-acc);font-weight:700}
+#save{font-size:12.5px;padding:3px 10px;border-radius:999px;border:1px solid var(--ok);color:var(--ok);white-space:nowrap}
+#save.warn{border-color:var(--tag);color:var(--tag)}
+#nav{display:flex;gap:4px;align-items:center;overflow-x:auto;padding:4px 12px 8px;scrollbar-width:thin;white-space:nowrap}
+#nav button{flex:0 0 auto;min-width:34px;height:30px;padding:0 6px;border:1px solid var(--line);background:var(--card);border-radius:7px;font-size:13px;position:relative}
+#nav button.cur{background:var(--acc);color:var(--on-acc);border-color:var(--acc);font-weight:700}
+#nav button.has-star::after{content:"";position:absolute;right:2px;top:2px;width:6px;height:6px;border-radius:50%;background:var(--star)}
+#nav button.todo{opacity:.55}
+#nav .glab{flex:0 0 auto;font-size:12.5px;color:var(--sub);margin:0 2px 0 8px}
+#nav .glab:first-of-type{margin-left:6px}
+/* cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:16px 0}
+.slide{scroll-margin-top:calc(var(--barH) + 8px)}
+#top{scroll-margin-top:calc(var(--barH) + 8px)}
+h1{font-size:22px;margin:4px 0 2px}
+h2{font-size:19px;margin:0 0 10px}
+h3{font-size:16px;margin:14px 0 6px}
+.muted{color:var(--sub);font-size:14px}
+.shead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.sno{font-weight:800;color:var(--acc);font-size:15px;letter-spacing:.02em}
+.stitle{font-weight:700;font-size:18px}
+.thumbrow{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:14px;align-items:start}
+.thumb{display:block;width:100%;height:auto;aspect-ratio:1170/827;border:1px solid var(--line);border-radius:8px;cursor:zoom-in;background:#fff}
+.oneline{background:var(--acc-soft);border-left:4px solid var(--acc);padding:8px 12px;border-radius:6px}
+.oneline b{color:var(--acc)}
+.lec{background:var(--lec-bg);border:1px solid var(--lec-line);border-radius:10px;padding:10px 14px;margin-top:12px}
+.lec .lh{font-weight:700;margin-bottom:4px}
+.lec p{margin:6px 0}
+.sum{margin-top:8px;padding-top:8px;border-top:1px dashed var(--lec-line);font-weight:600}
+.tag{display:inline-block;font-size:12px;font-weight:700;color:var(--tag);border:1px solid var(--tag);border-radius:5px;padding:0 5px;margin:0 2px;line-height:1.6;vertical-align:1px}
+.flag{background:rgba(220,120,40,.1);border:1px solid rgba(220,120,40,.5);border-radius:8px;padding:6px 10px;margin:8px 0;font-size:14.5px}
+.tip{background:var(--tip-bg);border:1px solid var(--tip-line);color:var(--tip-ink);border-radius:8px;padding:7px 11px;margin:4px 0 10px;font-size:14.5px}
+.tip b{color:inherit}
+body.no-easy .lec, body.no-easy .tip{display:none}
+details.sec{border:1px solid var(--line);border-radius:10px;margin:8px 0;background:var(--card)}
+details.sec>summary{cursor:pointer;padding:8px 12px;font-weight:700;list-style:none;display:flex;gap:8px;align-items:center}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary::before{content:"▸";color:var(--sub);transition:transform .15s}
+details.sec[open]>summary::before{transform:rotate(90deg)}
+details.sec>.body{padding:2px 14px 12px}
+.grp{font-size:12.5px;font-weight:700;color:var(--sub);margin:14px 0 2px;letter-spacing:.05em}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+th{background:var(--soft)}
+.tblwrap{overflow-x:auto}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0;padding:6px 0;border-bottom:1px dashed var(--line)}
+.pair .src{color:var(--sub);font-size:14.5px}
+.eq{font-family:"Cambria Math","STIX Two Math","Times New Roman",serif;background:var(--soft);border-radius:6px;padding:4px 10px;display:inline-block;margin:2px 0}
+.steps{margin:4px 0;padding-left:0;list-style:none}
+.steps li{margin:4px 0;padding:6px 10px;background:var(--soft);border-radius:6px}
+/* figure */
+.fig{position:relative;max-width:760px;margin:6px auto}
+.fig img{display:block;width:100%;height:auto;border-radius:6px;background:#fff}
+.fig .bx{position:absolute;border:2px solid rgba(220,40,40,.75);border-radius:4px;cursor:pointer;background:transparent;padding:0}
+.fig .bx span{position:absolute;left:-2px;top:-2px;background:rgba(220,40,40,.9);color:#fff;font-size:12px;font-weight:700;line-height:18px;min-width:18px;text-align:center;border-radius:3px 0 3px 0}
+.fig .bx.sel{border-color:#ff8c00;background:rgba(255,200,0,.18);box-shadow:0 0 0 3px rgba(255,140,0,.45)}
+.fig .bx.sel span{background:#ff8c00}
+.figctl{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin:6px 0}
+.figctl button{min-width:32px;height:30px;border:1px solid var(--line);background:var(--soft);border-radius:6px}
+.figctl button.sel{background:#ff8c00;color:#fff;border-color:#ff8c00;font-weight:700}
+.figdesc{background:var(--soft);border-radius:8px;padding:8px 12px;min-height:3em}
+.figdesc b{color:#d46b00}
+.redraw{margin-top:10px}
+/* quiz */
+.qz{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0}
+.qz .qq{font-weight:600;margin-bottom:6px}
+.opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:7px 10px;margin:5px 0}
+.opt:hover{border-color:var(--acc)}
+.opt.right{border-color:var(--ok);background:rgba(45,125,70,.12)}
+.opt.wrong{border-color:var(--bad);background:rgba(178,59,59,.1)}
+.opt:disabled{cursor:default}
+.fb{margin-top:6px;font-size:14.5px}
+.fb .r{color:var(--ok);font-weight:700}.fb .w{color:var(--bad);font-weight:700}
+.score{display:flex;gap:10px;align-items:center;margin:6px 0;font-weight:700}
+.score button,.ess button{border:1px solid var(--line);background:var(--soft);border-radius:999px;padding:2px 12px;font-size:13.5px;font-weight:400}
+.ess textarea{width:100%;min-height:80px;border:1px solid var(--line);border-radius:8px;padding:8px;background:var(--card);color:var(--ink);font:inherit;font-size:14.5px}
+.model{display:none;margin-top:6px;background:var(--soft);border-radius:8px;padding:8px 10px}
+.model.show{display:block}
+.model label{display:block;font-size:14.5px}
+/* marks */
+.marks{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.marks button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:2px 12px;font-size:13.5px}
+.marks button.star.on{background:var(--star);border-color:var(--star);color:#fff;font-weight:700}
+.marks button.ques.on{background:var(--q);border-color:var(--q);color:#fff;font-weight:700}
+.marks textarea{flex:1 1 100%;min-height:52px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--card);color:var(--ink);font:inherit;font-size:14.5px}
+.pending{color:var(--sub);font-style:italic;margin-top:10px}
+body.only-star .slide:not(.starred){display:none}
+/* map */
+.mm{display:grid;grid-template-columns:1fr minmax(160px,220px) 1fr;gap:12px;align-items:stretch}
+.mm .col{display:flex;flex-direction:column;gap:10px}
+.mm .center{display:flex;align-items:center;justify-content:center;text-align:center;background:var(--acc);color:var(--on-acc);border-radius:16px;padding:14px;font-weight:800;font-size:17px;line-height:1.45}
+.br{border:2px solid var(--line);border-radius:12px;padding:8px 10px;background:var(--soft);position:relative}
+.br .bt{font-weight:800;margin-bottom:2px}
+.br .bk{font-size:14px;color:var(--sub)}
+.br .bn{margin-top:4px;display:flex;flex-wrap:wrap;gap:4px}
+.br .bn button,.jump{border:1px solid var(--acc);color:var(--acc);background:var(--card);border-radius:6px;font-size:12.5px;padding:0 6px;line-height:1.7}
+.left .br::after{content:"";position:absolute;right:-14px;top:50%;width:12px;border-top:2px solid var(--line)}
+.right .br::before{content:"";position:absolute;left:-14px;top:50%;width:12px;border-top:2px solid var(--line)}
+.rels{margin-top:12px}
+.rel{padding:5px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
+.rel .ar{color:var(--acc);font-weight:800}
+.guide{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gbox{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--soft)}
+.gbox h3{margin:0 0 6px}
+.gbox ol,.gbox ul{margin:0;padding-left:20px}
+.gbox li{margin:3px 0;font-size:14.5px}
+.gbox details{margin:4px 0;font-size:14.5px}
+.gbox details summary{cursor:pointer}
+.gbox details div{background:var(--card);border-radius:6px;padding:5px 8px;margin-top:3px}
+/* tooltip */
+.tt{border-bottom:1.5px dotted var(--acc);cursor:help}
+#tip{position:fixed;z-index:100;max-width:300px;background:var(--card);color:var(--ink);border:1px solid var(--acc);border-radius:10px;padding:8px 11px;font-size:13.5px;line-height:1.55;box-shadow:0 6px 20px rgba(0,0,0,.2);display:none}
+#tip .tn{font-weight:800;color:var(--acc)}
+#tip .tr{color:var(--sub)}
+#tip .tx{margin-top:3px;background:var(--soft);border-radius:5px;padding:2px 6px}
+/* lightbox */
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:200;display:none;align-items:center;justify-content:center;padding:10px}
+#lb img{max-width:100%;max-height:100%;background:#fff;border-radius:6px}
+#lb.show{display:flex}
+@media (max-width:720px){
+  body{font-size:15.5px}
+  .wrap{padding:8px 8px 70px}
+  .card{padding:12px 12px}
+  .thumbrow{grid-template-columns:1fr}
+  .pair{grid-template-columns:1fr}
+  .mm{grid-template-columns:1fr}
+  .mm .center{order:-1}
+  .left .br::after,.right .br::before{display:none}
+  .mm .col{gap:8px}
+  .br{border-left:4px solid var(--acc)}
+  .guide{grid-template-columns:1fr}
+  #ttl{flex:1 1 100%;font-size:15px}
+  #tools button{padding:3px 9px;font-size:13px}
+}
+</style>
+<link rel="stylesheet" href="sb/sb.css"><link rel="stylesheet" href="lat/lat.css">
+</head>
+<body>
+<div id="bar">
+  <div id="head">
+    <div id="ttl">Week 3 · 자기센서 ② — 강의 해설 노트</div>
+    <div id="tools">
+      <button id="bStar" type="button">★ 표시만</button>
+      <button id="bAll" type="button">전체 펼치기</button>
+      <button id="bEasy" type="button" class="on">🎙 쉬운 설명</button>
+      <span id="save">저장: 연결 중…</span>
+    </div>
+  </div>
+  <div id="nav" aria-label="슬라이드 번호"></div>
+</div>
+<div class="wrap" id="main"></div>
+<div id="tip" role="tooltip"></div>
+<div id="lb"><img alt="확대 이미지"></div>
+<script src="content.js"></script>
+<script src="app.js"></script>
+<script src="lat/data.js"></script><script src="lat/lat.js"></script><script src="sb/sb.js"></script>
+</body>
+</html>

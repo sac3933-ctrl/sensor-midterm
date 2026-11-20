@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 5 속도센서·금속탐지기 — 강의 해설 노트</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#f6f5f1; --card:#ffffff; --ink:#1d1f23; --sub:#5d636d; --line:#e2e0d9; --soft:#f0eee8;
+  --acc:#2b5bd7; --acc-soft:#e7eeff; --star:#d99a00; --q:#c2410c; --ok:#15803d; --ok-soft:#e5f5ea; --bad:#b91c1c; --bad-soft:#fdeaea;
+  --ai:#6d28d9; --ai-soft:#efe8fd; --es:#a16207; --es-soft:#fdf3d8; --hy:#0f766e; --hy-soft:#dcf3ef; --warn-soft:#fff3e6;
+  --hint:#166534; --hint-soft:#e8f6ec; --hint-line:#9bd3ad;
+  --shadow:0 1px 2px rgba(0,0,0,.05),0 2px 8px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#15171b; --card:#1d2026; --ink:#e7e9ee; --sub:#9aa1ad; --line:#2f333b; --soft:#252931;
+  --acc:#7aa2ff; --acc-soft:#1f2a45; --star:#f5c34b; --q:#fb923c; --ok:#4ade80; --ok-soft:#183324; --bad:#f87171; --bad-soft:#3a1d1d;
+  --ai:#c4b5fd; --ai-soft:#2c2446; --es:#fcd34d; --es-soft:#3a3018; --hy:#5eead4; --hy-soft:#163533; --warn-soft:#3a2a18;
+  --hint:#86efac; --hint-soft:#15301f; --hint-line:#2f6b45;
+  --shadow:none;
+}}
+*{box-sizing:border-box}
+html{scroll-padding-top:118px}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.7 "Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif;-webkit-text-size-adjust:100%;overflow-x:hidden}
+button{font:inherit;color:inherit}
+.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top1{display:flex;align-items:center;gap:8px;padding:8px 14px 4px;max-width:1100px;margin:0 auto;flex-wrap:wrap}
+.top1 h1{font-size:15px;margin:0;font-weight:700;flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st{font-size:12px;color:var(--sub);padding:2px 8px;border:1px solid var(--line);border-radius:99px;white-space:nowrap}
+.st.db{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 40%,transparent)}
+.st.local{color:var(--q)}
+.tb{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:3px 10px;font-size:13px;cursor:pointer;white-space:nowrap}
+.tb[aria-pressed=true]{background:var(--acc);color:#fff;border-color:var(--acc)}
+.chips{display:flex;gap:4px;overflow-x:auto;padding:4px 14px 8px;max-width:1100px;margin:0 auto;scrollbar-width:thin}
+.chip{flex:0 0 auto;min-width:34px;height:28px;border:1px solid var(--line);background:var(--card);border-radius:7px;font-size:12.5px;cursor:pointer;position:relative;padding:0 6px}
+.chip.cur{background:var(--acc);color:#fff;border-color:var(--acc);font-weight:700}
+.chip.s::after{content:"★";position:absolute;top:-7px;right:-3px;font-size:11px;color:var(--star)}
+.chip.qq::before{content:"";position:absolute;bottom:2px;left:50%;margin-left:-3px;width:6px;height:6px;border-radius:50%;background:var(--q)}
+.chip.dim{opacity:.35}
+.chip.todo{opacity:.45}
+.partsep{flex:0 0 auto;font-size:11px;color:var(--sub);align-self:center;padding:0 2px 0 6px;white-space:nowrap}
+main{max-width:1100px;margin:0 auto;padding:12px 14px 80px}
+.part{margin:28px 0 10px;padding:10px 14px;border-left:4px solid var(--acc);background:var(--acc-soft);border-radius:0 10px 10px 0}
+.part b{display:block;font-size:16px}.part span{font-size:13px;color:var(--sub)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;margin:14px 0;padding:14px 16px;box-shadow:var(--shadow)}
+.card.hide{display:none}
+.hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.no{font-weight:700;color:var(--acc);font-size:14px;letter-spacing:.02em}
+.ttl{font-weight:700;font-size:17px;flex:1 1 auto;min-width:0}
+.light{font-size:11px;color:var(--sub);border:1px solid var(--line);border-radius:99px;padding:0 7px}
+.warnb{font-size:11px;color:var(--q);border:1px solid color-mix(in srgb,var(--q) 50%,transparent);border-radius:99px;padding:0 7px}
+.top2{display:grid;grid-template-columns:230px minmax(0,1fr);gap:14px;margin-top:10px;align-items:start}
+.thumb{width:100%;height:auto;border:1px solid var(--line);border-radius:8px;cursor:zoom-in;display:block;background:#fff;aspect-ratio:460/325;object-fit:contain}
+.one{font-size:15.5px;line-height:1.75}
+.one::before{content:"한 줄";display:inline-block;font-size:11px;font-weight:700;color:var(--acc);background:var(--acc-soft);border-radius:5px;padding:0 6px;margin-right:6px;vertical-align:2px}
+.talk{margin-top:10px;border-left:4px solid var(--acc);background:color-mix(in srgb,var(--acc-soft) 45%,transparent);border-radius:0 10px 10px 0;padding:6px 12px 8px}
+.talk h3{font-size:13px;margin:2px 0 2px;color:var(--acc);letter-spacing:.02em}
+.talk p{margin:6px 0}
+.talk .sum{margin-top:8px;padding:7px 10px;background:var(--card);border-radius:8px;border:1px solid var(--line)}
+.talk .sum b:first-child{color:var(--acc)}
+.hint{background:var(--hint-soft);border:1px solid var(--hint-line);color:var(--ink);border-radius:8px;padding:6px 10px;margin:0 0 8px;font-size:13.8px}
+.hint::before{content:"🎙 강사 한마디";display:block;font-size:11.5px;font-weight:700;color:var(--hint);margin-bottom:1px}
+body.easy-off .talk, body.easy-off .hint{display:none}
+.marks{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:flex-start}
+.mk{border:1px solid var(--line);background:var(--soft);border-radius:8px;padding:2px 10px;font-size:13px;cursor:pointer}
+.mk.star[aria-pressed=true]{background:var(--star);color:#1d1f23;border-color:var(--star)}
+.mk.q[aria-pressed=true]{background:var(--q);color:#fff;border-color:var(--q)}
+.memo{width:100%;min-height:38px;resize:vertical;border:1px dashed var(--line);background:var(--soft);color:var(--ink);border-radius:8px;padding:6px 10px;font:inherit;font-size:14px;margin-top:8px}
+.grp{margin-top:12px}
+.gl{font-size:11.5px;font-weight:700;color:var(--sub);letter-spacing:.06em;margin:10px 0 4px}
+details{border:1px solid var(--line);border-radius:10px;margin:6px 0;background:var(--card)}
+summary{cursor:pointer;padding:7px 12px;font-weight:600;font-size:14px;list-style:none;display:flex;gap:8px;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸";color:var(--sub);transition:transform .15s}
+details[open]>summary::before{transform:rotate(90deg)}
+details[open]>summary{border-bottom:1px solid var(--line)}
+.bd{padding:10px 14px;overflow-x:auto}
+.bd p{margin:.3em 0}
+.bd ul,.bd ol{margin:.3em 0;padding-left:1.3em}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+th{background:var(--soft);font-weight:600}
+.pair td:first-child{color:var(--sub);width:48%;font-size:13px}
+.tg{display:inline-block;font-size:10.5px;font-weight:700;border-radius:5px;padding:0 5px;margin:0 2px;vertical-align:1px;white-space:nowrap}
+.tg.ai{color:var(--ai);background:var(--ai-soft)}.tg.es{color:var(--es);background:var(--es-soft)}.tg.hy{color:var(--hy);background:var(--hy-soft)}
+.warn{background:var(--warn-soft);border-radius:8px;padding:8px 12px}
+.calc{background:var(--soft);border-radius:8px;padding:8px 12px;font-variant-numeric:tabular-nums}
+.calc .ln{display:block;padding:1px 0}
+.math{font-family:"Cambria Math","Times New Roman",serif;font-size:1.05em;white-space:nowrap}
+code,.m{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.93em}
+.fig{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:8px;background:#fff;max-width:760px;width:100%}
+.fig img{position:absolute;max-width:none;display:block}
+.bx{position:absolute;border:2px solid #2b5bd7;border-radius:4px;background:rgba(43,91,215,.06);cursor:pointer;padding:0}
+.bx span{position:absolute;top:-2px;left:-2px;background:#2b5bd7;color:#fff;font-size:11px;font-weight:700;min-width:18px;height:18px;line-height:18px;text-align:center;border-radius:4px 0 4px 0}
+.fig.sel .bx{opacity:.35}
+.fig.sel .bx.on{opacity:1;border-color:#e11d48;background:rgba(225,29,72,.10);box-shadow:0 0 0 2000px rgba(0,0,0,.18)}
+.fig.sel .bx.on span{background:#e11d48}
+.fnav{display:flex;gap:4px;flex-wrap:wrap;margin:8px 0 4px}
+.fnav button{border:1px solid var(--line);background:var(--card);border-radius:6px;min-width:30px;height:28px;cursor:pointer;font-size:13px}
+.fnav button.on{background:#e11d48;color:#fff;border-color:#e11d48}
+.fdesc{min-height:2.5em;background:var(--soft);border-radius:8px;padding:8px 12px;font-size:14px}
+.fdesc b.fh{color:#e11d48}
+.redraw{margin-top:8px}
+.quiz{border-top:1px dashed var(--line);padding-top:8px;margin-top:8px}
+.qi{margin:10px 0 14px}
+.qq{font-weight:600}
+.qk{font-size:11px;color:var(--sub);margin-right:4px}
+.opts{display:grid;gap:5px;margin-top:6px}
+.opt{text-align:left;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:14px}
+.opt:hover:not(:disabled){border-color:var(--acc)}
+.opt.ok{background:var(--ok-soft);border-color:var(--ok)}
+.opt.bad{background:var(--bad-soft);border-color:var(--bad)}
+.opt:disabled{cursor:default}
+.ex{margin-top:6px;font-size:13.5px;border-radius:8px;padding:6px 10px;background:var(--soft);display:none}
+.ex.show{display:block}
+.qs{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--sub);flex-wrap:wrap}
+.sa textarea{width:100%;min-height:64px;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font:inherit;font-size:14px;background:var(--soft);color:var(--ink);margin-top:6px}
+.model{display:none;margin-top:6px;background:var(--ok-soft);border-radius:8px;padding:8px 12px;font-size:14px}
+.model.show{display:block}
+.model label{display:block;font-size:13.5px}
+.lb{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:50;cursor:zoom-out;padding:10px}
+.lb.show{display:flex}
+.lb img{max-width:100%;max-height:100%;background:#fff;border-radius:6px}
+.empty{padding:30px;text-align:center;color:var(--sub)}
+.wip{color:var(--sub);font-size:14px;margin-top:6px}
+.svgk{max-width:560px;width:100%;height:auto}
+.svgk text{fill:var(--ink);font-family:"Noto Sans KR",sans-serif}
+/* guide */
+.guide{border:2px solid var(--acc)}
+.guide .ttl{font-size:18px}
+.mmwrap{margin-top:8px;border:1px solid var(--line);border-radius:10px;background:var(--soft)}
+.mm{display:block;width:100%;height:auto}
+.mm text{fill:var(--ink);font-family:"Noto Sans KR",sans-serif;pointer-events:none}
+.mm .nd{cursor:pointer}
+.mm .nd rect{fill:var(--card);stroke-width:2.5}
+.mm .nd:hover rect{stroke-width:4}
+.mm .ctr{cursor:pointer}
+.mm .ctr ellipse{fill:var(--acc)}
+.mm .ctr text{fill:#fff}
+.mm .spoke{stroke:var(--line);stroke-width:3}
+.mm .lk path{fill:none;stroke:var(--sub);stroke-width:2;stroke-dasharray:6 5}
+.mm .lk circle{fill:var(--card);stroke:var(--sub);stroke-width:2;cursor:pointer}
+.mm .lk text{font-size:13px;font-weight:700}
+.mm.sel .nd,.mm.sel .lk{opacity:.22}
+.mm.sel .nd.on,.mm.sel .lk.on{opacity:1}
+.mm.sel .lk.on path{stroke:#e11d48;stroke-width:3}
+.mm.sel .lk.on circle{stroke:#e11d48}
+.mmv{display:none;padding:10px}
+.mmv .c{background:var(--acc);color:#fff;border-radius:14px;text-align:center;padding:10px;font-weight:700}
+.mmv .c small{display:block;font-weight:400;font-size:12.5px;opacity:.9}
+.mmv .stem{width:3px;height:10px;background:var(--line);margin:0 auto}
+.mmv .br{background:var(--card);border:2px solid;border-radius:12px;padding:8px 12px;margin:0 0 8px}
+.mmv .br h4{margin:0 0 2px;font-size:15px}
+.mmv .br .kw{font-size:13.5px}
+.mmlinks{margin-top:8px}
+.mmlinks li{margin:4px 0;font-size:14px}
+.mmpanel{background:var(--soft);border-radius:10px;padding:10px 14px;margin-top:6px;font-size:14px;min-height:3em}
+.mmpanel h4{margin:0 0 4px;font-size:15px}
+.sl{display:inline-block;border:1px solid var(--line);background:var(--card);border-radius:6px;padding:0 7px;margin:2px 3px 2px 0;font-size:12.5px;cursor:pointer}
+.sl:hover{border-color:var(--acc);color:var(--acc)}
+.gsec{margin-top:12px}
+.gsec h3{font-size:14.5px;margin:0 0 4px;color:var(--acc)}
+.gsec ol,.gsec ul{margin:.2em 0;padding-left:1.3em}
+.gsec li{margin:4px 0}
+.ord td:first-child{white-space:nowrap;font-weight:600}
+.chkq details{margin:5px 0}
+.chkq summary{font-weight:500}
+@media (max-width:700px){
+  body{font-size:14.5px}
+  .top1 h1{flex-basis:100%;font-size:13.5px}
+  .st{font-size:11px;padding:1px 6px}
+  .tb{font-size:12px;padding:2px 8px}
+  .top2{grid-template-columns:minmax(0,1fr)}
+  .thumb{max-width:420px}
+  .card{padding:12px 12px}
+  .bd{padding:8px 10px}
+  .mm{display:none}
+  .mmv{display:block}
+  .mmlegwide{display:none}
+  html{scroll-padding-top:112px}
+}
+/* tooltip */
+.tip{border-bottom:1.5px dotted var(--acc);cursor:help}
+#tipbox{position:fixed;z-index:100;max-width:min(320px,calc(100vw - 16px));background:var(--ink);color:var(--card);border-radius:10px;padding:9px 12px;font-size:13.5px;line-height:1.55;box-shadow:0 6px 24px rgba(0,0,0,.25);display:none}
+#tipbox b{font-size:14.5px}
+#tipbox .rd{opacity:.8;font-size:12.5px}
+#tipbox .tx{margin-top:4px;opacity:.92;font-size:12.8px}
+</style>
+<link rel="stylesheet" href="sb/sb.css"><link rel="stylesheet" href="lat/lat.css">
+</head>
+<body>
+<header class="top">
+  <div class="top1">
+    <h1>Week 5 · 속도센서 · 금속탐지기 — 강의 해설 노트</h1>
+    <button class="tb" id="fStar" aria-pressed="false">★ 표시만</button>
+    <button class="tb" id="fOpen" aria-pressed="false">전체 펼치기</button>
+    <button class="tb" id="easy" aria-pressed="true">🎙 쉬운 설명</button>
+    <span class="st" id="st">저장: 연결 중…</span>
+  </div>
+  <nav class="chips" id="chips" aria-label="슬라이드 번호"></nav>
+</header>
+<main id="main"><div class="empty">노트를 불러오는 중…</div></main>
+<div class="lb" id="lb"><img alt="슬라이드 확대"></div>
+<div id="tipbox" role="tooltip"></div>
+<script src="notes.js"></script>
+<script>
+(function(){
+"use strict";
+const N = (window.NOTES||[]).slice().sort((a,b)=>a.n-b.n);
+const TOTAL = 31;
+const PARTS = window.PARTS||{};
+const GL = window.GLOSS||[];
+const $ = (s,r=document)=>r.querySelector(s);
+const esc = s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const tg = s=>String(s==null?"":s)
+  .replace(/\[AI 보충\]/g,'<span class="tg ai">AI 보충</span>')
+  .replace(/\[추정\]/g,'<span class="tg es">추정</span>')
+  .replace(/\[현업\]/g,'<span class="tg hy">현업</span>');
+const pad = n=>String(n).padStart(2,"0");
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+/* ---------- state & storage ---------- */
+const LKEY="speed-w5-notes-v1", EKEY="speed-w5-easy";
+let state={}; let mode="local"; let col=null;
+try{state=JSON.parse(localStorage.getItem(LKEY)||"{}")||{};}catch(e){state={};}
+function saveLocal(){try{localStorage.setItem(LKEY,JSON.stringify(state));}catch(e){}}
+function setSt(t,c){const el=$("#st");el.textContent=t;el.className="st "+(c||"");}
+const queue={}, timers={};
+function persist(n,delay){
+  saveLocal();
+  if(mode!=="db"||!col) return;
+  clearTimeout(timers[n]);
+  timers[n]=setTimeout(()=>flush(n),delay||0);
+}
+async function flush(n){
+  if(queue[n]){queue[n].again=true;return;}
+  queue[n]={again:false};
+  setSt("저장: 저장 중…","db");
+  try{
+    const s=state[n]||{};
+    await col.doc("w5-s"+pad(n)).set({star:!!s.star,q:!!s.q,memo:String(s.memo||""),t:Date.now()});
+    setSt("저장: 계정(db) ✓","db");
+  }catch(e){
+    mode="local"; setSt("저장: 브라우저(db 저장 실패)","local");
+  }
+  const again=queue[n].again; delete queue[n];
+  if(again&&mode==="db") flush(n);
+}
+async function connect(){
+  const timer=setTimeout(()=>{if(mode!=="db")setSt("저장: 브라우저(db 응답 없음)","local");},10000);
+  try{
+    if(!window.claude||!window.claude.use){clearTimeout(timer);setSt("저장: 브라우저(계정 연결 없음)","local");return;}
+    const [db,user]=await Promise.all([window.claude.use("db"),window.claude.use("user")]);
+    const uid=user?await user.id():null;
+    if(!db||!uid){clearTimeout(timer);setSt("저장: 브라우저(계정 연결 없음)","local");return;}
+    col=db.collection("data/users/"+uid);
+    const snap=await col.get();
+    clearTimeout(timer);
+    const remote={};
+    snap.docs.forEach(d=>{const m=/^w5-s(\d\d)$/.exec(d.id); if(m&&d.exists){remote[+m[1]]=d.data();}});
+    const localOnly=[];
+    Object.keys(state).forEach(k=>{ if(!remote[k]){const s=state[k]; if(s&&(s.star||s.q||s.memo)) localOnly.push(+k);} });
+    Object.keys(remote).forEach(k=>{const r=remote[k]; state[k]={star:!!r.star,q:!!r.q,memo:String(r.memo||"")};});
+    mode="db"; saveLocal(); applyAllMarks();
+    setSt("저장: 계정(db) ✓","db");
+    for(const k of localOnly){ await flush(k); }
+  }catch(e){
+    clearTimeout(timer); mode="local"; setSt("저장: 브라우저(db 연결 실패)","local");
+  }
+}
+
+/* ---------- render ---------- */
+function hint(s,k){ return s.h&&s.h[k]?`<div class="hint">${tg(s.h[k])}</div>`:""; }
+function det(title,body,open){
+  if(!body) return "";
+  return `<details${open?" open":""}><summary>${title}</summary><div class="bd">${body}</div></details>`;
+}
+function renderTerms(t){
+  if(!t||!t.length) return "";
+  return `<table><tr><th>영문</th><th>한글</th><th>쉬운 뜻</th></tr>${t.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${tg(r[2])}</td></tr>`).join("")}</table>`;
+}
+function renderRead(r){
+  if(!r||!r.length) return "";
+  return `<table class="pair"><tr><th>원문</th><th>풀어 읽기 · 해석</th></tr>${r.map(x=>`<tr><td class="notip">${x[0]}</td><td>${tg(x[1])}</td></tr>`).join("")}</table>`;
+}
+function renderFig(s){
+  const f=s.fig; if(!f) return "";
+  const [x0,y0,x1,y1]=f.c, cw=x1-x0, ch=y1-y0;
+  const ar=(cw*1755)/(ch*1241);
+  const boxes=f.b.map((b,i)=>{
+    const l=(b[0]-x0)/cw*100, t=(b[1]-y0)/ch*100, w=(b[2]-b[0])/cw*100, h=(b[3]-b[1])/ch*100;
+    return `<button class="bx" data-i="${i}" style="left:${l}%;top:${t}%;width:${w}%;height:${h}%" aria-label="영역 ${i+1}"><span>${i+1}</span></button>`;
+  }).join("");
+  const nav=`<div class="fnav"><button data-k="prev" aria-label="이전">‹</button>${f.b.map((b,i)=>`<button data-k="${i}">${i+1}</button>`).join("")}<button data-k="next" aria-label="다음">›</button></div>`;
+  const img=`<img loading="lazy" src="h/h${pad(s.n)}.jpg" alt="Slide ${s.n} 그림" style="width:${100/cw}%;left:${-x0/cw*100}%;top:${-y0/ch*100}%">`;
+  let html=`<div class="fig" data-n="${s.n}" style="aspect-ratio:${ar.toFixed(4)};max-width:min(760px,${Math.round(520*ar)}px)">${img}${boxes}</div>${nav}<div class="fdesc">번호나 그림 속 박스를 누르면 그 부분 설명이 여기에 나옵니다.</div>`;
+  if(f.ko) html+=`<details class="redraw"><summary>한글로 다시 그린 도표</summary><div class="bd">${tg(f.ko)}</div></details>`;
+  return html;
+}
+function renderQuiz(s){
+  if(!s.quiz||!s.quiz.length) return "";
+  const mc=s.quiz.filter(q=>q.o).length;
+  let h=`<div class="quiz" data-n="${s.n}">`;
+  if(mc) h+=`<div class="qs"><span class="score">객관식 0 / ${mc}</span><button class="tb retry">다시 풀기</button></div>`;
+  s.quiz.forEach((q,i)=>{
+    if(q.o){
+      h+=`<div class="qi mc" data-i="${i}"><div class="qq"><span class="qk">객관식</span>${tg(q.q)}</div><div class="opts"></div><div class="ex"></div></div>`;
+    }else{
+      h+=`<div class="qi sa" data-i="${i}"><div class="qq"><span class="qk">서술형</span>${tg(q.q)}</div><textarea placeholder="내 답을 먼저 써 보세요"></textarea><button class="tb show">모범 답안 보기</button><div class="model"><p><b>모범 답안</b> ${tg(q.m)}</p><p style="margin-top:6px"><b>채점 포인트</b></p>${q.p.map(p=>`<label><input type="checkbox"> ${tg(p)}</label>`).join("")}</div></div>`;
+    }
+  });
+  return h+"</div>";
+}
+function fillMC(qz,s){
+  let right=0,done=0; const mc=s.quiz.filter(q=>q.o).length;
+  const upd=()=>{const el=qz.querySelector(".score"); if(el) el.textContent=`객관식 ${right} / ${mc}`+(done===mc?" · 완료":"");};
+  qz.querySelectorAll(".qi.mc").forEach(div=>{
+    const q=s.quiz[+div.dataset.i];
+    const order=shuffle(q.o.map((t,k)=>k));
+    const box=div.querySelector(".opts"); const ex=div.querySelector(".ex");
+    ex.className="ex"; ex.innerHTML="";
+    box.innerHTML=order.map((k,j)=>`<button class="opt" data-k="${k}">${"①②③④⑤⑥"[j]} ${tg(q.o[k])}</button>`).join("");
+    box.querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>{
+      const k=+b.dataset.k, ok=k===q.a;
+      box.querySelectorAll(".opt").forEach(x=>{x.disabled=true; if(+x.dataset.k===q.a) x.classList.add("ok");});
+      if(!ok) b.classList.add("bad");
+      ex.innerHTML=(ok?'<b style="color:var(--ok)">정답</b> ':'<b style="color:var(--bad)">오답</b> ')+tg(q.e);
+      ex.classList.add("show"); done++; if(ok) right++; upd();
+    }));
+  });
+  upd();
+}
+function talkBox(s){
+  if(!s.talk) return "";
+  return `<div class="talk"><h3>🎙 강사 설명</h3>${tg(s.talk)}${s.sum?`<p class="sum"><b>정리하면</b> ${tg(s.sum)}</p>`:""}</div>`;
+}
+function card(s){
+  const warnBadge=s.warn?'<span class="warnb">⚠ 원본 확인</span>':"";
+  const lightBadge=s.light?'<span class="light">가벼운 장</span>':"";
+  let during="";
+  during+=det("용어",s.terms&&s.terms.length?hint(s,"terms")+renderTerms(s.terms):"");
+  during+=det(s.readTitle||"원문 풀어 읽기 · 해석",s.read&&s.read.length?hint(s,"read")+renderRead(s.read):"");
+  during+=det("그림 읽기",s.fig?hint(s,"fig")+renderFig(s):"");
+  during+=det("표",s.tbl?hint(s,"tbl")+tg(s.tbl):"");
+  during+=det("숫자 예제",s.calc?hint(s,"calc")+`<div class="calc">${tg(s.calc)}</div>`:"");
+  during+=det("⚠ 원본 확인",s.warn?`<div class="warn">${tg(s.warn)}</div>`:"");
+  let review="";
+  review+=det("핵심 논리",tg(s.logic||""));
+  review+=det("외울 것",s.mem&&s.mem.length?`<ol>${s.mem.map(m=>`<li>${tg(m)}</li>`).join("")}</ol>`:"");
+  review+=det("시험 대비 한 줄 답안",tg(s.ans||""));
+  review+=det("백지 복원 과제",tg(s.blank||""));
+  const quiz=s.quiz&&s.quiz.length?det(`퀴즈 (${s.quiz.length})`,renderQuiz(s)):"";
+  return `<section class="card" id="s${s.n}" data-n="${s.n}">
+    <div class="hd"><span class="no">Slide ${pad(s.n)}</span><span class="ttl">${esc(s.t)}</span>${lightBadge}${warnBadge}</div>
+    <div class="top2">
+      <img class="thumb" loading="lazy" width="460" height="325" src="s/s${pad(s.n)}.jpg" data-full="h/h${pad(s.n)}.jpg" alt="Slide ${s.n} 원본 썸네일">
+      <div>
+        <div class="one">${tg(s.one)}</div>
+        ${s.extra?`<div style="margin-top:6px">${tg(s.extra)}</div>`:""}
+        ${talkBox(s)}
+        <div class="marks">
+          <button class="mk star" aria-pressed="false">★ 시험 강조</button>
+          <button class="mk q" aria-pressed="false">? 질문</button>
+        </div>
+        <textarea class="memo" rows="1" placeholder="메모 (자동 저장)"></textarea>
+      </div>
+    </div>
+    ${during?`<div class="grp"><div class="gl">강의 중</div>${during}</div>`:""}
+    ${review?`<div class="grp"><div class="gl">복습</div>${review}</div>`:""}
+    ${quiz?`<div class="grp"><div class="gl">퀴즈</div>${quiz}</div>`:""}
+  </section>`;
+}
+function wipCard(n){
+  return `<section class="card wipc" id="s${n}" data-n="${n}">
+    <div class="hd"><span class="no">Slide ${pad(n)}</span><span class="ttl">(해설 작성 중)</span></div>
+    <div class="top2"><img class="thumb" loading="lazy" width="460" height="325" src="s/s${pad(n)}.jpg" data-full="h/h${pad(n)}.jpg" alt="Slide ${n} 원본 썸네일"><div class="wip">이 슬라이드의 해설은 곧 추가됩니다. 썸네일을 누르면 원본을 크게 볼 수 있어요.</div></div>
+  </section>`;
+}
+
+/* ---------- guide ---------- */
+const G=window.GUIDE;
+const CIR="①②③④⑤⑥⑦⑧";
+function slBtns(arr){return arr.map(n=>`<button class="sl" data-go="${n}">S${n}</button>`).join("");}
+function mindmap(){
+  const W=250,H=118, C={x:450,y:300}; const pos={}; G.nodes.forEach(n=>pos[n.id]=n);
+  let svg=`<svg class="mm" viewBox="0 0 900 600" role="img" aria-label="Week5 개념 마인드맵">`;
+  G.nodes.forEach(n=>{svg+=`<line class="spoke" x1="${C.x}" y1="${C.y}" x2="${n.x}" y2="${n.y}"/>`;});
+  let labels="";
+  G.links.forEach((l,i)=>{
+    const A=pos[l.a],B=pos[l.b]; const mx=(A.x+B.x)/2,my=(A.y+B.y)/2;
+    let dx=mx-C.x,dy=my-C.y; let len=Math.hypot(dx,dy);
+    if(len<20){dx=-(B.y-A.y);dy=B.x-A.x;len=Math.hypot(dx,dy);}
+    const off=len<150?70:35; let cx=mx+dx/len*off, cy=my+dy/len*off;
+    if(l.q){cx=l.q[0];cy=l.q[1];}
+    const lx=0.25*A.x+0.5*cx+0.25*B.x, ly=0.25*A.y+0.5*cy+0.25*B.y;
+    svg+=`<g class="lk" data-l="${i}"><path d="M${A.x} ${A.y} Q${cx.toFixed(1)} ${cy.toFixed(1)} ${B.x} ${B.y}"/></g>`;
+    labels+=`<g class="lk" data-l="${i}"><circle cx="${lx.toFixed(1)}" cy="${ly.toFixed(1)}" r="13"/><text x="${lx.toFixed(1)}" y="${(ly+4.5).toFixed(1)}" text-anchor="middle">${CIR[i]}</text></g>`;
+  });
+  svg+=`<g class="ctr"><ellipse cx="${C.x}" cy="${C.y}" rx="104" ry="48"/><text x="${C.x}" y="${C.y-4}" text-anchor="middle" font-size="18" font-weight="700">${G.center.t}</text><text x="${C.x}" y="${C.y+18}" text-anchor="middle" font-size="12">${G.center.s}</text></g>`;
+  G.nodes.forEach((n,i)=>{
+    svg+=`<g class="nd" data-i="${i}" tabindex="0" role="button" aria-label="${n.t}"><rect x="${n.x-W/2}" y="${n.y-H/2}" width="${W}" height="${H}" rx="12" stroke="${n.c}"/>`+
+      `<text x="${n.x}" y="${n.y-H/2+24}" text-anchor="middle" font-size="15.5" font-weight="700" style="fill:${n.c}">${n.t}</text>`+
+      n.k.map((k,j)=>`<text x="${n.x}" y="${n.y-H/2+45+j*18}" text-anchor="middle" font-size="12.5">${k}</text>`).join("")+
+      `<text x="${n.x}" y="${n.y+H/2-9}" text-anchor="middle" font-size="11.5" style="fill:var(--sub)">S ${n.slides[0]}–${n.slides[n.slides.length-1]} · 눌러서 보기</text></g>`;
+  });
+  return svg+labels+"</svg>";
+}
+function mindmapV(){
+  let h=`<div class="mmv"><div class="c">${G.center.t}<small>${G.center.s}</small></div>`;
+  G.nodes.forEach(n=>{
+    h+=`<div class="stem"></div><div class="br" style="border-color:${n.c}"><h4 style="color:${n.c}">${n.t}</h4><div class="kw">${n.k.join(" · ")}</div><div>${slBtns(n.slides)}</div></div>`;
+  });
+  return h+"</div>";
+}
+function guideCards(){
+  if(!G) return "";
+  const links=`<ul class="mmlinks">${G.links.map((l,i)=>{const A=G.nodes.find(n=>n.id===l.a),B=G.nodes.find(n=>n.id===l.b);return `<li><b>${CIR[i]} ${A.t} ⇢ ${B.t}</b>: ${tg(l.d)} ${slBtns(l.s)}</li>`;}).join("")}</ul>`;
+  const map=`<section class="card guide" id="s0" data-n="0">
+    <div class="hd"><span class="no">Map</span><span class="ttl">전체 지도 (개념 마인드맵)</span></div>
+    <div class="one" style="margin-top:8px">${G.lead}</div>
+    <div class="mmwrap">${mindmap()}${mindmapV()}</div>
+    <div class="mmpanel mmlegwide" id="mmpanel">가지를 누르면 그 가지의 설명과 슬라이드 번호가, 점선 위 번호(①~⑤)를 누르면 두 가지가 왜 이어지는지가 여기에 나옵니다.</div>
+    <div class="gsec"><h3>가지끼리 이어지는 관계</h3>${links}</div>
+  </section>`;
+  const ord=`<table class="ord">${G.order.map(o=>`<tr><td>${o[0]}</td><td>${o[1]}<br>${slBtns(o[2])}</td></tr>`).join("")}</table>`;
+  const core=`<ol>${G.core.map(c=>`<li>${tg(c[0])} ${slBtns(c[1])}</li>`).join("")}</ol>`;
+  const chk=`<div class="chkq">${G.checks.map((c,i)=>`<div style="margin:6px 0"><div>${i+1}. ${tg(c.q)} ${slBtns(c.s)}</div><details><summary>답 보기</summary><div class="bd">${tg(c.a)}</div></details></div>`).join("")}</div>`;
+  const guide=`<section class="card guide" id="sg" data-n="0">
+    <div class="hd"><span class="no">Guide</span><span class="ttl">학습 가이드</span></div>
+    <div class="gsec"><h3>① 공부 방법</h3><ol>${G.method.map(m=>`<li>${m}</li>`).join("")}</ol></div>
+    <div class="gsec"><h3>② 순서 (개념이 쌓이는 묶음)</h3>${ord}</div>
+    <div class="gsec"><h3>③ 핵심 — 꼭 이해할 것</h3>${core}</div>
+    <div class="gsec"><h3>④ 점검 — 스스로 답해 보기</h3>${chk}</div>
+  </section>`;
+  return map+guide;
+}
+
+let html=guideCards();
+const have=new Set(N.map(s=>s.n));
+const byN={}; N.forEach(s=>byN[s.n]=s);
+for(let i=1;i<=TOTAL;i++){
+  const p=PARTS[i];
+  if(p) html+=`<div class="part"><b>${p[0]}</b><span>${p[1]}</span></div>`;
+  html+=byN[i]?card(byN[i]):wipCard(i);
+}
+const main=$("#main");
+main.innerHTML=html;
+
+/* chips */
+const chips=$("#chips");
+if(G){const b=document.createElement("button"); b.className="chip"; b.textContent="지도"; b.dataset.n=0; b.addEventListener("click",()=>go(0)); chips.appendChild(b);}
+for(let i=1;i<=TOTAL;i++){
+  if(PARTS[i]&&PARTS[i][2]){const sp=document.createElement("span"); sp.className="partsep"; sp.textContent=PARTS[i][2]; chips.appendChild(sp);}
+  const b=document.createElement("button"); b.className="chip"+(have.has(i)?"":" todo"); b.textContent=i; b.dataset.n=i;
+  b.addEventListener("click",()=>go(i)); chips.appendChild(b);
+}
+function hdr(){return document.querySelector('.top').offsetHeight;}
+function go(n){
+  const el=document.getElementById("s"+n); if(!el||el.classList.contains("hide")) return;
+  const y=el.getBoundingClientRect().top+window.scrollY-hdr()-8;
+  window.scrollTo({top:y,behavior:"smooth"}); markCur(n);
+}
+
+/* marks */
+function applyMarks(n){
+  const c=document.getElementById("s"+n); const s=state[n]||{};
+  if(c&&c.querySelector(".mk.star")){
+    c.querySelector(".mk.star").setAttribute("aria-pressed",!!s.star);
+    c.querySelector(".mk.q").setAttribute("aria-pressed",!!s.q);
+    const m=c.querySelector(".memo"); if(document.activeElement!==m) m.value=s.memo||"";
+    autoGrow(m);
+  }
+  const ch=chips.querySelector(`[data-n="${n}"]`);
+  if(ch){ch.classList.toggle("s",!!s.star); ch.classList.toggle("qq",!!s.q);}
+}
+function applyAllMarks(){for(let i=1;i<=TOTAL;i++) applyMarks(i); applyFilter();}
+function autoGrow(t){t.style.height="auto"; t.style.height=Math.max(38,t.scrollHeight+2)+"px";}
+document.querySelectorAll(".thumb").forEach(t=>t.addEventListener("click",e=>{const lb=$("#lb"); lb.querySelector("img").src=e.target.dataset.full; lb.classList.add("show");}));
+N.forEach(s=>{
+  const c=document.getElementById("s"+s.n);
+  c.querySelector(".mk.star").addEventListener("click",()=>{state[s.n]=state[s.n]||{}; state[s.n].star=!state[s.n].star; applyMarks(s.n); applyFilter(); persist(s.n,0);});
+  c.querySelector(".mk.q").addEventListener("click",()=>{state[s.n]=state[s.n]||{}; state[s.n].q=!state[s.n].q; applyMarks(s.n); persist(s.n,0);});
+  const m=c.querySelector(".memo");
+  m.addEventListener("input",()=>{state[s.n]=state[s.n]||{}; state[s.n].memo=m.value; autoGrow(m); persist(s.n,800);});
+  const qz=c.querySelector(".quiz");
+  if(qz){
+    fillMC(qz,s);
+    const r=qz.querySelector(".retry"); if(r) r.addEventListener("click",()=>fillMC(qz,s));
+    qz.querySelectorAll(".qi.sa").forEach(d=>d.querySelector(".show").addEventListener("click",ev=>{const mo=d.querySelector(".model"); mo.classList.toggle("show"); ev.target.textContent=mo.classList.contains("show")?"모범 답안 숨기기":"모범 답안 보기";}));
+  }
+  const fig=c.querySelector(".fig");
+  if(fig){
+    const desc=fig.parentElement.querySelector(".fdesc"), nav=fig.parentElement.querySelector(".fnav");
+    let cur=-1; const B=s.fig.b;
+    const sel=i=>{
+      cur=(i+B.length)%B.length;
+      fig.classList.add("sel");
+      fig.querySelectorAll(".bx").forEach((b,k)=>b.classList.toggle("on",k===cur));
+      nav.querySelectorAll("button[data-k]").forEach(b=>b.classList.toggle("on",b.dataset.k===String(cur)));
+      desc.innerHTML=`<b class="fh">${cur+1}. ${B[cur][4]}</b><br>${tg(B[cur][5])}`;
+      applyTips(desc);
+    };
+    fig.querySelectorAll(".bx").forEach(b=>b.addEventListener("click",()=>sel(+b.dataset.i)));
+    nav.addEventListener("click",e=>{const k=e.target.dataset&&e.target.dataset.k; if(k==null) return; if(k==="prev") sel(cur<0?B.length-1:cur-1); else if(k==="next") sel(cur+1); else sel(+k);});
+  }
+});
+$("#lb").addEventListener("click",()=>$("#lb").classList.remove("show"));
+
+/* guide behaviors */
+if(G){
+  main.addEventListener("click",e=>{const b=e.target.closest("[data-go]"); if(b){go(+b.dataset.go);}});
+  const g=document.getElementById("s0");
+  const mm=g.querySelector(".mm"), panel=document.getElementById("mmpanel");
+  const ids=G.nodes.map(n=>n.id);
+  function clearSel(){mm.classList.add("sel"); mm.querySelectorAll(".nd,.lk").forEach(x=>x.classList.remove("on"));}
+  function selNode(i){
+    clearSel(); const n=G.nodes[i];
+    mm.querySelector(`.nd[data-i="${i}"]`).classList.add("on");
+    const rel=[]; G.links.forEach((l,k)=>{ if(l.a===n.id||l.b===n.id){ rel.push(k); mm.querySelectorAll(`.lk[data-l="${k}"]`).forEach(x=>x.classList.add("on")); const o=l.a===n.id?l.b:l.a; mm.querySelector(`.nd[data-i="${ids.indexOf(o)}"]`).classList.add("on");} });
+    panel.innerHTML=`<h4 style="color:${n.c}">${n.t}</h4><p>${tg(n.d)}</p><p><b>슬라이드</b> ${slBtns(n.slides)}</p>`+
+      (rel.length?`<p><b>연결</b> ${rel.map(k=>`${CIR[k]} ${G.links[k].t}`).join(" · ")}</p>`:"");
+    applyTips(panel);
+  }
+  function selLink(k){
+    clearSel(); const l=G.links[k];
+    mm.querySelectorAll(`.lk[data-l="${k}"]`).forEach(x=>x.classList.add("on"));
+    [l.a,l.b].forEach(id=>mm.querySelector(`.nd[data-i="${ids.indexOf(id)}"]`).classList.add("on"));
+    const A=G.nodes[ids.indexOf(l.a)], B=G.nodes[ids.indexOf(l.b)];
+    panel.innerHTML=`<h4>${CIR[k]} ${l.t}</h4><p><b style="color:${A.c}">${A.t}</b> ⇢ <b style="color:${B.c}">${B.t}</b></p><p>${tg(l.d)}</p><p><b>근거</b> ${slBtns(l.s)}</p>`;
+    applyTips(panel);
+  }
+  mm.querySelectorAll(".nd").forEach(nd=>{nd.addEventListener("click",()=>selNode(+nd.dataset.i)); nd.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault(); selNode(+nd.dataset.i);}});});
+  mm.querySelectorAll(".lk circle").forEach(c=>c.addEventListener("click",()=>selLink(+c.parentNode.dataset.l)));
+  mm.querySelector(".ctr").addEventListener("click",()=>{mm.classList.remove("sel"); mm.querySelectorAll(".on").forEach(x=>x.classList.remove("on")); panel.innerHTML=`<h4>${G.center.t}</h4><p>${tg(G.center.d)}</p>`;});
+}
+
+/* ---------- tooltip glossary ---------- */
+const JOSA='(?:에서|으로|까지|이다|이며|이고|예요|이에요|처럼|보다|부터|이나|과는|와는|에는|으로는|로는|을|를|은|는|이|가|의|에|와|과|로|도|만|란)';
+const reEsc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+const GT=[]; GL.forEach((g,gi)=>(g.k||[g.name]).forEach(k=>GT.push({k,gi,unit:!!g.unit})));
+GT.sort((a,b)=>b.k.length-a.k.length);
+const pat=GT.map(t=>{
+  const e=reEsc(t.k);
+  if(/[가-힣]/.test(t.k)) return `(?<![가-힣])${e}(?=$|[^가-힣]|${JOSA}(?![가-힣]))`;
+  if(t.unit) return `(?<![A-Za-zµμ])${e}(?![A-Za-z0-9_])`;
+  return `(?<![A-Za-z0-9_])${e}(?![A-Za-z0-9_])`;
+}).join('|');
+const TRE=GT.length?new RegExp(pat,'g'):null;
+const lookup={}; GT.forEach(t=>lookup[t.k]=t.gi);
+const SKIP='button,a,textarea,input,.fig,.math,.calc,.quiz,.tip,.notip,summary,.chips,svg,.hd,.mmv .c,.fnav,.sl';
+function applyTips(root,usedIn){
+  if(!TRE||!root) return;
+  const used=usedIn||new Set();
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(n){
+    if(!n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+    return n.parentElement.closest(SKIP)?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT;
+  }});
+  const nodes=[]; while(w.nextNode()) nodes.push(w.currentNode);
+  nodes.forEach(node=>{
+    const txt=node.nodeValue; TRE.lastIndex=0;
+    let m,last=0,frag=null;
+    while((m=TRE.exec(txt))){
+      const gi=lookup[m[0]];
+      if(gi===undefined||used.has(gi)) continue;
+      used.add(gi);
+      frag=frag||document.createDocumentFragment();
+      frag.appendChild(document.createTextNode(txt.slice(last,m.index)));
+      const sp=document.createElement('span'); sp.className='tip'; sp.tabIndex=0; sp.dataset.g=gi; sp.textContent=m[0];
+      frag.appendChild(sp); last=m.index+m[0].length;
+    }
+    if(frag){frag.appendChild(document.createTextNode(txt.slice(last))); node.replaceWith(frag);}
+  });
+}
+document.querySelectorAll("main .card").forEach(c=>applyTips(c));
+const tipbox=$('#tipbox'); let tipFor=null, tipAt=0;
+function showTip(el){
+  const g=GL[+el.dataset.g]; if(!g) return;
+  tipbox.innerHTML=`<b>${esc(g.name)}</b>${g.read?` <span class="rd">· 읽기: ${esc(g.read)}</span>`:''}<div>${esc(g.easy)}</div>${g.ex?`<div class="tx">${esc(g.ex)}</div>`:''}`;
+  tipbox.style.display='block'; tipbox.style.left='8px'; tipbox.style.top='8px';
+  const r=el.getBoundingClientRect(), tb=tipbox.getBoundingClientRect();
+  let x=Math.min(Math.max(8,r.left),innerWidth-tb.width-8);
+  let y=r.bottom+6; if(y+tb.height>innerHeight-8) y=r.top-tb.height-6;
+  tipbox.style.left=Math.max(8,x)+'px'; tipbox.style.top=Math.max(8,y)+'px'; tipFor=el; tipAt=Date.now();
+}
+function hideTip(){tipbox.style.display='none'; tipFor=null;}
+const hoverable=matchMedia('(hover:hover)');
+document.addEventListener('mouseover',e=>{const t=e.target.closest&&e.target.closest('.tip'); if(t&&hoverable.matches) showTip(t);});
+document.addEventListener('mouseout',e=>{const t=e.target.closest&&e.target.closest('.tip'); if(t&&hoverable.matches&&!(e.relatedTarget&&t.contains(e.relatedTarget))) hideTip();});
+document.addEventListener('click',e=>{
+  const t=e.target.closest('.tip');
+  if(t){e.preventDefault(); e.stopPropagation(); if(tipFor===t&&!hoverable.matches&&Date.now()-tipAt>400){hideTip();} else showTip(t); return;}
+  if(tipFor&&!e.target.closest('#tipbox')) hideTip();
+},true);
+document.addEventListener('keydown',e=>{const t=e.target; if(t&&t.classList&&t.classList.contains('tip')&&(e.key==='Enter'||e.key===' ')){e.preventDefault(); showTip(t);}});
+let lastY=window.scrollY;
+addEventListener('scroll',()=>{ if(tipFor&&Math.abs(window.scrollY-lastY)>40){hideTip();} if(!tipFor) lastY=window.scrollY; },{passive:true});
+
+/* filter & expand */
+const fStar=$("#fStar"), fOpen=$("#fOpen");
+function applyFilter(){
+  const on=fStar.getAttribute("aria-pressed")==="true";
+  for(let i=1;i<=TOTAL;i++){
+    const st=!!(state[i]&&state[i].star);
+    const el=document.getElementById("s"+i); if(el) el.classList.toggle("hide",on&&!st);
+    const ch=chips.querySelector(`[data-n="${i}"]`); if(ch) ch.classList.toggle("dim",on&&!st);
+  }
+  document.querySelectorAll(".part,.guide").forEach(p=>p.style.display=on?"none":"");
+}
+fStar.addEventListener("click",()=>{fStar.setAttribute("aria-pressed",fStar.getAttribute("aria-pressed")!=="true"); applyFilter();});
+fOpen.addEventListener("click",()=>{
+  const open=fOpen.getAttribute("aria-pressed")!=="true";
+  fOpen.setAttribute("aria-pressed",open); fOpen.textContent=open?"전체 접기":"전체 펼치기";
+  document.querySelectorAll("main .card:not(.guide) details").forEach(d=>d.open=open);
+});
+/* easy toggle */
+const easyBtn=$("#easy");
+function setEasy(on){easyBtn.setAttribute("aria-pressed",on); document.body.classList.toggle("easy-off",!on); try{localStorage.setItem(EKEY,on?"1":"0");}catch(e){}}
+let easyInit=true; try{easyInit=localStorage.getItem(EKEY)!=="0";}catch(e){}
+setEasy(easyInit);
+easyBtn.addEventListener("click",()=>setEasy(easyBtn.getAttribute("aria-pressed")!=="true"));
+
+/* header offset */
+function setPad(){document.documentElement.style.scrollPaddingTop=(hdr()+8)+"px";}
+setPad(); window.addEventListener("resize",setPad);
+/* current highlight */
+let curN=0;
+function markCur(n){
+  if(n===curN&&chips.querySelector(".chip.cur")) return;
+  curN=n; chips.querySelectorAll(".chip").forEach(c=>c.classList.toggle("cur",+c.dataset.n===n));
+  const ch=chips.querySelector(`[data-n="${n}"]`);
+  if(ch){const l=ch.offsetLeft-chips.clientWidth/2+ch.clientWidth/2; chips.scrollTo({left:l,behavior:"smooth"});}
+}
+function onScroll(){
+  const y=window.scrollY+hdr()+20; let best=null;
+  document.querySelectorAll("main .card:not(.hide)").forEach(c=>{if(c.offsetTop<=y) best=+c.dataset.n;});
+  if(best==null) best=0;
+  markCur(best);
+}
+let raf=0; window.addEventListener("scroll",()=>{cancelAnimationFrame(raf); raf=requestAnimationFrame(onScroll);},{passive:true});
+onScroll();
+
+/* keyboard */
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){$("#lb").classList.remove("show"); hideTip(); return;}
+  if(e.key!=="ArrowLeft"&&e.key!=="ArrowRight") return;
+  const t=e.target; if(t&&(t.tagName==="TEXTAREA"||t.tagName==="INPUT"||t.tagName==="SELECT"||t.isContentEditable)) return;
+  if(e.altKey||e.ctrlKey||e.metaKey) return;
+  const vis=[0,...[...document.querySelectorAll("main .card:not(.hide):not(.guide)")].map(c=>+c.dataset.n)];
+  let i=vis.indexOf(curN); if(i<0) i=0;
+  const j=e.key==="ArrowRight"?Math.min(vis.length-1,i+1):Math.max(0,i-1);
+  e.preventDefault(); go(vis[j]);
+});
+
+applyAllMarks();
+connect();
+})();
+</script>
+<script src="lat/data.js"></script><script src="lat/lat.js"></script><script src="sb/sb.js"></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+.lat-wrap{margin:14px 0 6px}
+.lat-grp{font-size:12px;font-weight:700;letter-spacing:.04em;color:#b45309;margin:0 0 6px}
+.lat-sec{border:1px solid #fbbf24;border-radius:10px;background:rgba(245,158,11,.06);overflow:hidden}
+.lat-sec>summary{cursor:pointer;padding:10px 14px;font-weight:700;color:#b45309;list-style:none}
+.lat-sec>summary::-webkit-details-marker{display:none}
+.lat-sec>summary::before{content:"▸ ";display:inline-block;transition:transform .15s}
+.lat-sec[open]>summary::before{transform:rotate(90deg)}
+.lat-body{padding:2px 14px 12px;line-height:1.7;font-size:15px}
+.lat-it{margin:10px 0 14px}
+.lat-h{font-weight:700;margin-bottom:4px}
+.lat-b ul{margin:4px 0;padding-left:20px}
+.lat-b li{margin:3px 0}
+.lat-b p{margin:4px 0}
+.lat-b table{border-collapse:collapse;width:100%;font-size:14px;margin:6px 0}
+.lat-b th,.lat-b td{border:1px solid rgba(180,83,9,.3);padding:5px 8px;text-align:left;vertical-align:top}
+.lat-b th{background:rgba(245,158,11,.12)}
+.lat-tw{overflow-x:auto}
+.lat-cap{font-size:13px;opacity:.85}
+.lat-tag{display:inline-block;font-size:11.5px;font-weight:700;border-radius:6px;padding:0 6px;margin:0 2px;vertical-align:1px}
+.lat-t-ai{background:#ede9fe;color:#5b21b6}
+.lat-t-g{background:#f1f5f9;color:#475569;border:1px dashed #94a3b8}
+.lat-t-h{background:#dcfce7;color:#166534;font-weight:700}
+.lat-note{font-size:13px;color:#92400e;margin:8px 0 4px}
+.lat-src{font-size:13px;line-height:1.6;margin-top:6px;word-break:break-all}
+.lat-src ul{margin:4px 0;padding-left:18px}
+.lat-src a{color:#2563eb}
+@media (prefers-color-scheme:dark){
+  .lat-grp,.lat-sec>summary{color:#fcd34d}
+  .lat-sec{border-color:#78350f;background:rgba(245,158,11,.07)}
+  .lat-b th,.lat-b td{border-color:rgba(252,211,77,.25)}
+  .lat-note{color:#fcd34d}
+  .lat-t-ai{background:#3b2a63;color:#ddd6fe}
+  .lat-t-g{background:#1e293b;color:#cbd5e1}
+  .lat-t-h{background:#14532d;color:#bbf7d0}
+  .lat-src a{color:#93c5fd}
+}

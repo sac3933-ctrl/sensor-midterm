@@ -1,0 +1,2724 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Week 1 센서의 기초 — 강의 해설 노트</title>
+<style>:root{
+  --bg:#f7f7f4;--card:#ffffff;--ink:#1d1d1b;--sub:#5d5d58;--line:#e2e1da;
+  --accent:#2457c5;--accent-soft:#e8eefb;--talk:#fff7e6;--talk-line:#f0c46b;
+  --tip:#e7f5ea;--tip-line:#5aae6c;--tip-ink:#1f5a2c;--star:#d99a00;--q:#c2410c;
+  --ok:#1f7a3a;--ng:#b42318;--box:#e5484d;--barH:96px;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#141413;--card:#1e1e1c;--ink:#ecebe6;--sub:#a9a8a1;--line:#34342f;
+  --accent:#7aa2ff;--accent-soft:#1f2a44;--talk:#2b2416;--talk-line:#8a6a26;
+  --tip:#16301d;--tip-line:#3f8a52;--tip-ink:#bfe6c8;--star:#f2c14e;--q:#fb923c;
+  --ok:#5fd18a;--ng:#ff8a80;--box:#ff6b6b;
+}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.7 "Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;overflow-x:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+/* top bar */
+/* ---- sidebar layout ---- */
+:root{--sideW:300px;--railW:56px}
+.ic{border:1px solid var(--line);background:var(--card);border-radius:8px;min-width:34px;height:34px;font-size:15px;line-height:1;padding:0 8px}
+.ic.on{background:var(--accent);border-color:var(--accent);color:#fff}
+#side{position:fixed;top:0;left:0;bottom:0;width:var(--sideW);z-index:60;background:var(--card);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.sd-head{display:flex;align-items:center;gap:8px;padding:10px 12px 6px}
+.sd-title{font-size:15px;margin:0;line-height:1.3;flex:1;min-width:0}
+.sd-title small{display:block;font-size:12px;font-weight:400;color:var(--sub)}
+.sd-search{padding:4px 12px 6px}
+#q{width:100%;height:38px;border:1px solid var(--line);border-radius:9px;padding:0 10px;font:inherit;font-size:14.5px;background:var(--bg);color:var(--ink)}
+#q:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
+.qf{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.qc{border:1px solid var(--line);background:var(--bg);border-radius:99px;padding:1px 9px;font-size:12px}
+.qc.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:700}
+.qres{margin:0 8px 6px;max-height:46vh;overflow:auto;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.qmeta{font-size:12px;color:var(--sub);padding:6px 10px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg)}
+.hit{display:flex;gap:8px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:transparent;padding:7px 10px;font-size:13px;line-height:1.45}
+.hit:hover,.hit.sel{background:var(--accent-soft)}
+.hn{flex:0 0 auto;min-width:30px;height:22px;border-radius:6px;background:var(--accent);color:#fff;font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.hb{min-width:0;display:flex;flex-direction:column}
+.hl{font-weight:700;font-size:12px;color:var(--accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hs{color:var(--ink);word-break:break-word}
+.hs mark,mark.hit{background:#fde047;color:#000;border-radius:3px;padding:0 1px}
+mark.hit{box-shadow:0 0 0 3px #fde047}
+.sd-tools{display:flex;flex-wrap:wrap;gap:5px;align-items:center;padding:4px 12px 8px;border-bottom:1px solid var(--line)}
+.tb{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:3px 9px;font-size:12.5px;white-space:nowrap}
+.tb.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.savest{font-size:11.5px;color:var(--sub);padding:2px 8px;border:1px solid var(--line);border-radius:99px;white-space:nowrap}
+.savest.db{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 40%,transparent)}
+.savest.local{color:var(--q)}
+.sd-nav{flex:1;min-height:0;overflow:auto;padding:4px 6px 20px;position:relative}
+.partsep{font-size:11px;font-weight:700;color:var(--sub);letter-spacing:.04em;padding:10px 8px 3px}
+.nv{display:flex;align-items:center;gap:8px;width:100%;text-align:left;border:0;background:transparent;border-radius:7px;padding:5px 8px;font-size:13px;line-height:1.35}
+.nv:hover{background:var(--bg)}
+.nv .nn{flex:0 0 auto;min-width:24px;font-weight:700;color:var(--sub);font-variant-numeric:tabular-nums;font-size:12px}
+.nv .nt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nv .mk{flex:0 0 auto;font-size:11px}
+.nv.st .mk::before{content:"★";color:var(--star)}
+.nv.qm .mk::after{content:"?";color:var(--q);font-weight:800;margin-left:2px}
+.nv.cur{background:var(--accent);color:#fff}.nv.cur .nn{color:#fff}
+.nv.pend{opacity:.55}
+body.staronly .nv[data-go]:not(.st):not([data-go="map"]):not([data-go="guide"]){opacity:.35}
+#rail{display:none;position:fixed;top:0;left:0;bottom:0;width:var(--railW);z-index:60;background:var(--card);border-right:1px solid var(--line);flex-direction:column;align-items:center;gap:6px;padding:10px 0}
+.rl-sep{width:28px;border-top:1px solid var(--line);margin:4px 0}
+.rl-cur{font-size:12px;font-weight:800;color:var(--accent)}
+#topbar{display:none;position:fixed;top:0;left:0;right:0;z-index:50;height:52px;align-items:center;gap:8px;padding:0 10px;background:color-mix(in srgb,var(--bg) 92%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.tb-cur{flex:1;min-width:0;font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#scrim{display:none;position:fixed;inset:0;z-index:55;background:rgba(0,0,0,.35)}
+main{padding:20px 24px 80px calc(var(--sideW) + 24px)}
+main>*{max-width:920px;margin-left:auto;margin-right:auto}
+body.side-collapsed #side{display:none}
+body.side-collapsed #rail{display:flex}
+body.side-collapsed main{padding-left:calc(var(--railW) + 24px)}
+@media (max-width:1023px){
+  #topbar{display:flex}
+  #rail{display:none!important}
+  #side{display:flex!important;width:min(340px,88vw);transform:translateX(-105%);transition:transform .2s ease;box-shadow:4px 0 20px rgba(0,0,0,.15)}
+  body.drawer-open #side{transform:none}
+  body.drawer-open #scrim{display:block}
+  main{padding:calc(52px + 14px) 12px 80px!important}
+  #bSide::before{content:"✕"} #bSide{font-size:0}
+  #bSide::before{font-size:15px}
+}
+@media (min-width:1024px) and (max-width:1199px){:root{--sideW:260px}}
+h1{font-size:22px;margin:4px 0 14px}
+.card,.slide{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin:0 0 18px}
+.slide,.card{scroll-margin-top:calc(var(--barH) + 8px)}
+/* map */
+.map{display:grid;grid-template-columns:1fr minmax(120px,170px) 1fr;gap:10px;align-items:center}
+.map .center{grid-column:2;grid-row:1/span 3;background:var(--accent);color:#fff;border-radius:50%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:800;font-size:18px;padding:10px}
+.br{border:2px solid var(--accent-soft);border-radius:10px;padding:8px 10px;background:var(--bg);min-width:0}
+.br b{display:block;font-size:14.5px;color:var(--accent)}
+.br ul{margin:4px 0 4px 16px;padding:0;font-size:13.5px;line-height:1.5}
+.sref{display:inline-block;border:1px solid var(--accent);color:var(--accent);background:transparent;border-radius:5px;font-size:12px;line-height:1.4;padding:0 5px;margin:1px 2px}
+.links{margin-top:12px;font-size:14px}
+.links li{margin:4px 0}
+@media (max-width:640px){
+  .map{grid-template-columns:1fr}
+  .map .center{grid-column:1;grid-row:auto;border-radius:12px;aspect-ratio:auto;padding:12px;order:-1}
+  .map .br{grid-column:auto!important;grid-row:auto!important}
+}
+.guide{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.guide>div{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0}
+.guide h3{margin:0 0 6px;font-size:15px}
+.guide ol,.guide ul{margin:0;padding-left:20px;font-size:14px;line-height:1.6}
+.guide details{font-size:14px;margin:4px 0}
+@media (max-width:640px){.guide{grid-template-columns:1fr}}
+/* slide */
+.shead{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px;margin-bottom:8px}
+.shead h2{margin:0;font-size:18px;flex:1 1 300px}
+.shead h2 .no{color:var(--accent);margin-right:6px}
+.marks{display:flex;gap:6px}
+.marks button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:2px 10px;font-size:13px}
+.marks .bs.on{background:var(--star);border-color:var(--star);color:#000;font-weight:700}
+.marks .bq.on{background:var(--q);border-color:var(--q);color:#fff;font-weight:700}
+.thumb{display:block;width:100%;height:auto;max-width:560px;border:1px solid var(--line);border-radius:8px;cursor:zoom-in;background:#fff;aspect-ratio:1287/910}
+.one{margin:10px 0 0;padding:8px 12px;border-left:4px solid var(--accent);background:var(--accent-soft);border-radius:0 8px 8px 0}
+.one b{color:var(--accent);margin-right:6px}
+.talk{margin:10px 0 0;background:var(--talk);border:1px solid var(--talk-line);border-radius:10px;padding:10px 14px}
+.talk .lab{font-weight:700;font-size:14px}
+.talk p{margin:6px 0}
+.talk .sum{font-weight:600;border-top:1px dashed var(--talk-line);padding-top:6px}
+body.noeasy .talk,body.noeasy .tip{display:none}
+.grp{margin:14px 0 4px;font-size:12px;font-weight:700;color:var(--sub);letter-spacing:.05em}
+details.sec{border:1px solid var(--line);border-radius:9px;margin:6px 0;background:var(--card)}
+details.sec>summary{padding:8px 12px;font-weight:600;cursor:pointer;list-style:none}
+details.sec>summary::before{content:"▸";display:inline-block;width:16px;transition:transform .15s}
+details.sec[open]>summary::before{transform:rotate(90deg)}
+details.sec>summary::-webkit-details-marker{display:none}
+.sbody{padding:0 12px 12px;overflow-x:auto}
+.tip{background:var(--tip);border-left:4px solid var(--tip-line);color:var(--tip-ink);border-radius:0 8px 8px 0;padding:6px 10px;margin:4px 0 10px;font-size:14.5px}
+.tip::before{content:"🎙 강사 한마디  ";font-weight:700}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:4px 0}
+th,td{border:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}
+th{background:var(--bg)}
+.pair td:first-child{color:var(--sub);width:48%}
+.cap{font-size:13px;color:var(--sub);margin:4px 0}
+.steps{margin:0;padding-left:0;list-style:none}
+.steps li{padding:5px 8px;border-bottom:1px dashed var(--line);font-variant-numeric:tabular-nums}
+.tag{display:inline-block;font-size:11.5px;font-weight:700;border-radius:4px;padding:0 5px;margin:0 2px;line-height:1.6;vertical-align:1px}
+.tag.ai{background:#e0e7ff;color:#3730a3}.tag.gs{background:#fef3c7;color:#92400e}.tag.wn{background:#fee2e2;color:#991b1b}.tag.wk{background:#dcfce7;color:#166534}
+@media (prefers-color-scheme:dark){.tag.ai{background:#312e81;color:#e0e7ff}.tag.gs{background:#78350f;color:#fef3c7}.tag.wn{background:#7f1d1d;color:#fee2e2}.tag.wk{background:#14532d;color:#dcfce7}}
+/* figure */
+.figwrap{position:relative;overflow:hidden;width:100%;max-width:640px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.figwrap img{position:absolute;display:block;max-width:none}
+.box{position:absolute;border:2px solid var(--box);background:rgba(229,72,77,.06);border-radius:4px;padding:0}
+.box span{position:absolute;top:-1px;left:-1px;background:var(--box);color:#fff;font-size:12px;font-weight:700;line-height:1;padding:3px 5px;border-radius:3px 0 4px 0}
+.box.act{border-width:3px;background:rgba(229,72,77,.16);box-shadow:0 0 0 2000px rgba(0,0,0,.28);z-index:2}
+.fignav{display:flex;gap:4px;flex-wrap:wrap;margin:8px 0 4px}
+.fignav button{min-width:32px;height:30px;border:1px solid var(--line);background:var(--bg);border-radius:6px}
+.fignav button.act{background:var(--box);border-color:var(--box);color:#fff;font-weight:700}
+.figdesc{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:48px}
+.figdesc b{color:var(--box)}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:13.5px}
+.flow span{border:1px solid var(--line);border-radius:8px;padding:5px 8px;background:var(--bg);text-align:center;line-height:1.35}
+.flow span.hl{border-color:var(--accent)}
+.flow small{color:var(--sub)}
+/* quiz */
+.qz{border:1px solid var(--line);border-radius:9px;padding:10px 12px;margin:8px 0}
+.qz .qq{font-weight:600;margin-bottom:6px}
+.qz .opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:7px 10px;margin:4px 0}
+.qz .opt.ok{border-color:var(--ok);background:rgba(31,122,58,.12)}
+.qz .opt.ng{border-color:var(--ng);background:rgba(180,35,24,.12)}
+.qz .exp{margin-top:6px;font-size:14.5px}
+.qz textarea,.memo textarea{width:100%;min-height:70px;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;background:var(--bg);color:var(--ink)}
+.qbar{display:flex;gap:10px;align-items:center;margin-top:6px}
+.qbar button,.qz .show{border:1px solid var(--accent);color:var(--accent);background:transparent;border-radius:999px;padding:2px 12px;font-size:13.5px}
+.score{font-weight:700}
+.model{margin-top:6px;background:var(--bg);border-radius:8px;padding:8px 10px;font-size:14.5px}
+.model label{display:block}
+.memo{margin-top:14px}
+.memo .lab{font-size:13px;font-weight:700;color:var(--sub)}
+.pending{color:var(--sub);font-size:14px;margin-top:8px}
+/* tooltip terms */
+.tt{border-bottom:1.5px dotted var(--accent);cursor:help}
+#tip{position:absolute;z-index:80;max-width:min(320px,calc(100vw - 16px));background:var(--card);border:1px solid var(--accent);border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.18);padding:8px 11px;font-size:14px;line-height:1.55;display:none}
+#tip .n{font-weight:700;color:var(--accent)}
+#tip .r{color:var(--sub);font-size:12.5px}
+/* lightbox */
+#lb{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;padding:10px;cursor:zoom-out}
+#lb img{max-width:100%;max-height:100%;background:#fff;border-radius:6px}
+body.staronly .slide:not(.st){display:none}
+#empty{display:none}
+body.staronly #empty.show{display:block}
+ul.mem{margin:4px 0 8px;padding-left:20px}
+.rv h4{margin:8px 0 2px;font-size:14px;color:var(--accent)}
+
+.tag.bk{background:#e0f2fe;color:#075985}
+@media (prefers-color-scheme:dark){.tag.bk{background:#0c4a6e;color:#e0f2fe}}
+.booksec{border-color:#7dd3fc}
+.booksec>summary{color:#0369a1}
+@media (prefers-color-scheme:dark){.booksec{border-color:#0c4a6e}.booksec>summary{color:#7dd3fc}}
+h4.bkh{margin:12px 0 4px;font-size:14.5px;color:var(--accent)}
+h4.bkh:first-child{margin-top:4px}
+.sbody ul{margin:4px 0;padding-left:20px}
+.math{font-family:"Cambria Math","Times New Roman",serif;white-space:nowrap}
+.warnbox{background:rgba(220,38,38,.07);border:1px solid rgba(220,38,38,.35);border-radius:8px;padding:7px 10px;margin:8px 0;font-size:14.5px}
+.slide.apx{border:2px solid #7dd3fc}
+table.wide{min-width:620px}
+
+.latestsec{border-color:#fbbf24}
+.latestsec>summary{color:#b45309}
+@media (prefers-color-scheme:dark){.latestsec{border-color:#78350f}.latestsec>summary{color:#fcd34d}}
+.src{font-size:13px;line-height:1.6;margin:10px 0 4px;word-break:break-all}
+.src a{color:var(--accent)}
+
+.sd-hub{display:block;margin:2px 12px 8px;padding:6px 10px;border:1px solid var(--line,#e3e7ee);border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;color:#2563eb;background:rgba(37,99,235,.06)}
+.sd-hub:hover{background:rgba(37,99,235,.12)}
+@media (prefers-color-scheme:dark){.sd-hub{color:#93c5fd;background:rgba(122,167,255,.08)}}
+#side.col .sd-hub{display:none}
+</style></head>
+<body>
+<aside id="side" aria-label="노트 메뉴">
+<div class="sd-head"><button id="bSide" class="ic" aria-label="메뉴 접기" aria-expanded="true" title="메뉴 접기 ( [ )">⟨</button><h1 class="sd-title">Week 1 · 센서의 기초<small>강의 해설 노트</small></h1></div>
+<a class="sd-hub" href="../" title="통합 목차·전체 검색">📚 통합 노트 · 전체 검색 · 과제·시험</a>
+<div class="sd-search"><input id="q" type="search" placeholder="검색 — 한글·영어 ( / )" autocomplete="off" aria-label="노트 검색"><div id="qf" class="qf"></div></div>
+<div id="qres" class="qres" hidden></div>
+<div class="sd-tools"><button id="bStar" class="tb">★ 표시만</button><button id="bAll" class="tb">전체 펼치기</button><button id="bEasy" class="tb on">🎙 쉬운 설명</button><span id="save" class="savest">저장: 확인 중</span></div>
+<nav id="nums" class="sd-nav"></nav>
+</aside>
+<div id="rail" aria-label="접힌 메뉴"><button id="rlOpen" class="ic" title="메뉴 펼치기 ( [ )" aria-label="메뉴 펼치기">⟩</button><button id="rlSearch" class="ic" title="검색 ( / )" aria-label="검색">🔍</button><button id="rlStar" class="ic" title="★ 표시만" aria-label="★ 표시만">★</button><button id="rlEasy" class="ic on" title="🎙 쉬운 설명" aria-label="쉬운 설명">🎙</button><div class="rl-sep"></div><button id="rlPrev" class="ic" title="이전 (←)" aria-label="이전">▲</button><div id="rlCur" class="rl-cur">지도</div><button id="rlNext" class="ic" title="다음 (→)" aria-label="다음">▼</button></div>
+<header id="topbar"><button id="tbMenu" class="ic" aria-label="메뉴 열기">☰</button><div id="tbCur" class="tb-cur">지도</div><button id="tbSearch" class="ic" aria-label="검색">🔍</button></header>
+<div id="scrim"></div>
+<main></main>
+<div id="tip" role="tooltip"></div>
+<div id="lb"><img alt="원본 슬라이드 확대"></div>
+<script>window.FIGS={"2": {"crop": [20, 265, 580, 795], "boxes": [[40, 300, 400, 600], [400, 280, 578, 600], [25, 622, 575, 790]]}, "3": {"crop": [705, 205, 1202, 808], "boxes": [[714, 228, 860, 506], [975, 228, 1197, 482], [710, 530, 1199, 806]]}, "8": {"crop": [330, 455, 980, 790], "boxes": [[335, 460, 505, 762], [490, 565, 778, 722], [822, 460, 978, 695], [522, 745, 782, 784]]}, "9": {"crop": [252, 238, 1032, 818], "boxes": [[256, 335, 370, 608], [372, 243, 716, 372], [430, 374, 646, 456], [430, 480, 646, 614], [678, 318, 1008, 452], [678, 508, 1008, 588], [678, 632, 1008, 814]]}, "10": {"crop": [780, 245, 1287, 785], "boxes": [[788, 248, 1082, 528], [800, 640, 935, 682], [800, 598, 955, 635], [800, 545, 1035, 596]]}, "11": {"crop": [258, 268, 1258, 735], "boxes": [[265, 365, 555, 722], [560, 380, 695, 472], [462, 505, 528, 558], [885, 395, 1150, 735], [1150, 272, 1256, 448]]}, "12": {"crop": [795, 300, 1252, 642], "boxes": [[798, 302, 845, 625], [1005, 355, 1125, 455], [838, 458, 905, 530], [842, 535, 1218, 562]]}, "13": {"crop": [860, 450, 1287, 705], "boxes": [[862, 455, 905, 700], [960, 475, 1255, 540], [960, 540, 1255, 625]]}, "14": {"crop": [255, 430, 940, 775], "boxes": [[262, 530, 490, 640], [262, 640, 490, 760], [790, 440, 830, 540], [600, 520, 935, 775]]}, "15": {"crop": [385, 440, 790, 722], "boxes": [[390, 445, 440, 720], [440, 540, 650, 700], [652, 462, 785, 505]]}, "16": {"crop": [150, 195, 1185, 800], "boxes": [[360, 320, 700, 525], [690, 200, 900, 345], [160, 585, 1180, 680], [315, 685, 905, 795]]}, "17": {"crop": [200, 310, 1060, 720], "boxes": [[225, 315, 1040, 462], [225, 500, 965, 568], [205, 624, 622, 714], [682, 624, 1047, 716]]}, "18": {"crop": [180, 280, 1100, 810], "boxes": [[185, 330, 505, 570], [225, 570, 625, 682], [725, 285, 1082, 507], [725, 535, 1095, 805]]}, "19": {"crop": [0, 320, 1287, 820], "boxes": [[195, 380, 455, 640], [500, 320, 955, 455], [500, 430, 955, 560], [500, 565, 955, 650], [500, 655, 955, 808], [960, 535, 1287, 815]]}, "20": {"crop": [180, 600, 1240, 790], "boxes": [[188, 628, 360, 780], [408, 628, 595, 790], [840, 600, 1240, 775]]}, "21": {"crop": [635, 325, 1155, 690], "boxes": [[636, 420, 735, 452], [785, 395, 890, 445], [960, 415, 1150, 500], [840, 500, 1000, 575], [795, 540, 945, 625], [945, 648, 1045, 685]]}, "22": {"crop": [670, 530, 1280, 812], "boxes": [[675, 590, 790, 725], [840, 560, 1252, 795], [1088, 652, 1198, 702]]}, "24": {"crop": [0, 230, 1250, 585], "boxes": [[0, 240, 505, 580], [600, 240, 1240, 570]]}, "25": {"crop": [140, 450, 1287, 750], "boxes": [[145, 455, 530, 748], [650, 450, 1012, 742], [1020, 450, 1287, 610]]}, "26": {"crop": [125, 505, 520, 780], "boxes": [[130, 700, 275, 775], [215, 595, 315, 700], [290, 700, 505, 775]]}, "29": {"crop": [200, 370, 1130, 720], "boxes": [[205, 375, 600, 705], [728, 425, 862, 460], [895, 428, 1030, 462], [733, 598, 868, 628], [905, 606, 1040, 634]]}, "30": {"crop": [0, 575, 940, 815], "boxes": [[165, 585, 490, 815], [635, 585, 935, 815], [0, 745, 285, 810]]}, "31": {"crop": [235, 330, 975, 560], "boxes": [[240, 385, 325, 505], [325, 335, 420, 400], [410, 370, 545, 505], [600, 340, 965, 560]]}, "32": {"crop": [70, 225, 1287, 820], "boxes": [[80, 235, 672, 312], [80, 455, 492, 532], [75, 692, 192, 752], [798, 610, 1285, 815]]}, "33": {"crop": [30, 450, 1265, 700], "boxes": [[35, 455, 393, 697], [408, 455, 752, 697], [782, 505, 1265, 656]]}};</script>
+<script>/* Week 1 「센서의 기초」 해설 데이터 */
+window.NOTE = {
+week: "w1",
+pageTitle: "Week 1 센서의 기초 — 강의 해설 노트",
+topic: "센서의 기초",
+total: 33,
+parts: [{from:1,label:"도입"},{from:8,label:"정의·구조"},{from:11,label:"감도·교정"},{from:20,label:"검출·선형성·정확도"},{from:28,label:"동특성·매칭"}],
+titles: {1:"Week 1 : 센서의 기초",2:"4차 산업혁명, Physical AI 시대의 도래",3:"센서 수요 및 기술 전망",4:"Sensor Market Share",5:"Sensor Market Share",6:"국내 센서 기술 현황",7:"센서 관련 논문지",8:"센서의 정의",9:"센서시스템 구조",10:"센서의 특성",11:"감도 (sensitivity)",12:"감도 (sensitivity)",13:"감도 변동 (sensitivity drift)",14:"분해능 (resolution)",15:"교정 (calibration)",16:"최소자승법 (least square method)",17:"최소자승법 (least square method) — 방법1",18:"최소자승법 (least square method) — 방법2",19:"예제",20:"측정하한치 (minimum detection limit : MDL)",21:"선형성 (linearity)",22:"Extra: 결정계수 (R², Coefficient of Determination) (read only)",23:"Extra: Example (read only)",24:"선형성 (Linearity) vs. 결정계수 (R²)",25:"Repeatability, Reproducibility",26:"정확도 (accuracy)",27:"예제",28:"센서의 특성",29:"응답시간 (Response time), 회복시간 (Recovery time)",30:"주파수 특성",31:"임피던스 매칭",32:"임피던스 매칭",33:"예제"},
+
+map: {
+  center: "센서의 기초",
+  branches: [
+    {name:"왜 센서인가 — 산업·시장", kw:["Physical AI","Trillion Sensor(10¹²개)","이미지 센서 최대 시장","높은 기술 장벽"], s:[2,3,4,6]},
+    {name:"센서란 무엇인가", kw:["자극(stimulus) → 전기 신호","transducer(변환기)","신호조건화 → ADC → 디지털 처리"], s:[8,9]},
+    {name:"감도와 교정", kw:["S = Δy/Δx","순간·평균·선형화 감도","최소자승법 y = ax + b","감도 변동(drift)"], s:[11,12,13,15,16,19]},
+    {name:"얼마나 작은 것까지 재나", kw:["분해능 = Noise/S","MDL = 3σ/S","단위 = 입력 단위"], s:[14,20]},
+    {name:"얼마나 곧고·고르고·맞나", kw:["선형성 [%FS]","R²(결정계수)","반복성·재현성","정확도 = 100 − 오차율"], s:[21,24,25,26]},
+    {name:"시간 응답·전력 전달", kw:["응답시간 = 포화값 90%","주파수 특성은 상대변화(%)","임피던스 매칭 R_S = R_L"], s:[29,30,32,33]}
+  ],
+  links: [
+    {a:"감도와 교정", b:"얼마나 작은 것까지 재나", t:"분해능(Noise/S)과 MDL(3σ/S)은 모두 감도로 나눠서 구해요. 감도가 크면 더 작은 입력까지 잡아요.", s:[14,20]},
+    {a:"감도와 교정", b:"얼마나 곧고·고르고·맞나", t:"최소자승법으로 얻은 직선 y = ax + b가 선형성·R²를 판단하는 기준선이에요.", s:[16,21,24]},
+    {a:"센서란 무엇인가", b:"감도와 교정", t:"센서 시스템의 마지막 디지털 처리 단계에 교정(Calibration)이 들어 있어요.", s:[9,15]},
+    {a:"왜 센서인가 — 산업·시장", b:"감도와 교정", t:"감도·선택성·신뢰성을 동시에 맞추기 어려워서 센서 산업의 진입장벽이 높아요.", s:[6,10]}
+  ]
+},
+
+guide: {
+  how: [
+    "① 슬라이드를 보며 🎙 강사 설명을 먼저 읽어요 (\"정리하면\" 줄의 용어는 꼭 소리 내어 읽기).",
+    "② 그림 읽기에서 번호 순서대로 눌러 보며 그림을 해석해요.",
+    "③ 숫자 예제를 계산기로 직접 따라 하고, 퀴즈로 바로 확인해요.",
+    "④ 복습 칸의 백지 복원 과제를 보지 않고 종이에 다시 써 봐요."
+  ],
+  order: [
+    {t:"왜 센서를 배우나 (산업·시장)", s:"1–7"},
+    {t:"센서의 정의와 시스템 구조", s:"8–10"},
+    {t:"감도·분해능·교정(최소자승법)", s:"11–19"},
+    {t:"검출 한계·선형성·정확도", s:"20–27"},
+    {t:"동특성(응답시간·주파수)과 임피던스 매칭", s:"28–33"}
+  ],
+  core: [
+    {t:"센서 = 외부 자극(stimulus)을 전기 신호로 바꾸는 transducer(변환기)", s:[8]},
+    {t:"감도 S = Δy/Δx = 교정 직선 y = ax + b의 기울기 a  (단위: 출력/입력, 예 mV/℃)", s:[11,16]},
+    {t:"비선형이면 순간 감도 dY/dX, 평균 감도 ΔY/ΔX, 선형화 감도 (Ymax−Ymin)/(Xmax−Xmin)", s:[12]},
+    {t:"분해능 = Noise/S,  MDL = 3σ/S  → 둘 다 단위는 입력 단위(예 ppm, ℃)", s:[14,20]},
+    {t:"선형성 = 최대편차/정격 × 100 [%FS],  R²는 단위 없음(1에 가까울수록 직선)", s:[21,24]},
+    {t:"오차율 = |xm − xt|/xt × 100 [%],  정확도 = 100 − 오차율", s:[26]},
+    {t:"응답시간 = 포화값의 90% 도달 시간,  최대 전력 전달: R_S = R_L (임피던스 매칭)", s:[29,32]}
+  ],
+  check: [
+    {q:"감도 2 mV/℃, 노이즈 0.1 mV인 온도 센서의 분해능은?", a:"분해능 = Noise/S = 0.1 mV ÷ 2 mV/℃ = 0.05 ℃ (단위가 입력 단위인 ℃로 나와요)", s:[14]},
+    {q:"노이즈 표준편차 0.02, 감도 0.5 /ppm인 가스 센서의 MDL은?", a:"MDL = 3σ/S = 3×0.02 ÷ 0.5 = 0.06 ÷ 0.5 = 0.12 ppm", s:[20]},
+    {q:"10 ppm 가스를 넣었는데 10.5 ppm이 표시됐다. 정확도는?", a:"오차율 = 0.5/10 × 100 = 5 % → 정확도 = 100 − 5 = 95 %", s:[26]},
+    {q:"선형성(%FS)과 R²는 각각 무엇을 기준으로 평가하나?", a:"선형성은 이상적인 기준직선(참값에서 기대되는 직선)에서 벗어난 정도, R²는 데이터로 구한 회귀직선이 Y의 변동을 얼마나 설명하는지예요.", s:[24]},
+    {q:"Y = 2X² 센서에서 X = 2일 때 순간 감도와, X = 2~4 평균 감도는?", a:"순간: dY/dX = 4X = 8,  평균: (32 − 8)/(4 − 2) = 12", s:[12]},
+    {q:"신호원 저항 R_S가 50 Ω일 때 부하에 최대 전력을 주려면 R_L은?", a:"R_L = R_S = 50 Ω (임피던스 매칭, maximum power transfer)", s:[32]}
+  ]
+},
+
+/* 용어 툴팁: [표시어, 이름, 읽는 법, 쉬운 뜻, 환산·예] */
+glossary: [
+  ["µs","microsecond","마이크로초","100만분의 1초","1 µs = 10⁻⁶ s = 1000 ns"],
+  ["ns","nanosecond","나노초","10억분의 1초","1 ns = 10⁻⁹ s = 0.001 µs"],
+  ["mV","millivolt","밀리볼트","1000분의 1 볼트","1 mV = 10⁻³ V = 1000 µV"],
+  ["µV","microvolt","마이크로볼트","100만분의 1 볼트","1 µV = 10⁻⁶ V = 0.001 mV"],
+  ["ppm","parts per million","피피엠","100만 개 중 몇 개인지 (농도)","1 ppm = 10⁻⁶ = 0.0001 %"],
+  ["ppb","parts per billion","피피비","10억 개 중 몇 개인지","1 ppb = 10⁻⁹ = 0.001 ppm"],
+  ["%FS","percent of Full Scale","퍼센트 풀스케일","측정 가능한 최대 범위(정격) 대비 몇 %인지","0~100 ℃ 센서에서 1 %FS = 1 ℃"],
+  ["GHz","gigahertz","기가헤르츠","1초에 10억 번 진동","1 GHz = 10⁹ Hz = 1000 MHz"],
+  ["℃","degree Celsius","섭씨 도","온도 단위","온도 '변화량' 1 ℃ = 1 K"],
+  ["Δ","delta","델타","변화량 (나중 값 − 처음 값)","Δx = 30 ℃ − 20 ℃ = 10 ℃"],
+  ["τ","tau (time constant)","타우 (시정수)","출력이 최종 변화의 63%에 도달하는 시간","[AI 보충] 1차 응답에서 1 − e⁻¹ ≈ 0.632"],
+  ["σ","sigma","시그마","표준편차 — 값이 평균에서 흔들리는 정도","MDL = 3σ/S"],
+  ["dY/dX","derivative","디와이 디엑스","한 점에서의 접선 기울기 (미분)","Y = 2X² → dY/dX = 4X"],
+  ["R²","coefficient of determination","알 스퀘어 (결정계수)","회귀직선이 데이터를 얼마나 잘 설명하나 (0~1)","R² = 0.999 이상 → 매우 우수한 직선성"],
+  ["10¹²","ten to the twelfth","10의 12승","1조","10¹² = 1,000,000,000,000"],
+  ["십억원","billion won","십억 원","표 숫자 1 = 10억 원","22,900 십억원 = 22,900×10⁹ 원 = 22.9조 원"],
+  ["ADC","Analog-to-Digital Converter","에이디씨","아날로그 전압을 숫자로 바꾸는 회로","10비트·0~5 V → 한 칸 = 5/1024 ≈ 4.88 mV"],
+  ["SNR","Signal-to-Noise Ratio","에스엔알","신호가 잡음보다 몇 배 큰지","신호 10 mV, 잡음 0.1 mV → SNR = 100"],
+  ["transducer","transducer","트랜스듀서","한 종류의 에너지를 다른 종류로 바꾸는 변환기","온도(열) → 전압(전기)"],
+  ["stimulus","stimulus","스티뮬러스","센서가 재려는 외부 자극 (양·특성·상태)","온도, 압력, 가스 농도"],
+  ["감도","Sensitivity","감도","입력이 조금 변할 때 출력이 얼마나 변하나","S = Δy/Δx, 예 10 mV/℃"],
+  ["교정","Calibration","교정","알고 있는 입력을 넣어 입력-출력 관계를 정하는 일","결과 = 교정 곡선(calibration curve)"],
+  ["선형성","Linearity","선형성","출력이 이상적인 직선에서 얼마나 벗어나나","단위 %FS"],
+  ["분해능","Resolution","분해능","센서가 구분할 수 있는 최소 입력 변화","분해능 = Noise/S"],
+  ["정확도","Accuracy","정확도","측정값이 참값에 얼마나 가까운가","정확도 = 100 − 오차율 [%]"],
+  ["히스테리시스","Hysteresis","히스테리시스","입력을 올릴 때와 내릴 때 같은 입력에서 출력이 다르게 나오는 현상","(y₂ − y₁)/FSO × 100 %FS  [교재 p.21]"],
+  ["응답시간","Response time","응답시간","입력이 바뀐 뒤 출력이 따라오는 데 걸리는 시간","포화값의 90% 도달 시간"],
+  ["Physical AI","Physical AI","피지컬 AI","현실 공간에서 보고·판단하고 몸으로 움직이는 AI","로봇, 자율주행차"],
+  ["Trillion Sensor","Trillion Sensor","트릴리언 센서","센서 수요가 1조 개 규모가 되는 시대","1 trillion = 10¹²"],
+  ["CMOS","Complementary Metal-Oxide-Semiconductor","씨모스","반도체 공정으로 만든 이미지 센서 방식","스마트폰 카메라"],
+  ["LiDAR","Light Detection And Ranging","라이다","레이저를 쏘아 돌아오는 시간으로 거리를 재는 센서","자율주행 3D 지도"],
+  ["IMU","Inertial Measurement Unit","아이엠유","가속도 + 자이로(+지자기) 묶음 센서","휴대폰 자세·걸음 측정"],
+  ["MEMS","Micro-Electro-Mechanical Systems","멤스","반도체 공정으로 만든 아주 작은 기계 구조","가속도·자이로 센서 칩"],
+  ["MHz","megahertz","메가헤르츠","1초에 100만 번 진동","1 MHz = 10⁶ Hz = 1000 kHz"],
+  ["kHz","kilohertz","킬로헤르츠","1초에 1000번 진동","1 kHz = 10³ Hz"],
+  ["Ω","ohm","옴","저항·임피던스의 단위","1 kΩ = 1000 Ω"],
+  ["pF","picofarad","피코패럿","커패시턴스(전기 저장 능력) 단위","1 pF = 10⁻¹² F"],
+  ["ω","omega","오메가","각주파수","ω = 2πf, f = 1 GHz → ω ≈ 6.28×10⁹ rad/s"],
+  ["Σ","sigma (capital)","시그마 (대문자)","1번부터 N번까지 모두 더하기","Σx = x₁ + x₂ + … + x_N"],
+  ["∂","partial","라운드 디 (편미분)","다른 변수는 고정하고 한 변수로만 미분","∂Φ/∂a = a로만 미분"],
+  ["MDL","Minimum Detection Limit","엠디엘","잡음과 구별해 검출 가능한 최소 입력","MDL = 3σ/S"],
+  ["GC","Gas Chromatography","지씨 (가스 크로마토그래피)","가스를 성분별로 분리해 정밀하게 재는 분석 장비","가스 센서의 참값(reference) 측정"],
+  ["최소자승법","Least squares method","최소자승법","오차 제곱의 합이 가장 작은 직선을 찾는 방법","Φ(a,b) = Σ(axᵢ + b − yᵢ)² 최소"],
+  ["임피던스","Impedance","임피던스","교류에서의 '저항' — 실수부(저항) + 허수부(리액턴스)","Z = 50 + j20 Ω"],
+  ["반복성","Repeatability","반복성","같은 조건·단기간 연속 측정 값의 일치 정도","예: 평균 대비 ±3% 이내"],
+  ["재현성","Reproducibility","재현성","장기간·다른 사람·다른 실험실에서도 같은 값이 나오는 정도","예: 평균 대비 ±3.7% 이내"],
+  ["신호조건화","Signal conditioning","신호조건화","센서의 작은 신호를 증폭·정리해 다루기 좋게 만드는 일","증폭·선형화·신호 변환"]
+],
+
+slides: {
+
+1: {
+  one: "1주차는 \"센서가 무엇인지\"와 \"좋은 센서를 어떤 숫자로 평가하는지\"를 배우는 시간이에요.",
+  talk: [
+    "예를 들어 체중계를 하나 고른다고 해 볼게요. \"몇 g 단위까지 보이나\", \"같은 사람이 두 번 올라가면 같은 값이 나오나\", \"올라가자마자 바로 숫자가 뜨나\"를 따지죠.",
+    "이번 주는 앞부분에서 센서가 왜 중요한지(산업·시장)를 보고, 뒷부분에서 바로 그런 평가 기준들을 하나씩 배워요."
+  ],
+  sum: "정리하면: 1주차는 센서의 정의(transducer, 변환기)와 정특성(static characteristics)·동특성(dynamic characteristics)을 배우는 시간이에요."
+},
+
+2: {
+  one: "센서는 AI가 세상을 알아보고(상황 인식), 판단하고, 행동한 결과를 다시 확인하게(피드백) 해 주는 입력 장치예요.",
+  talk: [
+    "예를 들어 물류창고 로봇이 상자를 옮긴다고 해 볼게요. 먼저 카메라와 거리 센서로 상자와 장애물이 어디 있는지 재요. 이게 '상황 인식'이에요.",
+    "그 측정값을 받아서 AI가 어느 쪽으로 팔을 뻗을지 정해요. 센서 값이 틀리면 AI가 아무리 똑똑해도 엉뚱하게 판단하니까, 센서는 '믿을 수 있는 입력 데이터'를 줘야 해요.",
+    "팔을 움직인 뒤에는 힘 센서로 \"제대로 잡았나\"를 다시 재서 쥐는 힘을 고쳐요. 이게 '제어 및 피드백'이에요.",
+    "왼쪽 그림처럼 산업혁명은 증기기관 → 전기 → 컴퓨터·인터넷 → 인공지능·빅데이터·초연결 순으로 왔고, 4차에서는 사물이 사람 없이 스스로 데이터를 모으고 행동까지 해요."
+  ],
+  sum: "정리하면: Physical AI(물리 AI) 시대에 센서는 상황 인식(perception) → 판단 지원 → 제어 및 피드백(feedback control)의 입력을 담당해요.",
+  terms: {
+    tip: "\"보고(인식) – 판단 – 움직이고 다시 확인(피드백)\" 세 단계로 묶어 외우면 쉬워요.",
+    rows: [
+      ["4th Industrial Revolution","4차 산업혁명","사물이 스스로 데이터를 모으고 통신·판단·행동까지 하는 산업 변화"],
+      ["Physical AI","피지컬 AI","현실 공간에서 주변을 인식하고 스스로 판단해 움직이는 AI"],
+      ["Feedback","피드백","행동한 결과를 다시 재서 다음 동작을 고치는 것"]
+    ]
+  },
+  orig: {
+    tip: "\"센서의 역할\" 세 줄이 원인 → 중간 → 결과 순서예요: 측정(인식) → AI 판단 → 다시 측정(피드백).",
+    rows: [
+      ["인간의 직접적인 개입 없이 사물들이 스스로 데이터를 생성·수집하고, 상호 통신하여 필요한 서비스를 제공","사람이 손대지 않아도 기계끼리 데이터를 모으고 주고받아 알아서 서비스를 해 준다는 뜻이에요."],
+      ["단순한 센싱을 넘어 데이터 처리 → 의사결정 → 행동(Action)까지 수행","재기만 하는 게 아니라 재고 → 계산하고 → 결정하고 → 실제로 움직이는 데까지 간다는 뜻이에요."],
+      ["주변 상황을 인식하고, 스스로 판단하여 실제 환경에서 행동하는 인공지능","Physical AI의 정의예요. 화면 속 AI가 아니라 로봇·자동차처럼 몸이 있는 AI예요."],
+      ["상황 인식 → 사람, 물체, 장애물, 거리, 위치, 온도, 힘 등을 실시간으로 측정","센서의 첫 역할: 지금 주변이 어떤지 바로바로 재요."],
+      ["판단 지원 → AI가 자율적으로 판단할 수 있도록 신뢰성 높은 입력 데이터 제공","두 번째 역할: AI가 판단할 재료를 믿을 수 있게 줘요."],
+      ["제어 및 피드백 → 행동 결과를 다시 측정하여 안정적이고 정확한 제어 구현","세 번째 역할: 움직인 결과를 다시 재서 정확하게 고쳐요."]
+    ]
+  },
+  fig: {
+    key: "2",
+    tip: "1번(1~3차 계단) → 2번(4차) → 3번(사진) 순서로 보세요. 계단이 높아질수록 기계가 스스로 하는 일이 많아져요.",
+    items: [
+      "1·2·3차 산업혁명: 증기기관(기계화, 18세기) → 전기에너지(산업화, 19~20세기 초) → 컴퓨터·인터넷(정보화, 20세기 후반). 왼쪽 세로 화살표는 '범위·영향력 증가', 아래 화살표는 '점점 빨라지는 산업혁명 주기'예요.",
+      "4차 산업혁명(지능화, 21세기 초): 인공지능·빅데이터·초연결이 핵심이고, 그 결과 '직관(기계가 데이터를 반복 학습해 판단)'까지 한다는 뜻이에요.",
+      "Physical AI 예시 사진: 자율주행차 무리, 창고에서 일하는 휴머노이드 로봇, 상자를 옮기는 로봇. 모두 센서로 주변을 재고 움직여요."
+    ]
+  },
+  review: {
+    logic: "사물이 스스로 데이터를 모으고 행동하려면 → 정확한 측정값이 필요하고 → 그래서 센서가 인식·판단·피드백의 출발점이 돼요.",
+    mem: ["센서의 3역할: 상황 인식 / 판단 지원 / 제어 및 피드백"],
+    exam: "Physical AI는 주변을 인식·판단해 실제 환경에서 행동하는 AI이며, 센서는 상황 인식, 신뢰성 높은 판단 입력 제공, 행동 결과 피드백을 통한 정확한 제어를 담당한다.",
+    blank: ["센서의 역할 3가지를 화살표로 이어 쓰고, 로봇 예시를 하나씩 붙이기"]
+  },
+  quiz: [
+    {t:"mc", q:"로봇이 상자를 잡은 뒤 손가락의 힘 센서로 다시 재서 쥐는 힘을 고쳤다. 슬라이드의 센서 역할 중 무엇에 해당할까요?",
+     o:["제어 및 피드백","상황 인식","판단 지원","데이터 저장"],
+     e:"행동한 '결과'를 다시 재서 동작을 고치는 것이 제어 및 피드백이에요. 상황 인식은 행동 전에 주변을 재는 단계예요."}
+  ]
+},
+
+3: {
+  one: "센서는 스마트폰 한 대에 수십 개, 자동차 한 대에 수백 개가 들어가서, 필요한 센서 수가 1조(10¹²) 개 규모로 커지고 있어요.",
+  talk: [
+    "예를 들어 휴대폰을 옆으로 눕히면 화면이 돌아가죠? 가속도 센서가 기울기를 잰 거예요. 통화할 때 화면이 꺼지는 건 근접 센서, 화면 밝기가 저절로 바뀌는 건 조도 센서 덕분이에요.",
+    "자동차는 타이어 공기압, 냉각수 온도, 주차 거리, 바퀴 속도까지 재야 해서 한 대에 수백 개가 들어가요. 웨어러블은 심박·산소포화도·피부온도 같은 몸 정보를 재요.",
+    "기기 수 × 기기당 센서 수가 곱해지니까 전체 수요가 '조' 단위가 되는 거예요."
+  ],
+  sum: "정리하면: Trillion Sensor(1조 개 센서) 시대는 스마트폰·자동차·웨어러블(wearable) 기기에 여러 센서가 들어가며 센서 수요가 10¹² 개 규모로 커지는 흐름이에요.",
+  terms: {
+    tip: "기기별로 묶어 외우세요 — 폰: 이미지·근접·조도·가속도·자이로 / 차: 카메라·Radar·LiDAR·초음파·IMU / 몸: 심박·SpO₂·피부온도.",
+    rows: [
+      ["ToF / LiDAR","티오에프 / 라이다","빛을 쏘아 돌아오는 시간으로 거리를 재는 센서"],
+      ["Ambient Light / Proximity","조도 / 근접","주변 밝기 / 물체가 가까이 왔는지"],
+      ["Accelerometer / Gyroscope / Magnetometer","가속도 / 자이로 / 지자기","움직임·기울기 / 회전 / 방위(나침반)"],
+      ["Barometer","기압계","공기 압력 → 높이(층) 추정"],
+      ["IMU","관성 측정 장치","가속도+자이로(+지자기) 묶음"],
+      ["BMS","배터리 관리 시스템","배터리 전압·전류·온도 감시"],
+      ["PPG / ECG / SpO₂ / BIA","광혈류 / 심전도 / 산소포화도 / 생체임피던스","빛으로 맥박 / 심장 전기 신호 / 혈중 산소 비율 / 몸에 약한 전류를 흘려 체성분 추정"]
+    ]
+  },
+  orig: {
+    tip: "숫자 3개만 챙기세요: 1조(10¹²), 스마트폰 '수십 개', 자동차 '수백 개'.",
+    rows: [
+      ["Physical AI의 확산과 초연결 사회의 발전으로 센서 수요가 1조(10¹²) 개 규모로 확대되는 시대","AI 로봇과 모든 것이 연결되는 사회 때문에 센서가 1조 개나 필요해지는 시대예요."],
+      ["기기당 수십 개의 센서 및 센싱 기능 탑재","스마트폰 한 대에 센서가 수십 개 들어 있어요."],
+      ["차량 1대당 수백 개의 센서 적용","자동차는 한 대에 수백 개예요."],
+      ["심박(PPG), ECG, SpO₂피부온도, IMU, 생체임피던스(BIA)","[원본 확인] \"SpO₂피부온도\"는 쉼표가 빠진 것으로 보여요: SpO₂(산소포화도)와 피부온도는 별개 항목이에요. 시험에서는 슬라이드 표현을 따르세요."]
+    ]
+  },
+  fig: {
+    key: "3",
+    tip: "1번(차 왼쪽 라벨) → 2번(오른쪽 라벨) → 3번(폰 아이콘) 순서로 보세요. 영어 라벨은 아래 '한글로 다시 그린 도표'를 펴면 쉬워요.",
+    items: [
+      "자동차 앞·실내 쪽 센서: 실내외 온도, 오일, 냉각수 온도, 산소(배기가스), 가속도, GPS, 레이더, 도난 방지 센서.",
+      "자동차 뒤·바퀴 쪽 센서: 승객 착석 감지, 연료량, 주차 센서, 속도계·회전계, 주행거리계, 타이어 공기압(TPMS), 바퀴 속도.",
+      "스마트폰 센서 아이콘: 근접, 기압계, 조도, GLONASS(러시아 위성항법), 자이로, 홀 효과(자기장) 센서, 가속도, UWB(초광대역, 정밀 위치)."
+    ],
+    redraw: "<table><tr><th>영어 라벨</th><th>한글</th><th>무엇을 재나</th></tr><tr><td>Indoor/outdoor temperature sensors</td><td>실내·외 온도</td><td>에어컨 제어</td></tr><tr><td>Seat belt tension</td><td>안전벨트 장력</td><td>벨트 착용·당김</td></tr><tr><td>Passenger Occupancy</td><td>승객 착석</td><td>에어백 작동 판단</td></tr><tr><td>Fuel level</td><td>연료량</td><td>연료 게이지</td></tr><tr><td>Oil sensor</td><td>오일</td><td>엔진 오일 상태</td></tr><tr><td>Rain sensor</td><td>빗물 감지</td><td>와이퍼 자동</td></tr><tr><td>Water coolant temperature</td><td>냉각수 온도</td><td>엔진 과열</td></tr><tr><td>Oxygen sensor</td><td>산소 센서</td><td>배기가스 산소량</td></tr><tr><td>Accelerometer</td><td>가속도</td><td>충돌·자세</td></tr><tr><td>GPS / Radar sensor</td><td>위성 위치 / 레이더</td><td>위치 / 앞차 거리</td></tr><tr><td>Anti theft sensors</td><td>도난 방지</td><td>침입 감지</td></tr><tr><td>Wheel speed</td><td>바퀴 속도</td><td>ABS 제동</td></tr><tr><td>Tire pressure monitor</td><td>타이어 공기압</td><td>TPMS</td></tr><tr><td>Speedometer / Tachometer / Odometer</td><td>속도계 / 회전계 / 주행거리계</td><td>속도 / 엔진 rpm / 누적 거리</td></tr><tr><td>Parking sensor</td><td>주차 센서</td><td>뒤 물체 거리(초음파)</td></tr></table>"
+  },
+  num: {
+    tip: "① 1조를 지수로 → ② 기기 수 × 센서 수 → ③ 결과를 다시 지수로.",
+    steps: [
+      "① 1조 = 10¹² = 1,000,000,000,000 (0이 12개)",
+      "② [AI 보충·가정한 숫자] 스마트폰 1년 10억 대 × 대당 20개 = 10⁹ × 20 = 2×10¹⁰ 개",
+      "③ 2×10¹⁰ = 200억 개 → 폰만으로도 1조(10¹²)의 2%예요 (2×10¹⁰ ÷ 10¹² = 0.02)"
+    ]
+  },
+  review: {
+    logic: "기기 하나에 센서가 여러 개 → 기기 수가 엄청 많음 → 곱하면 센서 수요가 10¹² 규모.",
+    mem: ["Trillion Sensor = 1조(10¹²) 개", "스마트폰 수십 개 / 자동차 수백 개"],
+    exam: "Physical AI와 초연결 사회의 확산으로 스마트폰(수십 개), 자동차(수백 개), 웨어러블 등 기기당 다수의 센서가 탑재되어 센서 수요가 10¹² 규모로 증가하는 Trillion Sensor 시대가 오고 있다.",
+    blank: ["스마트폰·자동차·웨어러블별 센서를 3개씩 써 보기"]
+  },
+  quiz: [
+    {t:"mc", q:"통화하려고 휴대폰을 귀에 대면 화면이 꺼진다. 어떤 센서 덕분일까요?",
+     o:["근접 센서(Proximity)","조도 센서(Ambient Light)","기압 센서(Barometer)","자이로(Gyroscope)"],
+     e:"근접 센서는 물체(얼굴)가 가까이 왔는지를 감지해요. 조도 센서는 밝기를, 기압 센서는 공기 압력을 재요."},
+    {t:"mc", q:"'Trillion Sensor 시대'의 trillion을 지수로 나타내면?",
+     o:["10¹²","10⁹","10⁶","10¹⁵"],
+     e:"trillion = 1조 = 10¹². 10⁹는 10억(billion), 10⁶은 100만(million)이에요."}
+  ]
+},
+
+4: {
+  one: "2019년 센서 시장에서 이미지 센서가 22,900 십억원(약 22.9조 원)으로 가장 크고, 바이오·압력 센서가 뒤를 이어요.",
+  talk: [
+    "예를 들어 표에서 2019년 열만 세로로 훑어보면 이미지 센서 22,900, 바이오 16,910, 압력 16,270이 큰 편이에요.",
+    "단위가 '십억원'이라서 22,900은 22,900 × 10억 = 22조 9천억 원이에요. 카메라가 스마트폰·자율주행·공장 비전 검사로 퍼지면서 이미지 센서가 1위가 됐어요.",
+    "오른쪽 글은 분야별 성장 이유예요: 바이오는 연속혈당측정(CGM)과 생체 인식, 화학·가스는 반도체·배터리 공장과 환경 규제, 자동차는 자율주행과 전기차예요."
+  ],
+  sum: "정리하면: 시장 규모 1위는 CMOS 이미지 센서(image sensor)이고, 바이오센서(biosensor)·화학·가스 센서(chemical/gas sensor)·자동차 센서 수요가 함께 커지고 있어요.",
+  terms: {
+    tip: "약어는 \"무엇을 재나\"로 짝지어 외우세요: CGM-혈당, VOC-휘발성 가스, TPMS-타이어, ESC-차체 자세.",
+    rows: [
+      ["CGM (Continuous Glucose Monitoring)","연속혈당측정","피부에 붙여 혈당을 계속 재는 바이오센서"],
+      ["VOC (Volatile Organic Compounds)","휘발성 유기화합물","페인트·용제에서 나오는 냄새 나는 가스"],
+      ["TPMS","타이어 공기압 모니터링","타이어 바람 빠짐 경고"],
+      ["ESC (Electronic Stability Control)","전자식 차체 자세 제어","미끄러질 때 바퀴별 브레이크로 자세 잡기"],
+      ["SDV (Software Defined Vehicle)","소프트웨어 정의 차량","기능을 소프트웨어 업데이트로 바꾸는 차"]
+    ]
+  },
+  table: {
+    tip: "2012 열과 2019 열 두 개만 비교하세요. 맨 아래 Total(전체)도 함께 봐요.",
+    html: "<p class='cap'>(단위: 십억원)</p><table><tr><th>구분</th><th>2012</th><th>2013</th><th>2014</th><th>2019</th></tr><tr><td>Image sensor 이미지</td><td>12,280</td><td>13,330</td><td>14,490</td><td><b>22,900</b></td></tr><tr><td>Pressure sensor 압력</td><td>10,340</td><td>10,910</td><td>11,480</td><td>16,270</td></tr><tr><td>Biosensor 바이오</td><td>8,650</td><td>9,430</td><td>10,290</td><td>16,910</td></tr><tr><td>Load/torque 하중·토크</td><td>6,120</td><td>6,530</td><td>6,970</td><td>9,430</td></tr><tr><td>Position 위치</td><td>5,870</td><td>6,290</td><td>6,740</td><td>9,450</td></tr><tr><td>Chemical 화학</td><td>5,340</td><td>5,780</td><td>6,210</td><td>9,250</td></tr><tr><td>Temperature 온도</td><td>4,810</td><td>5,230</td><td>5,690</td><td>7,650</td></tr><tr><td>Flow 유량</td><td>4,350</td><td>4,720</td><td>5,120</td><td>6,880</td></tr><tr><td>Level 레벨(높이)</td><td>3,430</td><td>3,970</td><td>4,430</td><td>6,120</td></tr><tr><td>Miscellaneous 기타</td><td>6,990</td><td>7,550</td><td>8,120</td><td>11,240</td></tr><tr><td><b>Total</b></td><td>68,180</td><td>73,740</td><td>79,540</td><td><b>116,100</b></td></tr></table>"
+  },
+  num: {
+    tip: "① 단위 바꾸기 → ② 비중(%) → ③ 성장 배수. 모두 '말 = 식 = 숫자(단위)'로 따라 해 보세요.",
+    steps: [
+      "① 이미지 센서 2019 = 22,900 십억원 = 22,900 × 10⁹ 원 = 2.29 × 10¹³ 원 = 22.9조 원",
+      "② 이미지 비중 = 22,900 ÷ 116,100 × 100 ≈ 19.7 %",
+      "③ 전체 성장 = 116,100 ÷ 68,180 ≈ 1.70배 (2012 → 2019)",
+      "④ 증가액 1위: 이미지 22,900 − 12,280 = 10,620 십억원 (바이오는 16,910 − 8,650 = 8,260)"
+    ]
+  },
+  review: {
+    logic: "카메라 사용처 확대 → 이미지 센서 시장 1위 / 헬스케어·규제·전기차 → 바이오·가스·자동차 센서 성장.",
+    mem: ["2019 시장 1위: 이미지 센서 (22,900 십억원)", "Total 2019 = 116,100 십억원 ≈ 116조 원"],
+    exam: "센서 시장은 스마트폰·자율주행·비전 수요로 이미지 센서가 최대 규모이며, CGM 기반 바이오센서, 공정·환경 규제에 따른 화학·가스 센서, 자율주행·EV용 자동차 센서가 함께 성장하고 있다.",
+    blank: ["2019 상위 3개 센서와 성장 이유를 한 줄씩 쓰기"]
+  },
+  quiz: [
+    {t:"mc", q:"표에서 2012년 → 2019년 증가액(십억원)이 가장 큰 센서는?",
+     o:["Image sensor","Biosensor","Pressure sensor","Chemical sensor"],
+     e:"이미지 22,900 − 12,280 = 10,620으로 가장 커요. 바이오 8,260, 압력 5,930, 화학 3,910이에요."}
+  ]
+},
+
+5: {
+  one: "센서 종류별 대표 기업 표예요 — 이미지 센서는 Sony 약 50%, 삼성전자 약 15%로 한국 기업도 상위권이에요.",
+  talk: [
+    "예를 들어 스마트폰 카메라 칩은 Sony가 약 절반을 만들고, 삼성전자가 약 15%예요. 빨간 글씨는 교수님이 직접 덧붙인 메모예요.",
+    "한국에도 압력(현대케피코·대양전기공업), 혈당(아이센스·SD바이오센서), 가스(센코·가스트론·센텍코리아) 센서 회사가 있어요."
+  ],
+  sum: "정리하면: 이미지(Image)·압력(Pressure)·바이오(Biosensor)·화학(Chemical) 센서마다 주요 적용 분야와 글로벌·국내 대표 기업이 있고, CMOS 이미지 센서는 Sony 약 50%, 삼성전자 약 15%예요.",
+  table: {
+    tip: "빨간 상자(주요 적용 분야)와 빨간 글씨(점유율·국내 기업)만 보면 돼요.",
+    html: "<table><tr><th>센서</th><th>대표 적용(빨간 상자)</th><th>글로벌 기업</th><th>국내 기업·메모</th></tr><tr><td>이미지 (CMOS)</td><td>스마트폰 카메라, 자율주행(ADAS)</td><td>Sony ~50%, OmniVision ~10%, onsemi, Canon</td><td>삼성전자 ~15%, SK하이닉스, 넥스트칩(자동차 영상 SoC)</td></tr><tr><td>압력</td><td>자동차(TPMS, 엔진)</td><td>Bosch Sensortec, Honeywell, TE, Infineon, NXP</td><td>삼성전기(MEMS), LG이노텍, 엠씨넥스(MEMS 모듈) / 현대케피코·대양전기공업(압력센서 제조)</td></tr><tr><td>바이오</td><td>혈당 측정</td><td>Abbott, Dexcom, Roche, Siemens Healthineers, Medtronic</td><td>아이센스(자가혈당·CGM 특화), 바디텍메드, 수젠텍, 씨젠 / SD바이오센서(자가혈당센서도 제조)</td></tr><tr><td>화학(가스)</td><td>가스 감지, 대기환경 모니터링</td><td>Sensirion, Honeywell, Figaro, ams-OSRAM</td><td>센코, 위즈센(WIZSENS), 삼영에스앤씨, 휴마닉스 / 가스트론·센텍코리아(가스센서 제조)</td></tr></table>"
+  },
+  quiz: [
+    {t:"mc", q:"당뇨 환자가 팔에 붙여 혈당을 계속 재는 CGM은 표의 어느 센서 분류에 속할까요?",
+     o:["바이오 센서","화학(가스) 센서","압력 센서","이미지 센서"],
+     e:"혈당(포도당)처럼 생체 물질을 재는 것은 바이오센서예요. 표에서 바이오 센서의 대표 적용이 '혈당 측정'이에요."}
+  ]
+},
+
+6: {
+  one: "센서는 소재·설계·공정·패키징·신호처리·AI가 모두 필요해 진입장벽이 높고, 한국은 제조 인프라는 강하지만 핵심 소재·설계·원천 IP는 해외 의존도가 높아요.",
+  talk: [
+    "예를 들어 좋은 주방(공장)이 있어도 레시피(설계)와 비법(특허)이 없으면 유명 식당과 같은 맛을 내기 어렵죠. 센서도 공장만으로는 안 되고 오래 쌓인 설계 기술과 공정 노하우가 핵심이에요.",
+    "게다가 센서는 감도(작은 변화도 잡기), 선택성(원하는 것에만 반응), 신뢰성(오래 믿을 수 있음), 내환경성(열·습기에도 버팀)을 한꺼번에 맞춰야 해서 새 회사가 들어오기 어려워요.",
+    "그래서 슬라이드의 결론은, 한국의 강한 반도체·바이오 생산 인프라를 살려 센서 파운드리나 CDMO 같은 위탁 생산 모델로 키울 수 있다는 거예요.",
+    "비유의 한계: 센서 설계는 레시피처럼 한 번 적으면 끝이 아니라 공정 조건과 함께 계속 맞춰 가야 해요."
+  ],
+  sum: "정리하면: 센서는 감도(Sensitivity)·선택성(Selectivity)·신뢰성(Reliability)·내환경성(Robustness)을 동시에 만족해야 하는 기술집약 산업이고, 국내는 파운드리(Foundry)·CDMO 모델이 성장 기회예요.",
+  terms: {
+    tip: "성능 4개는 \"잘 잡고(감도) – 골라 잡고(선택성) – 오래 잡고(신뢰성) – 험한 데서도 잡는다(내환경성)\"로 외우세요.",
+    rows: [
+      ["Selectivity","선택성","여러 물질이 섞여 있어도 원하는 것에만 반응하는 능력"],
+      ["Reliability","신뢰성","오랫동안 같은 성능을 믿고 쓸 수 있는 정도"],
+      ["Robustness","내환경성(강건성)","온도·습도·진동 같은 환경에서도 성능이 유지되는 정도"],
+      ["IP (Intellectual Property)","지식재산(원천 특허)","남이 따라 못 하게 막는 핵심 기술 권리"],
+      ["Foundry / CDMO","파운드리 / 위탁개발생산","남의 설계를 대신 생산 / 개발까지 함께 위탁받아 생산"]
+    ]
+  },
+  orig: {
+    tip: "원인(기술 장벽) → 현황(인프라 강·IP 약) → 결과(파운드리·CDMO 기회) 순서예요.",
+    rows: [
+      ["센서는 소재, 소자 설계, 반도체 공정, 패키징, 신호처리 및 AI 알고리즘이 융합된 대표적인 기술집약 산업","센서 하나에 재료·설계·공정·포장·회로·AI 기술이 모두 들어가요."],
+      ["다양한 성능을 동시에 만족해야 하므로 신규 기업의 시장 진입 장벽이 매우 높다","여러 성능을 한꺼번에 맞추기 어려워서 새 회사가 들어오기 힘들어요."],
+      ["국내는 반도체 및 제조 인프라는 세계적인 수준이지만, 핵심 센서 소재·소자 설계기술과 원천 IP는 해외 의존도 높다","한국은 공장은 세계적이지만 핵심 재료·설계·특허는 외국에 기대요."],
+      ["센서 위탁생산 체계를 구축하거나 … CDMO 모델을 센서 산업에도 적용할 수 있다","삼성바이오로직스처럼 남의 제품을 개발·생산해 주는 방식을 센서에도 쓸 수 있어요."]
+    ]
+  },
+  review: {
+    logic: "여러 성능 동시 만족 + 융합 기술 필요 → 진입장벽 높음 → 한국은 생산 인프라 강점을 살려 위탁 생산으로 확장 가능.",
+    mem: ["감도·선택성·신뢰성·내환경성 (Sensitivity·Selectivity·Reliability·Robustness)"],
+    exam: "센서는 소재·설계·공정·패키징·신호처리·AI가 융합된 기술집약 산업으로 감도·선택성·신뢰성·내환경성을 동시에 만족해야 해 진입장벽이 높으며, 국내는 제조 인프라 강점을 활용한 센서 파운드리·CDMO가 성장 기회이다.",
+    blank: ["진입장벽이 높은 이유 2가지, 국내 강점 1가지, 약점 1가지 쓰기"]
+  },
+  quiz: [
+    {t:"mc", q:"주방의 일산화탄소(CO) 경보기가 요리용 술(알코올) 증기에도 울려 오경보가 났다. 어떤 성능이 부족한 걸까요?",
+     o:["선택성(Selectivity)","감도(Sensitivity)","내환경성(Robustness)","응답시간(Response time)"],
+     e:"원하는 가스(CO)에만 반응해야 하는데 다른 가스에도 반응했으니 선택성 부족이에요. 감도는 '얼마나 작은 변화를 크게 잡나'예요."}
+  ]
+},
+
+7: {
+  one: "센서 분야 주요 학술지 목록이에요 — 모두 분야 상위 그룹(Q1)이에요.",
+  talk: [
+    "예를 들어 좋은 논문을 찾고 싶을 때 이 목록의 저널(Sensors and Actuators, Biosensors & Bioelectronics, IEEE Sensors Journal 등)부터 보면 돼요.",
+    "IF(Impact Factor)는 논문이 평균적으로 얼마나 많이 인용되는지를 나타내는 숫자예요."
+  ],
+  sum: "정리하면: 센서 분야 대표 학술지(journal)는 Sensors and Actuators A/B, Biosensors & Bioelectronics, ACS Sensors, IEEE Sensors Journal 등이고 IF(Impact Factor)와 Q1 등급으로 수준을 비교해요.",
+  table: {
+    tip: "JOURNAL·IF·RATING 세 열만 보면 돼요. 같은 저널이 분야(CATEGORIES)별로 여러 번 나와요.",
+    html: "<table><tr><th>저널</th><th>IF (2023)</th><th>RATING</th></tr><tr><td>Biosensors & Bioelectronics</td><td>10.7</td><td>Q1</td></tr><tr><td>ACS Sensors</td><td>8.2</td><td>Q1</td></tr><tr><td>Sensors and Actuators B-Chemical</td><td>8.0</td><td>Q1</td></tr><tr><td>Photonic Sensors</td><td>5.0</td><td>Q1</td></tr><tr><td>Biosensors-Basel</td><td>4.9</td><td>Q1</td></tr><tr><td>IEEE Sensors Journal</td><td>4.3</td><td>Q1</td></tr><tr><td>Sensors and Actuators A-Physical</td><td>4.1</td><td>Q1</td></tr></table><p class='cap'>[AI 보충] Q1 = 그 분야 저널을 IF 순으로 4등분했을 때 상위 25%. IF(%) 열은 분야 안에서 상위 몇 %인지로 보여요 [추정].</p>"
+  }
+},
+
+8: {
+  one: "센서는 빛·기계·열·자기·화학 같은 외부 자극을 받아 전기 신호로 바꾸는 소자, 즉 transducer(변환기)예요.",
+  talk: [
+    "예를 들어 뜨거운 컵에 손을 대면 \"뜨겁다\"는 느끼지만 \"63.4 ℃\"라고 정확히 말할 수는 없죠. 사람의 오감은 자극의 세기·양·성분을 정확히 구분하지 못하기 때문이에요.",
+    "온도 센서는 열이라는 자극을 받아 전압 같은 전기 신호로 바꿔 줘요. 이렇게 한 종류의 에너지를 다른 종류의 에너지로 바꾸는 장치를 transducer(변환기)라고 해요.",
+    "그림 왼쪽의 입력 에너지는 광(빛)·기계(힘·압력)·열·자기·화학 다섯 가지예요. 가운데 센서는 물리적·화학적·생물학적 방법으로 이걸 바꾸고, 오른쪽처럼 정보는 전기 신호로 나와요.",
+    "출력을 전기로 바꾸는 이유는 증폭·귀환(feedback)·필터링·미분·저장 같은 신호처리가 간단하고, 먼 곳까지 정보를 보낼 수 있기 때문이에요 [교재 p.12].",
+    "참고로 transducer가 더 넓은 말이에요. 비전기량을 전기신호로 바꾸는 입력 트랜스듀서가 센서, 전기신호를 다른 에너지로 바꾸는 출력 트랜스듀서가 액추에이터예요. 스피커(전기 → 소리)는 액추에이터라서 센서가 아니에요 [교재 p.13]."
+  ],
+  sum: "정리하면: 센서(sensor)는 외부 자극(stimulus) — 측정하려는 양(quantity)·특성(property)·상태(condition) — 을 전기 신호(electrical signal)로 변환하는 transducer(변환기)예요.",
+  terms: {
+    tip: "자극의 3종류(양·특성·상태)와 입력 에너지 5종류(광·기계·열·자기·화학)를 따로 묶어 외우세요.",
+    rows: [
+      ["Sensor","센서","외부 자극을 전기 신호로 바꾸는 소자"],
+      ["Stimulus","자극","센서가 검출·측정하려는 대상"],
+      ["Quantity / Property / Condition","양 / 특성 / 상태","얼마나(농도·온도) / 어떤 성질(색·점도) / 어떤 상태(열림·닫힘)"],
+      ["Transducer","변환기","한 형태의 에너지를 다른 형태로 바꾸는 장치"]
+    ]
+  },
+  orig: {
+    tip: "첫 줄(정의)이 결과, 둘째 줄(자극의 뜻)이 대상, 셋째 줄(사람의 한계)이 센서가 필요한 이유예요.",
+    rows: [
+      ["센서: 외부 자극(stimulus)을 받아 이를 전기 신호로 변환하는 소자 (센서는 transducer이다)","센서 = 자극을 전기 신호로 바꾸는 부품. 그래서 변환기의 한 종류예요."],
+      ["외부 자극(Stimulus): 검출 또는 측정하고자 하는 양(Quantity), 특성(Property), 상태(Condition)를 의미","자극은 우리가 알고 싶은 '얼마나·어떤 성질·어떤 상태'예요."],
+      ["인간의 오감은 외부 자극의 세기, 수, 양, 성분을 정확히 구분하지 못함","사람 감각은 숫자로 정확히 못 재니까 센서가 필요해요."]
+    ]
+  },
+  fig: {
+    key: "8",
+    tip: "1번(입력) → 2번(센서 안 변환) → 3번(출력) 화살표 방향 그대로 보고, 마지막에 4번 결론을 읽으세요.",
+    items: [
+      "입력 에너지 5종류: 광(빛), 기계(힘·압력·변위), 열(온도), 자기(자기장), 화학(가스·이온 농도).",
+      "센서(변환): 물리적 수단, 화학적 수단, 생물학적 수단으로 입력을 바꿔요. 예: 가스가 표면에 붙어 저항이 바뀜(화학적), 효소가 포도당과 반응(생물학적).",
+      "출력 신호: \"정보는 전기 신호로 출력된다\" — 전압·전류·저항·주파수 같은 전기량으로 나와요.",
+      "결론: 센서는 transducer(에너지 변환기)이다."
+    ]
+  },
+  review: {
+    logic: "사람 감각은 정량 측정 불가 → 센서가 자극을 물리·화학·생물학적으로 변환 → 전기 신호로 출력해 처리 가능하게 함.",
+    mem: ["센서 = stimulus → 전기 신호로 바꾸는 transducer", "자극 = 양(Quantity)·특성(Property)·상태(Condition)", "입력 에너지: 광·기계·열·자기·화학"],
+    exam: "센서는 측정하고자 하는 양·특성·상태인 외부 자극(stimulus)을 물리적·화학적·생물학적 수단으로 전기 신호로 변환하는 transducer이다.",
+    blank: ["입력 5종 → 센서(3가지 수단) → 출력 그림을 보지 않고 그리기"]
+  },
+  quiz: [
+    {t:"mc", q:"열전대(thermocouple)는 두 금속 접점의 온도 차이로 전압을 만든다. 슬라이드 그림 기준으로 입력 에너지와 출력은?",
+     o:["열 → 전기 신호","기계 → 전기 신호","화학 → 열","전기 신호 → 열"],
+     e:"온도(열)가 입력, 전압(전기 신호)이 출력이에요. 센서의 출력은 항상 전기 신호라는 점이 핵심이에요."},
+    {t:"mc", q:"스피커는 전기 신호를 소리로 바꾼다. 다음 중 맞는 설명은?",
+     o:["transducer이지만 센서는 아니다","센서이지만 transducer는 아니다","센서이면서 transducer이다","둘 다 아니다"],
+     e:"[교재 p.13] 에너지를 바꾸니 transducer는 맞지만, 전기신호를 다른 에너지로 바꾸는 출력 트랜스듀서, 즉 액추에이터라서 센서는 아니에요."},
+    {t:"sa", q:"센서 출력을 굳이 '전기 신호'로 만드는 이유를 설명해 보세요.",
+     m:"전기 신호는 회로로 증폭·필터링하기 쉽고, ADC로 디지털 값으로 바꿔 저장·전송·계산(교정)할 수 있기 때문이다. 또한 사람 감각과 달리 자극의 세기를 숫자로 정량화할 수 있다.",
+     p:["증폭·처리가 쉽다","디지털 변환(ADC)·저장·전송","정량화(숫자로 표현)"]}
+  ]
+},
+
+9: {
+  one: "실제 세계의 물리량은 센서 소자 → 아날로그 신호조건화 → ADC → 디지털 신호처리를 거쳐 최종 측정값이 돼요.",
+  talk: [
+    "예를 들어 공장 배관의 압력을 잰다고 해 볼게요. 실제 세계의 압력(측정량)이 센서 소자에 들어가면 전기 신호로 바뀌어요(에너지 변환).",
+    "그런데 이때 주변 온도·습도·진동·빛 같은 외부 간섭요소도 함께 섞여 들어와요. 그래서 같은 압력이어도 여름과 겨울에 출력이 조금 다를 수 있어요.",
+    "센서 소자에서 나온 신호는 보통 아주 작아서, 아날로그 신호조건화 회로가 키우고(증폭), 곧게 펴고(선형화), 전압이나 주파수처럼 다루기 쉬운 형태로 바꿔요.",
+    "그다음 ADC가 이 아날로그 값을 숫자로 바꾸고, 디지털 신호처리 단계에서 계산·교정·보정을 거쳐 최종 측정값이 나와요.",
+    "센서 소자 아래 상자는 센서를 동작시키는 전원(구동전압)과 과전압 보호 회로예요."
+  ],
+  sum: "정리하면: 표준 센서 구조(standard sensor structure)는 Sensor element(에너지 변환) → Analog signal conditioning(증폭 Amplification·선형화 Linearization·신호 변환 Signal conversion) → A/D converter → Digital signal processing(계산 Calculation·교정 Calibration·보정 Correction) → Measured value이고, Influence factors(외부 간섭요소)가 오차를 만들어요.",
+  terms: {
+    tip: "아날로그 3개(증폭·선형화·변환)와 디지털 3개(계산·교정·보정)를 짝으로 외우세요.",
+    rows: [
+      ["Measured quantity","측정량","재려는 실제 물리량 (압력, 온도…)"],
+      ["Influence factors","외부 간섭요소","재려는 것 말고 출력에 섞이는 영향 (온도·습도·진동·빛·전자기파)"],
+      ["Sensor element","센서 소자","실제로 에너지를 변환하는 부분"],
+      ["Signal conditioning","신호조건화","작은 신호를 증폭·정리해 다루기 좋게 만드는 회로"],
+      ["A/D converter (ADC)","아날로그-디지털 변환기","연속 전압을 숫자로 바꿈"],
+      ["Calibration / Correction","교정 / 보정","출력을 실제 값으로 환산 / 오차를 빼서 바로잡기"]
+    ]
+  },
+  fig: {
+    key: "9",
+    tip: "1번(실제 세계) → 3번(센서 소자) → 5번 → 6번 → 7번이 주 흐름이고, 2번(간섭)·4번(전원)은 옆에서 끼어드는 요소예요.",
+    items: [
+      "Measured quantity · Real world: 측정 대상이 있는 실제 세계. 종류는 Mechanical(기계), Radiant/Optical(빛), Magnetic(자기), Thermal(열), Chemical(화학).",
+      "Influence factors(외부 간섭요소): 온도/습도/진동/빛/전자기파 등이 센서 소자에 원치 않게 영향을 줘요(빨간 화살표).",
+      "Sensor element · Energy conversion: 측정량을 전기 신호로 바꾸는 핵심 부품이에요.",
+      "Over voltage protection · Circuit of operation(구동전압): 센서에 전원을 주고 과전압으로부터 보호하는 회로예요.",
+      "Analog signal conditioning: Amplification(증폭), Linearization(선형화), Signal conversion(신호 변환). 결과는 Amplitude(진폭=전압 크기) 또는 Frequency(주파수) 형태로 넘어가요.",
+      "Analog/Digital converter: 아날로그 신호를 디지털 숫자로 바꿔요. 초록 점선 상자(5·6번)가 Sensor interface예요.",
+      "Digital signal processing: Calculation(계산), Calibration(교정), Correction(보정)을 거쳐 Measured value(측정값)가 나와요."
+    ],
+    redraw: "<div class='flow'><span>실제 세계<br><small>기계·빛·자기·열·화학</small></span>→<span class='hl'>센서 소자<br><small>에너지 변환</small></span>→<span>아날로그 신호조건화<br><small>증폭·선형화·신호 변환</small></span>→<span>ADC<br><small>아날로그 → 숫자</small></span>→<span>디지털 신호처리<br><small>계산·교정·보정</small></span>→<span class='hl'>측정값</span></div><p class='cap'>↑ 센서 소자에는 위에서 '외부 간섭요소(온도·습도·진동·빛·전자기파)', 아래에서 '구동전압·과전압 보호'가 연결돼요. 신호조건화+ADC = Sensor interface.</p>"
+  },
+  num: {
+    tip: "① ADC 칸 수 → ② 한 칸 전압 → ③ 증폭이 왜 필요한지 확인.",
+    steps: [
+      "① [AI 보충] 10비트 ADC의 칸 수 = 2¹⁰ = 1024칸",
+      "② 0~5 V를 1024칸으로 나누면 한 칸 = 5 V ÷ 1024 ≈ 0.00488 V = 4.88 mV",
+      "③ 센서 출력 변화가 2 mV면 한 칸(4.88 mV)보다 작아 구분이 안 돼요 → ×100 증폭 = 200 mV = 200 ÷ 4.88 ≈ 41칸으로 구분 가능"
+    ]
+  },
+  review: {
+    logic: "센서 소자의 신호는 작고 간섭이 섞임 → 아날로그 단에서 키우고 정리 → ADC로 숫자화 → 디지털 단에서 교정·보정해 정확한 측정값을 만듦.",
+    mem: ["흐름: Sensor element → Signal conditioning → ADC → DSP → Measured value", "아날로그: 증폭·선형화·신호변환 / 디지털: 계산·교정·보정", "Influence factors = 오차 원인(온도·습도·진동·빛·전자기파)"],
+    exam: "표준 센서 시스템은 측정량을 센서 소자에서 전기 신호로 변환한 뒤, 아날로그 신호조건화(증폭·선형화·신호 변환)와 A/D 변환을 거쳐 디지털 신호처리(계산·교정·보정)로 최종 측정값을 얻으며, 외부 간섭요소가 오차의 원인이 된다.",
+    blank: ["블록 6개(실제 세계~측정값)를 화살표로 그리고, 위·아래에 간섭요소와 구동전압 상자를 붙이기"]
+  },
+  quiz: [
+    {t:"mc", q:"압력은 그대로인데 한낮에 기온이 오르자 압력 센서 출력이 조금 올라갔다. 그림의 어느 요소 때문일까요?",
+     o:["Influence factors (외부 간섭요소)","A/D converter","Digital signal processing","Measured quantity"],
+     e:"재려는 압력이 아닌 온도가 출력에 섞인 것이니 외부 간섭요소예요. 이런 오차를 나중에 디지털 단의 Correction(보정)으로 줄여요."},
+    {t:"mc", q:"센서 소자 출력 변화가 수 mV로 너무 작아 ADC가 구분하지 못한다. 가장 먼저 필요한 블록은?",
+     o:["Analog signal conditioning의 증폭(Amplification)","Digital signal processing의 계산","Over voltage protection","Measured value"],
+     e:"ADC에 들어가기 '전에' 아날로그 단계에서 신호를 키워야 해요. 디지털로 바뀐 뒤에는 이미 구분 못 한 정보를 되살릴 수 없어요."},
+    {t:"sa", q:"측정량이 최종 측정값이 되기까지 거치는 단계를 순서대로, 각 단계가 하는 일과 함께 설명해 보세요.",
+     m:"측정량 → 센서 소자(에너지를 전기 신호로 변환) → 아날로그 신호조건화(증폭·선형화·신호 변환) → A/D 변환(디지털 값으로) → 디지털 신호처리(계산·교정·보정) → 측정값. 센서 소자에는 외부 간섭요소가 영향을 준다.",
+     p:["순서가 맞음 (소자 → 신호조건화 → ADC → DSP)","아날로그 단 3가지 기능","디지털 단 3가지 기능","외부 간섭요소 언급"]}
+  ]
+},
+
+10: {
+  one: "센서 성능은 입력이 일정하거나 천천히 바뀔 때의 정특성과, 시간에 따라 빠르게 바뀔 때의 동특성으로 나눠 평가해요.",
+  talk: [
+    "예를 들어 온도계를 평가할 때 두 가지를 물어요. \"온도가 그대로일 때 값이 정확하고 일정한가?\" — 이게 정특성이에요. \"온도가 갑자기 바뀌면 얼마나 빨리 따라오나?\" — 이게 동특성이에요.",
+    "정특성 항목은 교정·감도·선형성·정확도·히스테리시스이고, 동특성 항목은 응답시간·주파수 특성·장기 안정성이에요.",
+    "오른쪽 위 그래프는 가로축 온도(℃), 세로축 출력 전압(mV)이에요. 선이 가파를수록 같은 온도 변화에 출력이 크게 변하니 감도가 크고, 선이 곧을수록 선형성이 좋아요.",
+    "오른쪽 아래 그래프는 입력을 t_on에 갑자기 켰을 때 출력이 50%(t₀.₅), 63%(τ), 90%(t_r)에 도달하는 시간을 보여 줘요. 이 시간들이 짧을수록 빠른 센서예요.",
+    "히스테리시스는 입력을 올릴 때와 내릴 때 같은 입력에서 출력이 다르게 나오는 현상이에요. 슬라이드에는 따로 설명한 장이 없고, 교재 1.3.7에 정의와 식이 있어요(아래 📖 교재 보충) [교재 p.21]."
+  ],
+  sum: "정리하면: 정특성(static characteristics)은 교정(Calibration)·감도(Sensitivity)·선형성(Linearity)·정확도(Accuracy)·히스테리시스(Hysteresis), 동특성(dynamic characteristics)은 응답시간(Response Time)·주파수 특성(Frequency Response)·장기 안정성(Long-term Stability)이에요.",
+  terms: {
+    tip: "정특성 5개는 \"교·감·선·정·히\", 동특성 3개는 \"응·주·장\"으로 첫 글자만 외워도 돼요.",
+    rows: [
+      ["Static characteristics","정특성","입력이 일정·천천히 변할 때의 성능"],
+      ["Dynamic characteristics","동특성","입력이 시간에 따라 변할 때의 응답 성능"],
+      ["Hysteresis","히스테리시스","올릴 때와 내릴 때 같은 입력에서 출력이 다른 현상 [교재 p.21]"],
+      ["Frequency Response","주파수 특성","입력이 빠르게 진동할 때 출력이 얼마나 따라오나"],
+      ["Long-term Stability","장기 안정성","오래 써도 특성이 변하지 않는 정도"]
+    ]
+  },
+  fig: {
+    key: "10",
+    tip: "1번 그래프는 '기울기와 곧음', 2→3→4번은 아래에서 위로(50% → 63% → 90%) 순서로 보세요.",
+    items: [
+      "온도-출력 그래프: 가로축 Temperature(℃), 세로축 출력(mV). E·J·K는 가파르고(감도 큼), R·S·B는 완만해요(감도 작음). B 선은 살짝 휘어 있어 선형성이 덜 좋아요. [AI 보충] E·J·K·R·S·B는 열전대(thermocouple) 종류 이름이에요.",
+      "50% 지점: 입력을 켠 순간(t_on)부터 출력이 최종값의 50%가 될 때까지 걸린 시간 t₀.₅.",
+      "63% 지점: 최종값의 63%까지 걸린 시간 τ(타우, 시정수 time constant).",
+      "90% 지점: 최종값의 90%까지 걸린 시간 t_r. 이 강의에서는 이것을 응답시간으로 정의해요(29번 슬라이드)."
+    ]
+  },
+  num: {
+    tip: "① 그래프에서 기울기 읽기 → ② 단위 바꾸기 → ③ τ와 응답시간 관계.",
+    steps: [
+      "① E 선: 약 0 ℃에서 0 mV → 약 1000 ℃에서 76 mV [추정: 눈금 읽기]",
+      "② 감도 ≈ 76 mV ÷ 1000 ℃ = 0.076 mV/℃ = 76 µV/℃ (1 mV = 1000 µV)",
+      "③ [AI 보충] 출력이 지수함수로 오르는 1차 응답이면 t_r(90%) = τ × ln10 ≈ 2.3τ → τ = 2 s이면 응답시간 ≈ 4.6 s"
+    ]
+  },
+  review: {
+    logic: "센서 평가는 '가만히 있을 때 얼마나 정확한가(정특성)'와 '변할 때 얼마나 빨리 따라오나(동특성)' 두 질문으로 나뉨.",
+    mem: ["정특성: 교정·감도·선형성·정확도·히스테리시스", "동특성: 응답시간·주파수 특성·장기 안정성", "응답곡선: 50% t₀.₅ / 63% τ / 90% t_r"],
+    exam: "정특성은 입력이 일정하거나 천천히 변할 때의 성능(교정·감도·선형성·정확도·히스테리시스)이고, 동특성은 입력이 시간에 따라 변할 때의 응답 성능(응답시간·주파수 특성·장기 안정성)이다.",
+    blank: ["정특성·동특성 표를 그리고, 응답곡선에 50·63·90% 점을 찍어 이름 붙이기"]
+  },
+  quiz: [
+    {t:"mc", q:"온도를 25 ℃로 고정해 두고, 측정값이 참값과 얼마나 가까운지 확인했다. 어떤 특성을 본 것일까요?",
+     o:["정특성 (정확도)","동특성 (응답시간)","동특성 (주파수 특성)","동특성 (장기 안정성)"],
+     e:"입력이 일정할 때의 성능이니 정특성이고, 참값과의 차이를 봤으니 정확도예요."},
+    {t:"mc", q:"응답곡선에서 출력이 최종값의 90%에 도달한 시간 t_r은 이 강의에서 무엇으로 정의하나요?",
+     o:["응답시간(response time)","시정수 τ","회복시간(recovery time)","분해능"],
+     e:"29번 슬라이드: 포화값의 90%에 도달하는 시간이 응답시간이에요. τ는 63% 지점이에요."},
+    {t:"mc", q:"온도-출력 그래프에서 같은 온도 변화에 출력이 더 크게 변하는 열전대는?",
+     o:["E","S","B","R"],
+     e:"E 선이 가장 가파르니 기울기, 즉 감도가 가장 커요."},
+    {t:"sa", q:"정특성과 동특성의 차이를 예를 들어 설명해 보세요.",
+     m:"정특성은 입력이 일정하거나 천천히 변할 때의 성능(예: 25 ℃에서 정확히 25 ℃를 표시하는가, 감도·선형성)이고, 동특성은 입력이 시간에 따라 변할 때의 응답 성능(예: 25 → 80 ℃로 급변할 때 90%까지 따라오는 시간)이다.",
+     p:["입력이 일정/변화로 구분","정특성 항목 1개 이상","동특성 항목 1개 이상","구체적 예"]}
+  ]
+},
+
+11: {
+  one: "감도는 입력이 조금 변할 때 출력이 얼마나 변하는지의 비율로, 교정 그래프에서 직선의 기울기 S = Δy/Δx예요.",
+  talk: [
+    "예를 들어 주방 저울에 100 g을 올렸더니 출력 전압이 200 mV 올라갔다면, 1 g당 2 mV씩 변하는 셈이에요. 이 \"입력 한 단위당 출력 변화\"가 감도예요.",
+    "그래프로 그리면 가로축이 입력 x, 세로축이 출력 y예요. 직선에서 작은 삼각형을 그려 세로 변화 Δy를 가로 변화 Δx로 나누면 기울기, 즉 감도 S가 나와요. Δ(델타)는 '변화량'이라는 뜻이에요.",
+    "실제 측정점들은 오른쪽 그림처럼 조금씩 흩어져 있어요. 그래서 점들에 가장 잘 맞는 직선 y = ax + b를 긋고, 그 기울기 a를 감도로 써요. 이 그래프를 교정 그래프(calibration plot)라고 해요.",
+    "b는 입력이 0일 때의 출력(오프셋, offset)이라서 감도가 아니에요 [AI 보충].",
+    "감도의 단위는 \"출력 단위 ÷ 입력 단위\"예요. 예를 들어 mV/℃, V/ppm, mV/g이에요."
+  ],
+  sum: "정리하면: 감도(sensitivity) S = Δy/Δx이고, 교정 그래프(calibration plot)에서 직선 y = ax + b의 기울기(slope) a가 감도예요(단위: 출력/입력).",
+  terms: {
+    tip: "\"감도 = 기울기 = a\" 세 개를 한 묶음으로 외우세요. b는 출발점(오프셋)이에요.",
+    rows: [
+      ["Sensitivity","감도","입력 변화에 대한 출력 변화의 비율"],
+      ["Calibration plot","교정 그래프","알고 있는 입력과 측정된 출력을 그린 그래프"],
+      ["Slope","기울기","Δy ÷ Δx"],
+      ["Offset","오프셋","입력이 0일 때의 출력 b [AI 보충]"]
+    ]
+  },
+  fig: {
+    key: "11",
+    tip: "1번(축 읽기) → 2번(공식) → 3번(작은 삼각형) → 4번(실제 데이터) → 5번(감도 = a) 순서예요.",
+    items: [
+      "왼쪽 교정 그래프: 가로축 x = 입력(x_min ~ x_max), 세로축 y = 출력(y_min ~ y_max). 빨간 직선이 입력과 출력의 관계예요.",
+      "감도 공식 S = Δy/Δx: 출력 변화량 ÷ 입력 변화량.",
+      "작은 삼각형: 가로로 Δx만큼 갈 때 세로로 Δy만큼 올라가요. 이 비율이 기울기예요.",
+      "오른쪽 교정 그래프: 동그라미가 실제 측정점(Input-Output). 점들을 가장 잘 지나는 직선을 그어요.",
+      "'감도 → y = ax + b': 직선 식에서 a(기울기)가 감도라는 표시예요."
+    ]
+  },
+  num: {
+    tip: "① 입력 변화 Δx → ② 출력 변화 Δy → ③ S = Δy/Δx, 단위까지 같이 써요.",
+    steps: [
+      "예제 1 (저울) ① Δx = 100 g ② Δy = 200 mV ③ S = 200 mV ÷ 100 g = 2 mV/g",
+      "예제 2 (온도) ① Δx = 30 ℃ − 20 ℃ = 10 ℃ ② Δy = 1.10 V − 1.00 V = 0.10 V = 100 mV ③ S = 100 mV ÷ 10 ℃ = 10 mV/℃",
+      "예제 3 (교정식) y = 0.5x + 3 (y: mV, x: ppm) → 감도 a = 0.5 mV/ppm, 오프셋 b = 3 mV"
+    ]
+  },
+  review: {
+    logic: "입력이 변하면 출력이 변함 → 그 비율(기울기)이 클수록 작은 입력 변화도 크게 보임 → 측정점에 맞춘 직선의 기울기 a를 감도로 사용.",
+    mem: ["S = Δy/Δx (단위: 출력/입력)", "교정 직선 y = ax + b에서 a = 감도"],
+    exam: "감도는 입력 신호의 미소 변화에 대한 출력 신호의 미소 변화의 비율(S = Δy/Δx)이며, 교정 그래프에서 최적 직선 y = ax + b의 기울기 a로 나타낸다.",
+    blank: ["x-y 축 그리기 → 측정점 찍기 → 직선 긋기 → 삼각형으로 Δx, Δy 표시 → S = Δy/Δx 쓰기"]
+  },
+  quiz: [
+    {t:"mc", q:"온도 센서 A는 10 mV/℃, B는 2 mV/℃이다. 온도가 0.5 ℃ 올랐을 때 A의 출력 변화는?",
+     o:["5 mV","1 mV","20 mV","0.05 mV"],
+     e:"Δy = S × Δx = 10 mV/℃ × 0.5 ℃ = 5 mV. B라면 1 mV예요. 감도가 큰 A가 작은 변화를 더 크게 보여 줘요."},
+    {t:"mc", q:"교정식이 y = 0.5x + 3 (y: mV, x: ppm)일 때 감도는?",
+     o:["0.5 mV/ppm","3 mV","3.5 mV/ppm","2 ppm/mV"],
+     e:"기울기 a = 0.5가 감도이고 단위는 출력/입력 = mV/ppm이에요. 3 mV는 오프셋 b예요."},
+    {t:"mc", q:"같은 센서 두 개 중 교정 직선의 b(절편)만 다르고 a는 같다면?",
+     o:["감도는 같다","감도는 b가 큰 쪽이 크다","감도는 b가 작은 쪽이 크다","비교할 수 없다"],
+     e:"감도는 기울기 a로만 정해져요. b는 입력 0일 때 출력이 어디서 시작하는지(오프셋)일 뿐이에요."},
+    {t:"sa", q:"측정점 하나로 감도를 정하지 않고, 여러 점에 맞춘 직선의 기울기를 감도로 쓰는 이유는?",
+     m:"측정점마다 잡음·오차가 있어 점 하나(또는 두 점)로 구하면 오차가 그대로 감도에 들어간다. 여러 점에 가장 잘 맞는 직선(최소자승법)을 구하면 오차가 평균화되어 대표적인 입력-출력 관계를 얻을 수 있고, 그 기울기가 신뢰할 수 있는 감도가 된다.",
+     p:["측정점에 오차·잡음이 있음","여러 점으로 오차를 줄임(평균화)","최적 직선(최소자승법)의 기울기 = 감도"]}
+  ]
+},
+
+12: {
+  one: "출력이 곡선(비선형)이면 감도가 위치마다 달라서, 순간 감도·평균 감도·선형화 감도 중 하나로 나타내요.",
+  talk: [
+    "예를 들어 Y = 2X²처럼 휘어진 곡선은 X가 커질수록 점점 가팔라지죠. 그래서 \"감도는 얼마\"라고 숫자 하나로 말할 수 없어요.",
+    "첫째, 순간 감도는 딱 그 지점에서 곡선에 닿는 접선의 기울기 dY/dX예요. Y = 2X²를 미분하면 dY/dX = 4X라서 X = 1이면 4, X = 2면 8, X = 3이면 12예요. 슬라이드는 이것이 가장 일반적인 방법이라고 해요.",
+    "둘째, 평균 감도는 어떤 구간의 양 끝 두 점을 잇는 직선 기울기 ΔY/ΔX예요. X = 2일 때 Y = 8, X = 4일 때 Y = 32이니까 (32 − 8)/(4 − 2) = 24/2 = 12예요.",
+    "셋째, 선형화 감도는 전체 동작 범위를 직선 하나로 근사해 (Ymax − Ymin)/(Xmax − Xmin) 하나로 표현해요. 숫자 하나로 간단하지만 곡선이 심할수록 실제와 차이가 커져요.",
+    "오른쪽 책 그림은 곡선을 여러 짧은 직선 구간으로 잘라 이은 모습이고, 꺾이는 점을 '매듭'이라고 표시했어요. 교재도 비선형 센서는 몇 개의 직선으로 모델링하거나, 교정곡선을 여러 섹션으로 나눠 섹션마다 직선을 구한다고 설명해요 [교재 p.17·19]."
+  ],
+  sum: "정리하면: 비선형(nonlinear) 센서의 감도는 순간 감도(instantaneous sensitivity, dY/dX), 평균 감도(average sensitivity, ΔY/ΔX), 선형화 감도(linearized sensitivity, (Ymax−Ymin)/(Xmax−Xmin))로 표현해요.",
+  terms: {
+    tip: "\"한 점(순간) – 한 구간(평균) – 전체(선형화)\"로 범위가 넓어지는 순서로 외우세요.",
+    rows: [
+      ["Nonlinear","비선형","입력-출력 그래프가 곧은 직선이 아니라 휘어진 것"],
+      ["Instantaneous Sensitivity","순간 감도","한 점에서 접선의 기울기 (dY/dX)"],
+      ["Average Sensitivity","평균 감도","구간 양 끝을 잇는 직선의 기울기 (ΔY/ΔX)"],
+      ["Linearized Sensitivity","선형화 감도","전체 범위를 직선 하나로 근사한 기울기"],
+      ["Tangent","접선","곡선의 한 점에 살짝 닿는 직선 [AI 보충]"]
+    ]
+  },
+  orig: {
+    tip: "꼭 챙길 숫자: X = 1, 2, 3 → 4, 8, 12 / 구간 2~4 → 12.",
+    rows: [
+      ["비선형 센서에서는 감도(Sensitivity)가 일정하지 않기 때문에 한 개의 값으로 표현할 수 없다","곡선이면 위치마다 기울기가 달라서 숫자 하나로 못 말해요."],
+      ["dY/dX : 해당 특정 지점에서의 접선 기울기 (Example: Y=2X²)","순간 감도는 그 점의 접선 기울기, 즉 미분값이에요."],
+      ["S= 32−8 / 4-2 = 12","[원본 확인] 괄호가 빠진 표기예요. 정확히는 (32 − 8) ÷ (4 − 2) = 12예요. 시험에서는 슬라이드 표현을 따르되, 계산은 괄호를 넣어 하세요."],
+      ["센서의 전체 동작 범위를 직선으로 근사한 후 기울기를 감도로 사용하는 방법이다","처음과 끝을 직선으로 이어 그 기울기를 감도로 써요."]
+    ]
+  },
+  fig: {
+    key: "12",
+    tip: "1번(축) → 2번(매듭) → 3번(δ) → 4번(구간 화살표) 순서로 보세요.",
+    items: [
+      "축: 세로축 n(출력), 가로축 s(입력). n₀~n₄, s₀~s₄는 구간을 나누는 기준값이에요 [추정].",
+      "매듭: 곡선을 짧은 직선들로 이을 때 꺾이는 연결점이에요. 곡선(굵은 선)과 직선 조각들이 거의 겹쳐 보여요. 교재의 '섹션별 직선 교정'과 같은 방법이에요 [교재 p.19].",
+      "δ(델타 소문자): s₀ 근처의 아주 작은 입력 간격이에요. 작은 간격에서는 곡선을 직선처럼 볼 수 있다는 뜻으로 보여요 [추정].",
+      "아래 화살표: s₀~s₁, s₁~s₂ … 구간마다 직선 하나씩 쓴다는 표시예요. 구간마다 기울기(감도)가 달라요. 교재는 섹션마다 상수 a, b를 따로 구한다고 해요 [교재 p.19]."
+    ]
+  },
+  num: {
+    tip: "① 미분식 만들기 → ② X 넣기 → ③ 구간 평균과 비교. '말 = 식 = 숫자'로 따라 하세요.",
+    steps: [
+      "① 순간 감도 = dY/dX = 2 × 2 × X = 4X  ([AI 보충] 규칙: aXⁿ을 미분하면 n·a·Xⁿ⁻¹)",
+      "② X = 1 → 4×1 = 4,  X = 2 → 4×2 = 8,  X = 3 → 4×3 = 12",
+      "③ 평균 감도(X = 2~4) = (Y(4) − Y(2)) ÷ (4 − 2) = (2×16 − 2×4) ÷ 2 = (32 − 8) ÷ 2 = 12",
+      "④ [AI 보충] 선형화 감도(X = 0~4 전체) = (32 − 0) ÷ (4 − 0) = 8 → 같은 센서도 방법·구간에 따라 감도 숫자가 달라요"
+    ]
+  },
+  review: {
+    logic: "곡선이면 기울기가 위치마다 다름 → 한 점(순간)·한 구간(평균)·전체(선형화) 중 목적에 맞는 방식을 골라 감도를 표현.",
+    mem: ["순간 감도 = dY/dX (접선 기울기, 가장 일반적)", "평균 감도 = ΔY/ΔX (구간 양 끝)", "선형화 감도 = (Ymax−Ymin)/(Xmax−Xmin)"],
+    exam: "비선형 센서는 감도가 일정하지 않으므로 특정 지점의 접선 기울기인 순간 감도(dY/dX), 구간 평균 기울기인 평균 감도(ΔY/ΔX), 전체 범위를 직선 근사한 선형화 감도로 표현한다.",
+    blank: ["곡선 하나를 그리고 접선(순간)·두 점 연결선(평균)·처음-끝 연결선(선형화)을 서로 다른 색으로 그리기"]
+  },
+  quiz: [
+    {t:"mc", q:"출력이 Y = 3X²인 센서에서 X = 2일 때 순간 감도는?",
+     o:["12","6","24","9"],
+     e:"dY/dX = 2×3×X = 6X → X = 2에서 6×2 = 12. Y값(3×4 = 12)과 우연히 같지만, 감도는 '기울기'라는 점에 주의하세요."},
+    {t:"mc", q:"Y = 2X² 센서의 X = 1~3 구간 평균 감도는?",
+     o:["8","4","12","16"],
+     e:"Y(1) = 2, Y(3) = 18 → (18 − 2) ÷ (3 − 1) = 16 ÷ 2 = 8."},
+    {t:"mc", q:"데이터시트에 감도를 숫자 하나로 적어야 한다. 가장 맞는 방식은?",
+     o:["선형화 감도","순간 감도","평균 감도(아무 구간)","감도를 적을 수 없다"],
+     e:"선형화 감도는 전체 동작 범위를 하나의 값으로 표현하는 방법이에요. 순간 감도는 점마다 다른 값이 나와요."},
+    {t:"sa", q:"비선형 센서에서 감도를 하나의 값으로 말할 수 없는 이유와, 순간 감도와 평균 감도의 차이를 설명해 보세요.",
+     m:"비선형 센서는 입력-출력 곡선의 기울기가 위치마다 달라 감도가 일정하지 않기 때문이다. 순간 감도는 특정 한 점에서의 접선 기울기(dY/dX)이고, 평균 감도는 특정 구간 양 끝 두 점을 잇는 직선의 기울기(ΔY/ΔX)이다.",
+     p:["기울기가 위치마다 다름","순간 = 한 점의 접선(dY/dX)","평균 = 구간 양 끝(ΔY/ΔX)"]}
+  ]
+}
+
+}};
+
+/* Week 1 — 13~22번 */
+Object.assign(window.NOTE.slides, {
+
+13: {
+  one: "감도 변동(sensitivity drift)은 시간이 지나거나 환경이 바뀌면서 교정 직선의 기울기(감도)가 바뀌는 현상이고, 정기적인 재교정으로 바로잡아요.",
+  talk: [
+    "예를 들어 새로 산 주방 저울이 처음엔 100 g을 정확히 100 g으로 보여 주다가, 몇 년 쓰니 같은 100 g을 103 g으로 보여 준다고 해 볼게요. 입력은 같은데 출력이 더 크게 나오니 기울기, 즉 감도가 바뀐 거예요.",
+    "원인은 세 갈래예요. 첫째, 감지 물질 자체가 변해요 — 상변화, 원치 않는 가스(poison gas)가 달라붙는 흡착, 산화, 부식, 노화. 둘째, 증폭기·ADC·기준전압 같은 전자회로가 오래 쓰면서 조금씩 열화돼요. 셋째, 온도에 따른 열팽창이나 패키지가 누르는 힘(응력) 때문에 특성이 바뀌어요.",
+    "감도가 바뀌었는데 예전 교정 그래프를 계속 쓰면 측정값이 틀려지니 센서를 믿을 수 없게 돼요.",
+    "해결책은 정기적으로 다시 교정(re-calibration)해서 지금의 감도를 다시 재고, 교정 그래프를 새것으로 바꾸는 거예요.",
+    "오른쪽 그림에서 a는 원래 교정해 둔 직선, b는 감도가 변해 기울기가 달라진 직선이에요."
+  ],
+  sum: "정리하면: 감도 변동(sensitivity drift)은 교정 곡선(calibration curve)의 기울기가 시간·환경에 따라 변하는 현상이고, 감지 물질 열화(degradation)·회로 열화·패키지 응력이 원인이며, 재교정(re-calibration)으로 교정 그래프를 갱신해 해결해요.",
+  terms: {
+    tip: "원인 3개는 \"물질 – 회로 – 패키지\"로 묶어 외우세요. 해결은 하나뿐이에요: 재교정.",
+    rows: [
+      ["Sensitivity drift","감도 변동","시간·환경에 따라 감도(기울기)가 변하는 현상"],
+      ["Poison gas","피독 가스","감지 물질에 달라붙어 성능을 떨어뜨리는 원치 않는 가스"],
+      ["Oxidation / Corrosion / Aging","산화 / 부식 / 노화","산소와 반응 / 화학적으로 깎임 / 오래되어 성질이 변함"],
+      ["Degrade","열화되다","시간이 지나며 성능이 나빠지다"],
+      ["Re-calibration","재교정","다시 알려진 입력을 넣어 교정 그래프를 새로 만드는 일"]
+    ]
+  },
+  orig: {
+    tip: "원인(발생원인 3줄) → 결과(기울기 변화 → 신뢰성 저하) → 대책(재교정) 순서로 읽으세요.",
+    rows: [
+      ["센서의 입력-출력 변환 특성에서 감도(Slope)가 시간 또는 환경 조건에 따라 변화하는 현상","같은 입력인데 시간이 지나거나 환경이 바뀌면 기울기가 달라지는 현상이에요."],
+      ["Calibration Curve의 기울기가 변화한다 → 센서 신뢰성 저하","교정 그래프가 더 이상 맞지 않으니 믿을 수 없게 돼요."],
+      ["감지 물질 내 상변화, 원치 않는 물질(poison gas)의 흡착, 감지 물질 산화(oxidation), 부식(corrosion), 노화(aging)","감지 물질 쪽 원인이에요."],
+      ["증폭기, ADC, 기준전압 등 전자회로의 장기적 열화 및 비가역적 특성 변화","회로 쪽 원인이에요. '비가역적'은 되돌릴 수 없다는 뜻이에요."],
+      ["열팽창이나 패키지 응력으로 센서 특성이 변화","포장(패키지) 쪽 원인이에요."],
+      ["정기적인 Re-calibration을 통해 센서의 현재 감도 특성을 재평가하고, 이에 따라 Calibration plot를 갱신한다","주기적으로 다시 교정해서 그래프를 새로 고쳐요."]
+    ]
+  },
+  fig: {
+    key: "13",
+    tip: "1번(축) → 2번(a, 원래 직선) → 3번(b, 변한 직선) 순서로 두 직선의 기울기를 비교하세요.",
+    items: [
+      "축: 가로축 입력(x), 세로축 출력(y). 두 직선 모두 원점에서 출발해요.",
+      "b — Sensitivity drift: 시간이 지나 기울기가 커진(가팔라진) 직선. 같은 입력에 출력이 더 크게 나와요.",
+      "a — 이미 calibration 되어진 곡선: 처음에 교정해 둔 직선. 이 직선으로 계속 환산하면 b 상태의 센서는 실제보다 큰 값을 표시해요."
+    ]
+  },
+  num: {
+    tip: "① 원래 감도 → ② 변한 감도 → ③ 옛 교정식으로 환산했을 때 오차.",
+    steps: [
+      "[AI 보충·가정한 숫자] ① 원래 감도 a = 2.0 mV/℃ (교정 직선)",
+      "② 1년 뒤 감도 b = 2.1 mV/℃ → 감도 변화율 = (2.1 − 2.0) ÷ 2.0 × 100 = 5 %",
+      "③ 실제 50 ℃ → 출력 = 2.1 × 50 = 105 mV → 옛 교정식으로 환산 105 ÷ 2.0 = 52.5 ℃ → 2.5 ℃ 높게 표시"
+    ]
+  },
+  review: {
+    logic: "감지 물질·회로·패키지가 시간에 따라 변함 → 교정 직선의 기울기가 바뀜 → 옛 교정식으로는 오차 → 재교정으로 그래프 갱신.",
+    mem: ["Sensitivity drift = 교정 곡선 기울기가 시간·환경에 따라 변하는 현상", "원인: 감지 물질(흡착·산화·부식·노화) / 회로 열화 / 열팽창·패키지 응력", "대책: 정기적 re-calibration"],
+    exam: "감도 변동은 감지 물질의 상변화·피독·산화·부식·노화, 전자회로의 장기 열화, 열팽창·패키지 응력 등으로 교정 곡선의 기울기가 시간·환경에 따라 변하는 현상이며, 정기적인 재교정으로 현재 감도를 재평가해 교정 그래프를 갱신한다.",
+    blank: ["두 직선(a 원래, b drift)을 그리고 원인 3갈래와 대책 1개를 옆에 쓰기"]
+  },
+  quiz: [
+    {t:"mc", q:"가스 센서를 6개월 썼더니 같은 농도에서 출력이 점점 작아졌다. 가장 먼저 해야 할 일은?",
+     o:["재교정(re-calibration)으로 교정 그래프를 갱신한다","측정 범위를 넓힌다","응답시간을 측정한다","ADC 비트 수를 줄인다"],
+     e:"감도(기울기)가 변했으니 현재 감도를 다시 재서 교정 그래프를 새로 만들어야 해요."},
+    {t:"mc", q:"다음 중 슬라이드가 든 sensitivity drift의 원인이 아닌 것은?",
+     o:["측정 지점의 순간적인 잡음","감지 물질의 산화·부식","증폭기·ADC의 장기 열화","패키지 응력"],
+     e:"순간적인 잡음은 기울기를 바꾸지 않고 출력을 잠깐 흔들 뿐이에요. drift는 장기적·비가역적 변화예요."},
+    {t:"sa", q:"감도 변동이 생기면 왜 측정값이 틀려지는지, 그리고 어떻게 해결하는지 설명해 보세요.",
+     m:"센서는 교정 직선(y = ax + b)으로 출력을 입력값으로 환산하는데, 감도 변동으로 실제 기울기가 a에서 바뀌면 옛 교정식으로 환산한 값이 실제 입력과 달라진다. 따라서 정기적으로 재교정해 현재 기울기를 다시 구하고 교정 그래프를 갱신해야 한다.",
+     p:["출력 → 입력 환산에 교정식을 씀","기울기 변화로 환산값 오차","재교정으로 그래프 갱신"]}
+  ]
+},
+
+14: {
+  one: "분해능은 센서가 구분할 수 있는 가장 작은 입력 변화이고, 분해능 = Noise ÷ Sensitivity라서 단위는 입력 단위예요.",
+  talk: [
+    "예를 들어 시끄러운 카페에서 친구가 아주 작게 속삭이면 못 알아듣죠. 소리(신호)가 주변 소음(잡음)보다 커야 들려요. 센서도 똑같아요.",
+    "가스가 없을 때도 출력은 그림 아래 'NOISE'처럼 조금씩 흔들려요. 입력이 변해서 생긴 출력 변화가 이 흔들림보다 작으면 진짜 변화인지 잡음인지 구분할 수 없어요.",
+    "그래서 '잡음만큼의 출력 변화를 만들려면 입력이 얼마나 변해야 하나'를 계산하면 그게 구분 가능한 최소 입력 변화, 즉 분해능이에요. 출력 잡음을 감도(출력/입력)로 나누면 되니까 분해능 = Noise/S예요.",
+    "출력 단위를 '출력/입력' 단위로 나누니 결과는 입력 단위가 돼요. 예를 들어 온도 센서가 0.01 ℃ 변화를 감지하면 분해능은 0.01 ℃예요.",
+    "같은 잡음이라도 감도가 크면 분해능 숫자가 작아져서 더 미세하게 잴 수 있어요."
+  ],
+  sum: "정리하면: 분해능(resolution)은 검출 가능한 최소 입력 증분(smallest increment)이고, 분해능 = Noise/Sensitivity이며 단위는 입력량(input)의 단위예요. 신호 대 잡음비(SNR)와 관련돼요.",
+  terms: {
+    tip: "\"잡음 ÷ 감도 = 분해능, 단위는 입력\" — 이 한 줄이 핵심이에요.",
+    rows: [
+      ["Resolution","분해능","구분할 수 있는 가장 작은 입력 변화"],
+      ["Smallest increment","최소 증분","가장 작은 증가량"],
+      ["Noise","잡음(노이즈)","입력이 없거나 일정할 때도 생기는 출력의 흔들림"],
+      ["SNR (Signal-to-Noise Ratio)","신호 대 잡음비","신호 크기 ÷ 잡음 크기"]
+    ]
+  },
+  orig: {
+    tip: "꼭 챙길 것: 예시 0.01 ℃, 식 Noise/Sensitivity, 단위 = 입력 단위.",
+    rows: [
+      ["센서가 검출할 수 있는 최소 입력 변화량 또는 가장 작은 입력 증분 (smallest increment)","센서가 알아챌 수 있는 가장 작은 입력 변화예요."],
+      ["온도 센서가 0.01 ℃ 변화를 감지할 수 있다면, 해당 센서는 0.01 ℃의 분해능을 가짐","분해능은 입력 단위(℃)로 말해요."],
+      ["분해능= Noise/Sensitivity → 분해능의 단위는 input(입력량)의 단위를 갖는다","잡음을 감도로 나누면 입력 단위가 나와요."],
+      ["Noise: 가스가 없을 때 출력 흔들림 [ΔY]","잡음은 출력 쪽 양(ΔY)이에요."]
+    ]
+  },
+  fig: {
+    key: "14",
+    tip: "1번(신호+잡음) → 2번(잡음만) 비교 후, 4번 그래프에서 3번 빨간 띠(잡음 폭)를 입력축으로 옮겨 보세요.",
+    items: [
+      "SIGNAL + NOISE: 입력이 켜졌다 꺼졌다 할 때의 출력. 네모난 신호 위에 잔물결 같은 잡음이 얹혀 있어요.",
+      "NOISE: 입력이 없을 때의 출력. 이 흔들림 폭이 잡음(ΔY)이에요.",
+      "빨간 세로 띠: 잡음 폭을 교정 그래프 위에 표시한 것으로 보여요 [추정]. 이 폭 안의 변화는 잡음과 구분이 안 돼요.",
+      "교정 그래프: 기울기 Δy/Δx가 감도예요. 잡음 ΔY를 이 기울기로 나누면 입력축의 최소 변화(분해능)가 나와요."
+    ]
+  },
+  num: {
+    tip: "① 잡음(출력 단위) → ② 감도(출력/입력) → ③ 나누면 입력 단위.",
+    steps: [
+      "① 잡음 = 0.1 mV (출력 단위)",
+      "② 감도 = 2 mV/℃",
+      "③ 분해능 = 0.1 mV ÷ 2 mV/℃ = 0.05 ℃  (mV끼리 지워지고 ℃만 남아요)",
+      "④ 감도가 10 mV/℃로 커지면 0.1 ÷ 10 = 0.01 ℃ → 더 미세하게 구분"
+    ]
+  },
+  review: {
+    logic: "출력에는 항상 잡음이 있음 → 잡음보다 작은 변화는 구분 불가 → 잡음을 감도로 나눠 입력 기준 최소 변화(분해능)를 구함.",
+    mem: ["분해능 = Noise/Sensitivity", "단위 = 입력 단위 (예 ℃, ppm)"],
+    exam: "분해능은 센서가 검출할 수 있는 최소 입력 변화량으로, 출력 잡음을 감도로 나누어(분해능 = Noise/S) 구하며 입력량의 단위를 갖는다.",
+    blank: ["교정 그래프에 잡음 띠를 그리고, 그 폭이 입력축에서 얼마인지 화살표로 표시하기"]
+  },
+  quiz: [
+    {t:"mc", q:"잡음 0.3 mV, 감도 1.5 mV/ppm인 가스 센서의 분해능은?",
+     o:["0.2 ppm","0.45 ppm","5 ppm","0.2 mV"],
+     e:"0.3 mV ÷ 1.5 mV/ppm = 0.2 ppm. 단위는 입력 단위(ppm)예요."},
+    {t:"mc", q:"잡음은 그대로인데 증폭 없이 감도만 2배가 된 센서로 바꿨다. 분해능 숫자는?",
+     o:["절반이 된다(더 미세해짐)","2배가 된다","변하지 않는다","0이 된다"],
+     e:"분해능 = Noise/S이므로 S가 2배면 분해능 숫자는 1/2이 돼요. 숫자가 작을수록 좋은 분해능이에요."},
+    {t:"sa", q:"분해능의 단위가 출력 단위가 아니라 입력 단위인 이유를 설명해 보세요.",
+     m:"분해능 = Noise/Sensitivity에서 잡음은 출력 단위(예 mV), 감도는 출력/입력 단위(예 mV/℃)이므로 나누면 출력 단위가 지워지고 입력 단위(℃)만 남는다. 즉 '잡음만큼의 출력 변화를 만드는 입력 변화량'을 뜻한다.",
+     p:["잡음 = 출력 단위","감도 = 출력/입력","나누면 입력 단위"]}
+  ]
+},
+
+15: {
+  one: "교정은 알고 있는 입력을 넣어 입력-출력 관계(교정 곡선)를 만드는 일이고, 보통 최소자승법으로 가장 잘 맞는 직선을 구해요.",
+  talk: [
+    "예를 들어 새 체중계를 맞출 때 10 kg, 20 kg, 30 kg짜리 기준 추를 차례로 올려 보고 각각 출력이 얼마인지 적어요. 이렇게 '정답을 아는 입력'과 '나온 출력'을 짝지어 관계를 정하는 일이 교정이에요.",
+    "그 결과를 그래프로 그린 것이 교정 곡선(calibration curve)이에요. 점들이 조금씩 흩어지기 때문에 점을 다 지나는 선은 없고, 오차가 가장 작은 직선 y = ax + b를 골라요. 그 방법이 최소자승법이에요.",
+    "점이 2개뿐이면 그중 하나에 오차가 있을 때 직선이 크게 틀어져요. 그래서 측정점을 여러 개 잡을수록 오차가 평균되어 믿을 만한 직선이 나와요."
+  ],
+  sum: "정리하면: 교정(calibration)으로 입력과 출력의 관계를 수립하고, 그 곡선을 교정 곡선(calibration curve)이라 하며, 최소자승법(least squares method)으로 오차가 가장 적은 직선(best fit straight line) y = ax + b를 구해요.",
+  terms: {
+    tip: "\"교정 → 교정 곡선 → 최소자승법 → best fit 직선\" 네 단어를 순서대로 이어 외우세요.",
+    rows: [
+      ["Calibration","교정","알려진 입력으로 입력-출력 관계를 정하는 일"],
+      ["Calibration curve","교정 곡선","교정으로 얻은 입력-출력 그래프"],
+      ["Least squares method","최소자승법(최소제곱법)","오차 제곱의 합이 가장 작은 직선을 찾는 방법"],
+      ["Best fit straight line","최적 직선","점들에 가장 잘 맞는 직선"]
+    ]
+  },
+  fig: {
+    key: "15",
+    tip: "1번(축) → 2번(점들) → 3번(직선 식) 순서예요.",
+    items: [
+      "축: 가로축 x = Input(입력), 세로축 y = Output(출력).",
+      "동그라미: 기준 입력을 넣고 측정한 출력. 직선 위아래로 조금씩 흩어져 있어요.",
+      "y = ax + b: 점들에 가장 잘 맞게 그은 교정 직선. a가 감도, b가 오프셋이에요."
+    ]
+  },
+  review: {
+    logic: "기준 입력을 여러 개 넣어 출력을 잼 → 점들이 흩어짐 → 최소자승법으로 최적 직선 → 이 직선이 교정 곡선.",
+    mem: ["교정 곡선 = 교정으로 얻은 입력-출력 관계", "최소자승법으로 best fit 직선 y = ax + b", "점은 여러 개 잡아야 오차가 작아짐"],
+    exam: "교정은 알려진 입력에 대한 출력을 측정해 입력-출력 관계(교정 곡선)를 수립하는 과정이며, 일반적으로 여러 측정점에 대해 최소자승법으로 오차가 최소인 직선 y = ax + b를 구한다.",
+    blank: ["점 6~8개를 찍고 최적 직선을 긋고, a와 b가 무엇인지 화살표로 적기"]
+  },
+  quiz: [
+    {t:"mc", q:"교정할 때 측정점을 2개만 쓰지 않고 여러 개 잡는 이유는?",
+     o:["측정 오차가 평균되어 직선이 덜 틀어지게 하려고","감도를 크게 만들려고","응답시간을 줄이려고","잡음을 없애려고"],
+     e:"점마다 오차가 있으니 여러 점을 써야 한두 점의 오차에 직선이 끌려가지 않아요. 잡음 자체가 없어지지는 않아요."}
+  ]
+},
+
+16: {
+  one: "최소자승법은 각 측정점과 직선 사이 세로 거리(오차 eᵢ)를 제곱해 모두 더한 값 Φ가 가장 작아지는 a, b를 찾는 방법이에요.",
+  talk: [
+    "예를 들어 운동장에 학생들이 흩어져 서 있고, 그 사이로 줄 하나를 긋는다고 해 볼게요. 모든 학생과 줄 사이 거리가 '전체적으로' 가장 짧은 줄이 가장 잘 맞는 줄이겠죠.",
+    "그림에서 각 점과 직선 y = ax + b 사이의 세로 화살표가 오차 eᵢ예요. 오차 eᵢ = (axᵢ + b) − yᵢ, 즉 직선이 예측한 값에서 실제 값을 뺀 거예요.",
+    "그냥 더하면 위쪽(+)과 아래쪽(−) 오차가 서로 지워져 버려요. 그래서 제곱해서 모두 양수로 만든 뒤 더해요. 이 합이 Φ(파이)(a, b) = Σ(axᵢ + b − yᵢ)²예요. Σ(시그마)는 '1번부터 N번까지 다 더하라'는 기호예요.",
+    "a와 b를 바꾸면 직선이 움직이고 Φ도 바뀌어요. Φ가 가장 작아지는 a, b를 찾으면 그게 최적 직선이고, 그 a가 감도예요.",
+    "비유의 한계: 운동장 비유는 '최단 거리'처럼 들리지만, 실제 최소자승법은 수직 거리가 아니라 '세로 방향' 거리의 '제곱'을 줄여요 [AI 보충]."
+  ],
+  sum: "정리하면: 최소자승법(least square method)은 오차(error) eᵢ의 제곱합 Φ(a, b) = Σeᵢ² = Σ(axᵢ + b − yᵢ)²가 최소가 되는 a(감도, sensitivity)와 b를 구하는 방법이에요.",
+  terms: {
+    tip: "기호 3개만: eᵢ = 점 하나의 오차, Σ = 다 더하기, Φ = 오차 제곱의 합.",
+    rows: [
+      ["Error (eᵢ)","오차","i번째 점에서 직선 값과 실제 값의 차이"],
+      ["Σ (sigma)","시그마(합)","i = 1부터 N까지 모두 더하기"],
+      ["Φ (phi)","파이","오차 제곱의 합 — 줄여야 할 목표"],
+      ["Sum of squared errors","제곱오차의 합","각 오차를 제곱해 더한 값"]
+    ]
+  },
+  orig: {
+    tip: "세 줄은 같은 말을 점점 구체적으로 해요: 제곱합 최소 → 그 직선 → 그때의 a, b.",
+    rows: [
+      ["각 오차를 제곱하여 모두 더한 제곱오차의 합이 최소가 되도록 하는 직선을 찾는다","오차를 제곱해 더한 값이 가장 작은 직선을 찾아요."],
+      ["오차(eᵢ)의 제곱을 모두 더했을 때 최소가 되는 직선 (y=ax+b)","그 직선이 y = ax + b예요."],
+      ["최소가 되게하는 a, b를 구한다","결국 구하는 것은 숫자 두 개, a와 b예요."]
+    ]
+  },
+  fig: {
+    key: "16",
+    tip: "1번(점과 화살표) → 2번(직선과 'a는 감도') → 3번(문장) → 4번(식) 순서예요.",
+    items: [
+      "측정점과 세로 화살표: 화살표 길이가 각 점의 오차 eᵢ예요. 직선 위의 점도, 아래의 점도 있어요.",
+      "직선 y = ax + b와 'a는 감도이다': 최적 직선의 기울기 a가 감도예요.",
+      "설명 세 줄: 제곱오차의 합이 최소인 직선, 그때의 a, b를 구한다는 내용이에요.",
+      "Φ(a, b) = Σeᵢ² = Σ(axᵢ + b − yᵢ)²: a와 b에 따라 값이 바뀌는 '오차 점수'예요. 이걸 최소로 만들어요."
+    ]
+  },
+  num: {
+    tip: "① 각 점 오차 → ② 제곱 → ③ 더하기. 19번 예제 데이터로 따라 해 보세요.",
+    steps: [
+      "데이터 (1,4), (2,6), (3,7), 최적 직선 y = 1.5x + 2.6667 (19번 결과)",
+      "① 예측값: 4.1667, 5.6667, 7.1667 → 오차 e = 예측 − 실제 = +0.1667, −0.3333, +0.1667",
+      "② 제곱: 0.0278, 0.1111, 0.0278",
+      "③ Φ = 0.0278 + 0.1111 + 0.0278 ≈ 0.1667 → 다른 어떤 a, b를 넣어도 이보다 작아지지 않아요"
+    ]
+  },
+  review: {
+    logic: "점마다 오차가 있음 → +, −가 상쇄되지 않게 제곱해서 더함(Φ) → Φ가 최소인 a, b가 최적 직선.",
+    mem: ["Φ(a, b) = Σ(axᵢ + b − yᵢ)²", "Φ가 최소인 a, b → a = 감도"],
+    exam: "최소자승법은 측정점과 직선 y = ax + b 사이 오차의 제곱합 Φ(a, b) = Σ(axᵢ + b − yᵢ)²를 최소화하는 a, b를 구하는 방법이며, 이때 기울기 a가 감도이다.",
+    blank: ["점 5개와 직선을 그리고 오차 화살표를 그린 뒤 Φ 식을 쓰기"]
+  },
+  quiz: [
+    {t:"mc", q:"최소자승법에서 오차를 그냥 더하지 않고 '제곱해서' 더하는 가장 중요한 이유는?",
+     o:["+오차와 −오차가 서로 지워지지 않게 하려고","계산을 빠르게 하려고","감도를 크게 하려고","단위를 없애려고"],
+     e:"그냥 더하면 위·아래 오차가 상쇄되어 엉터리 직선도 합이 0이 될 수 있어요. 제곱하면 모두 양수가 돼요."},
+    {t:"mc", q:"데이터 (1,2), (2,4)에 대해 직선 y = 2x를 쓰면 Φ는?",
+     o:["0","2","4","1"],
+     e:"두 점 모두 직선 위에 있어 오차 0 → Φ = 0² + 0² = 0."},
+    {t:"sa", q:"최소자승법으로 무엇을 구하는지, 그리고 그 결과가 센서에서 어떤 의미인지 설명해 보세요.",
+     m:"측정점들과의 오차 제곱합 Φ(a, b)가 최소가 되는 직선 y = ax + b의 a, b를 구한다. 이 직선이 교정 곡선이 되고, 기울기 a는 센서의 감도, b는 입력 0일 때의 출력(오프셋)을 뜻한다.",
+     p:["오차 제곱합 최소","a, b를 구함","a = 감도(교정 직선)"]}
+  ]
+},
+
+17: {
+  one: "방법1(선형 회귀 분석)은 Φ를 a와 b로 각각 편미분해 0으로 놓은 두 식을 풀어 a, b를 구해요.",
+  talk: [
+    "예를 들어 그릇 모양 골짜기의 가장 낮은 바닥을 찾는다고 해 볼게요. 바닥에서는 어느 방향으로도 기울기가 0이죠. 그래서 '기울기 = 0'인 곳을 찾으면 바닥이에요.",
+    "Φ(a, b)를 펼쳐 보면 a²과 b² 앞의 숫자(계수)가 모두 양수라서, Φ는 아래로 볼록한 그릇 모양이에요. 그러니 바닥이 하나 있고 그곳이 최솟값이에요.",
+    "a 방향 기울기 ∂Φ/∂a와 b 방향 기울기 ∂Φ/∂b를 각각 0으로 놓으면 식 두 개가 나와요. 미지수가 a, b 두 개이니 연립방정식으로 풀 수 있어요.",
+    "∂(라운드 디)는 '편미분' 기호로, 다른 변수는 고정하고 한 변수로만 미분한다는 뜻이에요.",
+    "두 식을 정리하면 Σxᵢyᵢ = aΣxᵢ² + bΣxᵢ, Σyᵢ = aΣxᵢ + bN이 돼요 [AI 보충: 빨간 상자 식을 −2로 나누고 옮긴 형태]."
+  ],
+  sum: "정리하면: 선형 회귀 분석(linear regression analysis)에서는 Φ(a, b)가 아래로 볼록한 2차 함수이므로 편미분(partial derivative) ∂Φ/∂a = 0, ∂Φ/∂b = 0을 연립해 최솟값의 a, b를 구해요.",
+  terms: {
+    tip: "\"아래로 볼록 → 바닥 하나 → 기울기 0인 곳\" 순서로 이해하면 식을 외울 필요가 줄어요.",
+    rows: [
+      ["Linear Regression Analysis","선형 회귀 분석","데이터에 맞는 직선을 수학적으로 구하는 방법"],
+      ["Partial derivative (∂)","편미분","다른 변수는 고정하고 한 변수로만 미분"],
+      ["Convex (아래로 볼록)","아래로 볼록","그릇 모양 — 바닥(최솟값)이 하나"],
+      ["Coefficient","계수","문자 앞에 곱해진 숫자"]
+    ]
+  },
+  fig: {
+    key: "17",
+    tip: "1번(펼친 식) → 2번(그릇 모양 이유) → 3번·4번(두 조건식)을 차례로 보세요.",
+    items: [
+      "Φ(a, b)를 전개한 식: a²(Σxᵢ²) + b²N + Σyᵢ² + 2ab(Σxᵢ) − 2b(Σyᵢ) − 2a(Σxᵢyᵢ). 데이터에서 구할 합은 Σxᵢ², Σxᵢ, Σyᵢ, Σxᵢyᵢ, N이에요.",
+      "a², b²의 계수가 양수 → 아래로 볼록한 2차 함수 → 편미분이 0인 a, b에서 최솟값.",
+      "∂Φ/∂a = −2Σxᵢyᵢ + 2aΣxᵢ² + 2bΣxᵢ = 0 → 정리하면 Σxᵢyᵢ = aΣxᵢ² + bΣxᵢ.",
+      "∂Φ/∂b = −2Σyᵢ + 2aΣxᵢ + 2bN = 0 → 정리하면 Σyᵢ = aΣxᵢ + bN."
+    ]
+  },
+  num: {
+    tip: "① 합 4개 구하기 → ② 두 식에 넣기 → ③ 연립해서 a, b. 19번 데이터로 '말 = 식 = 숫자'로 따라 하세요.",
+    steps: [
+      "데이터 (1,4), (2,6), (3,7), N = 3",
+      "① Σx = 1+2+3 = 6,  Σx² = 1+4+9 = 14,  Σy = 4+6+7 = 17,  Σxy = 4+12+21 = 37",
+      "② 식1: 37 = 14a + 6b,  식2: 17 = 6a + 3b",
+      "③ 식2 × 2 = 34 = 12a + 6b → 식1 − 이것: 3 = 2a → a = 1.5",
+      "④ b = (17 − 6×1.5) ÷ 3 = 8 ÷ 3 ≈ 2.6667 → y = 1.5x + 2.6667 (19번 행렬 결과와 같아요)"
+    ]
+  },
+  review: {
+    logic: "Φ는 아래로 볼록 → 최솟값에서 a, b 방향 기울기가 모두 0 → 편미분 두 식 연립 → a, b.",
+    mem: ["∂Φ/∂a = 0, ∂Φ/∂b = 0", "Σxy = aΣx² + bΣx,  Σy = aΣx + bN"],
+    exam: "선형 회귀 분석에서는 오차 제곱합 Φ(a, b)가 a, b에 대해 아래로 볼록한 2차 함수이므로, ∂Φ/∂a = 0과 ∂Φ/∂b = 0을 연립하여 Φ를 최소로 하는 a, b를 구한다.",
+    blank: ["표에 x, y, x², xy 열을 만들고 합을 구한 뒤 두 식을 세워 풀기"]
+  },
+  quiz: [
+    {t:"mc", q:"Φ(a, b)의 최솟값을 '편미분 = 0'으로 찾을 수 있는 근거로 슬라이드가 든 것은?",
+     o:["a², b²의 계수가 양수라 아래로 볼록한 2차 함수다","Φ가 항상 0이다","a와 b가 같다","데이터가 3개뿐이다"],
+     e:"아래로 볼록하면 바닥이 하나뿐이고, 바닥에서 기울기(편미분)가 0이에요."},
+    {t:"mc", q:"데이터 (0,1), (1,3), (2,5)에서 Σx, Σx², Σy, Σxy는?",
+     o:["3, 5, 9, 13","3, 5, 9, 9","3, 3, 9, 13","2, 5, 9, 13"],
+     e:"Σx = 0+1+2 = 3, Σx² = 0+1+4 = 5, Σy = 1+3+5 = 9, Σxy = 0+3+10 = 13. (이 데이터는 y = 2x + 1 위에 정확히 있어요.)"},
+    {t:"sa", q:"방법1에서 a, b를 구하는 과정을 단계별로 설명해 보세요.",
+     m:"① 오차 제곱합 Φ(a, b) = Σ(axᵢ + b − yᵢ)²를 세운다. ② a², b² 계수가 양수라 아래로 볼록하므로 최솟값에서 ∂Φ/∂a = 0, ∂Φ/∂b = 0이다. ③ 두 식(Σxy = aΣx² + bΣx, Σy = aΣx + bN)을 연립해 a, b를 구한다.",
+     p:["Φ 세우기","아래로 볼록 → 편미분 0","두 식 연립"]}
+  ]
+},
+
+18: {
+  one: "방법2(행렬방정식)는 N개의 식 axᵢ + b = yᵢ를 Xp = y로 묶고, p = (XᵀX)⁻¹Xᵀy로 a, b를 한 번에 구해요.",
+  talk: [
+    "예를 들어 측정점이 3개면 '모든 점이 직선 위에 있었으면 좋겠다'는 바람으로 식을 3개 쓸 수 있어요: a·1 + b = 4, a·2 + b = 6, a·3 + b = 7.",
+    "그런데 미지수는 a, b 두 개뿐인데 식이 3개(N개)예요. 이렇게 식이 미지수보다 많으면 보통 모든 식을 동시에 만족하는 답이 없어요. 이걸 과결정 시스템(overdetermined system)이라고 해요.",
+    "이 식들을 표처럼 묶으면 X(왼쪽 열은 xᵢ, 오른쪽 열은 1) × p(a, b) = y(측정값)가 돼요.",
+    "X는 세로로 긴 직사각형이라 바로 나눌(역행렬) 수 없어요. 그래서 양변 앞에 Xᵀ(X를 뒤집은 전치행렬)를 곱해 정사각형 XᵀX로 만든 뒤, 그 역행렬을 곱해 p = (XᵀX)⁻¹Xᵀy를 얻어요.",
+    "이 결과는 방법1의 편미분 두 식과 똑같은 답을 줘요 [AI 보충: XᵀXp = Xᵀy가 바로 그 두 식이에요]."
+  ],
+  sum: "정리하면: 행렬방정식(matrix equation) 방법은 과결정(overdetermined) 선형 시스템 Xp = y에 전치행렬(transpose) Xᵀ를 곱한 정규방정식 XᵀXp = Xᵀy를 풀어 p = (XᵀX)⁻¹Xᵀy로 a, b를 구해요.",
+  terms: {
+    tip: "기호 3개: X(입력과 1의 표), p(구할 a, b), y(측정값). 공식은 \"X 전치 곱하고 → 역행렬\" 순서예요.",
+    rows: [
+      ["Matrix equation","행렬방정식","여러 식을 표(행렬) 하나로 묶은 식"],
+      ["Overdetermined system","과결정 시스템","식의 개수가 미지수보다 많은 연립방정식"],
+      ["Transpose (Xᵀ)","전치행렬","행과 열을 바꾼 행렬"],
+      ["Inverse ((XᵀX)⁻¹)","역행렬","곱하면 단위행렬이 되는 행렬 — '나누기' 역할"]
+    ]
+  },
+  fig: {
+    key: "18",
+    tip: "1번(바라는 식들) → 2번(식이 너무 많음) → 3번(행렬로 묶기) → 4번(풀기) 순서예요.",
+    items: [
+      "axᵢ + b = yᵢ → 원하는 바: 모든 측정점이 직선 위에 있기를 바라며 쓴 식 ①, ②, …, ⓝ. 식은 N개, 미지수는 a, b 2개.",
+      "Overdetermined(linear) system: 식이 미지수보다 많아 모든 식을 정확히 만족하는 답이 보통 없어요.",
+      "X P = y: X의 각 행은 (xᵢ, 1), P는 (a, b), y는 측정값. 행 하나를 곱하면 axᵢ + b가 돼요.",
+      "Xp = y → XᵀXp = Xᵀy → p = (XᵀX)⁻¹Xᵀy: 양변에 Xᵀ를 곱해 정사각 행렬을 만들고 역행렬로 p를 구해요."
+    ]
+  },
+  num: {
+    tip: "① X와 y 만들기 → ② XᵀX와 Xᵀy → ③ 2×2 역행렬 공식. 계산 자체는 19번에서 끝까지 해요.",
+    steps: [
+      "데이터 (1,4), (2,6), (3,7) → X = [[1,1],[2,1],[3,1]], y = [4, 6, 7]",
+      "XᵀX = [[Σx², Σx],[Σx, N]] = [[14, 6],[6, 3]],  Xᵀy = [Σxy, Σy] = [37, 17]",
+      "[AI 보충] 2×2 역행렬: [[p, q],[r, s]]⁻¹ = 1/(ps − qr) × [[s, −q],[−r, p]]  (행렬식 ps − qr = 14×3 − 6×6 = 6)"
+    ]
+  },
+  review: {
+    logic: "N개 식, 미지수 2개 → 정확한 해 없음(과결정) → Xᵀ를 곱해 정사각 행렬로 → 역행렬로 최소자승 해.",
+    mem: ["Xp = y → XᵀXp = Xᵀy → p = (XᵀX)⁻¹Xᵀy", "X 행 = (xᵢ, 1), p = (a, b)"],
+    exam: "측정점마다 axᵢ + b = yᵢ를 세우면 식이 미지수보다 많은 과결정 시스템 Xp = y가 되며, 양변에 Xᵀ를 곱한 XᵀXp = Xᵀy로부터 p = (XᵀX)⁻¹Xᵀy를 계산해 최소자승 직선의 a, b를 구한다.",
+    blank: ["X, p, y 행렬 모양을 그리고 공식 3줄을 순서대로 쓰기"]
+  },
+  quiz: [
+    {t:"mc", q:"측정점 5개로 y = ax + b를 구할 때 행렬 X의 크기는?",
+     o:["5행 2열","2행 5열","5행 1열","2행 2열"],
+     e:"점마다 한 행 (xᵢ, 1)이므로 5행 2열이에요. XᵀX는 2×2가 돼요."},
+    {t:"mc", q:"Xp = y에서 바로 p = X⁻¹y로 풀지 않는 이유는?",
+     o:["X가 정사각 행렬이 아니라 역행렬이 없기 때문","X가 항상 0이기 때문","y가 행렬이 아니기 때문","a, b가 음수이기 때문"],
+     e:"X는 N×2 직사각형이라 역행렬이 없어요. Xᵀ를 곱하면 2×2 정사각 행렬 XᵀX가 돼요."},
+    {t:"sa", q:"'overdetermined system'이 무엇이고, 센서 교정에서 왜 생기는지 설명해 보세요.",
+     m:"식의 개수가 미지수보다 많은 연립방정식이다. 교정에서는 미지수가 a, b 두 개인데 오차를 줄이려고 측정점을 여러 개(N개) 잡아 식이 N개가 되며, 측정 오차 때문에 모든 식을 동시에 만족하는 해가 없으므로 오차 제곱합이 최소인 해를 구한다.",
+     p:["식 수 > 미지수 수","측정점 여러 개 → 식 N개","정확한 해가 없어 최소자승 해를 구함"]}
+  ]
+},
+
+19: {
+  one: "(1,4), (2,6), (3,7)에 행렬 공식을 적용하면 a = 1.5, b = 2.6667, 즉 y = 1.5x + 2.6667이고 Excel 추세선과 같아요.",
+  talk: [
+    "예를 들어 센서에 입력 1, 2, 3을 넣었더니 출력이 4, 6, 7이 나왔어요. 세 점이 정확히 한 직선 위에 있지 않으니 가장 잘 맞는 직선을 구해야 해요.",
+    "먼저 XᵀX를 계산하면 [[14, 6],[6, 3]]이에요. 14는 x²의 합, 6은 x의 합, 3은 점의 개수예요.",
+    "2×2 역행렬은 1/(ad − bc) × [[d, −b],[−c, a]] 공식을 써요. ad − bc = 14×3 − 6×6 = 6이라서 (XᵀX)⁻¹ = [[0.5, −1],[−1, 14/6]]이에요.",
+    "Xᵀy는 [37, 17] — 37은 xy의 합, 17은 y의 합이에요. 둘을 곱하면 a = 0.5×37 − 1×17 = 1.5, b = −1×37 + (14/6)×17 = 2.6667이 나와요.",
+    "오른쪽 Excel 그래프의 추세선 y = 1.5x + 2.6667과 같으니 계산이 맞다는 확인이에요. 감도는 a = 1.5(출력/입력)예요."
+  ],
+  sum: "정리하면: 최소자승법(least square method)의 행렬 해 p = (XᵀX)⁻¹Xᵀy로 a = 1.5(감도, sensitivity), b = 2.6667을 얻어 교정 직선 y = 1.5x + 2.6667이 되고, R² = 0.9643으로 Excel 결과와 일치해요.",
+  fig: {
+    key: "19",
+    tip: "손글씨 계산을 1번 → 2번 → 3번 → 4번 → 5번 순서로 따라가고, 마지막에 6번 Excel로 확인하세요.",
+    items: [
+      "공식 정리: X, P, y 모양과 Xp = y → XᵀXp = Xᵀy → p = (XᵀX)⁻¹Xᵀy. 왼쪽 아래 그림은 16번의 오차 그림이에요.",
+      "XᵀX = [[1,2,3],[1,1,1]] × [[1,1],[2,1],[3,1]] = [[14, 6],[6, 3]].",
+      "(XᵀX)⁻¹ = 1/(ad − bc) × [[d, −b],[−c, a]] = 1/6 × [[3, −6],[−6, 14]] = [[1/2, −1],[−1, 14/6]].",
+      "Xᵀy = [[1,2,3],[1,1,1]] × [4, 6, 7] = [37, 17].",
+      "[[0.5, −1],[−1, 14/6]] × [37, 17] = [1.5, 2.6667] → ∴ y = 1.5x + 2.6667.",
+      "Excel을 통한 확인: 추세선 y = 1.5x + 2.6667, R² = 0.9643."
+    ]
+  },
+  num: {
+    tip: "① XᵀX → ② 행렬식 → ③ 역행렬 → ④ Xᵀy → ⑤ 곱하기. 한 줄씩 계산기로 확인하세요.",
+    steps: [
+      "① XᵀX = [[Σx², Σx],[Σx, N]] = [[1+4+9, 1+2+3],[6, 3]] = [[14, 6],[6, 3]]",
+      "② ad − bc = 14×3 − 6×6 = 42 − 36 = 6",
+      "③ (XᵀX)⁻¹ = (1/6)[[3, −6],[−6, 14]] = [[0.5, −1],[−1, 2.3333]]",
+      "④ Xᵀy = [Σxy, Σy] = [1×4 + 2×6 + 3×7, 4+6+7] = [37, 17]",
+      "⑤ a = 0.5×37 + (−1)×17 = 18.5 − 17 = 1.5,  b = (−1)×37 + 2.3333×17 = −37 + 39.667 = 2.6667",
+      "⑥ [AI 보충] R² 확인: 예측 4.1667, 5.6667, 7.1667 → SS_res = 0.1667, SS_tot = 4.6667 → R² = 1 − 0.1667/4.6667 = 0.9643"
+    ]
+  },
+  review: {
+    logic: "데이터 → XᵀX, Xᵀy 계산 → 2×2 역행렬 → 곱해서 a, b → Excel로 확인.",
+    mem: ["(XᵀX)⁻¹: 1/(ad − bc) × [[d, −b],[−c, a]]", "결과 y = 1.5x + 2.6667 (a = 감도 1.5)"],
+    exam: "측정값 (1,4), (2,6), (3,7)에 대해 p = (XᵀX)⁻¹Xᵀy를 계산하면 XᵀX = [[14,6],[6,3]], Xᵀy = [37,17]이므로 a = 1.5, b ≈ 2.667, 즉 y = 1.5x + 2.667이다.",
+    blank: ["슬라이드를 보지 않고 (1,4), (2,6), (3,7)로 ①~⑤를 손으로 다시 계산하기"]
+  },
+  quiz: [
+    {t:"mc", q:"데이터 (1,3), (2,5), (3,7)에 최소자승 직선을 구하면?",
+     o:["y = 2x + 1","y = 1.5x + 2.6667","y = 2x + 3","y = x + 2"],
+     e:"세 점이 모두 y = 2x + 1 위에 정확히 있어요. 검산: Σx = 6, Σx² = 14, Σy = 15, Σxy = 34 → a = 0.5×34 − 15 = 2, b = −34 + (14/6)×15 = 1."},
+    {t:"mc", q:"XᵀX = [[14, 6],[6, 3]]의 행렬식(ad − bc)은?",
+     o:["6","42","36","78"],
+     e:"14×3 − 6×6 = 42 − 36 = 6."},
+    {t:"sa", q:"(1,4), (2,6), (3,7) 데이터로 a를 구하는 과정을 식과 숫자로 써 보세요.",
+     m:"XᵀX = [[14,6],[6,3]], 행렬식 = 6, (XᵀX)⁻¹ = [[0.5, −1],[−1, 14/6]], Xᵀy = [37, 17] → a = 0.5×37 − 1×17 = 1.5 (b = −37 + 14/6×17 ≈ 2.667).",
+     p:["XᵀX 맞음","역행렬(행렬식 6) 맞음","Xᵀy 맞음","a = 1.5"]}
+  ]
+},
+
+20: {
+  one: "측정하한치(MDL)는 배경 잡음과 구별해 검출할 수 있는 최소 입력값으로, MDL = 3σ/S (σ = 입력 없을 때 출력 잡음의 표준편차)예요.",
+  talk: [
+    "예를 들어 아주 조용한 방에서도 귀에는 '쉬—' 하는 작은 소리가 들려요. 누군가 속삭인 소리가 이 배경 소리의 3배 정도는 되어야 '진짜 소리'라고 자신 있게 말할 수 있겠죠.",
+    "가스 센서도 가스가 전혀 없을 때 출력이 조금씩 흔들려요. 이 흔들림의 크기를 표준편차 σ(시그마)로 나타내요.",
+    "출력이 잡음의 3배(3σ)만큼 변해야 '검출됐다'고 보기로 약속하고, 그만큼의 출력 변화를 만드는 입력을 감도로 나눠 구해요. 그래서 MDL = 3σ/S이고 단위는 입력 단위(예 ppm)예요.",
+    "슬라이드 예: 잡음 표준편차 0.02, 감도 0.5/ppm이면 MDL = 3×0.02/0.5 = 0.12 ppm이에요.",
+    "분해능(Noise/S)과 모양이 비슷하지만, MDL은 '입력 0 근처에서 처음 검출되는 최소 농도'이고 3σ 기준을 쓴다는 점이 달라요 [AI 보충]."
+  ],
+  sum: "정리하면: 측정하한치(minimum detection limit, MDL)는 MDL = 3σ/S로, 입력이 없을 때 출력 노이즈의 표준편차(standard deviation, σ)의 3배에 해당하는 입력값이며 단위는 입력량(input)의 단위예요.",
+  terms: {
+    tip: "\"3σ 나누기 감도\" — 3배인 이유는 잡음과 확실히 구분하려는 약속이라고 기억하세요.",
+    rows: [
+      ["Minimum Detection Limit (MDL)","측정하한치(검출한계)","잡음과 구별해 검출 가능한 최소 입력"],
+      ["Standard deviation (σ)","표준편차","값이 평균에서 흔들리는 정도"],
+      ["Background noise","배경 잡음","측정 대상이 없을 때의 출력 흔들림"],
+      ["ppb","피피비","10억분의 1 (1 ppb = 0.001 ppm)"]
+    ]
+  },
+  orig: {
+    tip: "꼭 챙길 숫자: 3배(3σ), 예시 1 ppb, 예제 0.12 ppm.",
+    rows: [
+      ["MDL은 센서가 배경잡음과 구별하여 검출할 수 있는 최소 입력값","잡음과 구분해서 '있다'고 말할 수 있는 가장 작은 입력이에요."],
+      ["입력이 없는 상태에서 측정한 출력 노이즈의 표준편차(σ)와 센서 감도(Sensitivity)를 이용하여 구한다","입력 0일 때 흔들림(σ)과 감도로 계산해요."],
+      ["σ → 센서가 외부 측정요소에 노출시키지 아니할 때 발생하는 노이즈(출력값)의 3배의 값에 해당되는 인풋의 값","[원본 확인] 이 줄의 내용(노이즈의 3배에 해당하는 입력값)은 σ의 뜻이 아니라 MDL의 뜻으로 보여요. σ 자체는 '측정 대상에 노출되지 않았을 때 노이즈의 표준편차'예요 [추정]. 시험에서는 슬라이드 표현을 따르세요."],
+      ["평가과정 → 배경 노이즈 측정 → 반복 분석 → 노이즈 크기의 약 3배 정도에 해당하는 출력값을 detection limit으로 정의","① 가스 없이 잡음 기록 ② 같은 농도로 여러 번 재서 흔들림 평가 ③ 잡음의 약 3배 출력 = 검출한계."]
+    ]
+  },
+  fig: {
+    key: "20",
+    tip: "1번(잡음 크기 σ) → 2번(감도 S) → 3번(나누기) 순서로, 식의 분자·분모가 어디서 오는지 보세요.",
+    items: [
+      "SIGNAL + NOISE / NOISE: 아래 NOISE 파형의 흔들림 크기가 σ(표준편차)의 출처예요.",
+      "교정 그래프: 기울기 Δy/Δx가 감도 S예요.",
+      "예제: 노이즈 표준편차 0.02, 감도 0.5/ppm → MDL = 3×0.02 ÷ 0.5 = 0.12 ppm. [원본 확인] 감도 단위가 '0.5 / ppm'으로 출력 단위가 빠져 있어요(예: V/ppm). σ와 같은 출력 단위라고 보면 돼요 [추정]."
+    ]
+  },
+  num: {
+    tip: "① 3σ → ② ÷ S → ③ 단위 확인. '말 = 식 = 숫자'로.",
+    steps: [
+      "① 잡음 3배 = 3σ = 3 × 0.02 = 0.06 (출력 단위)",
+      "② MDL = 0.06 ÷ 0.5 (출력/ppm) = 0.12 ppm",
+      "③ ppb로 바꾸면 0.12 ppm × 1000 = 120 ppb  (1 ppm = 1000 ppb)",
+      "④ 슬라이드 예 1 ppb = 0.001 ppm → 이 예제 센서보다 120배 낮은 농도까지 검출"
+    ]
+  },
+  review: {
+    logic: "입력이 없어도 출력이 흔들림(σ) → 잡음의 3배는 넘어야 확실히 검출 → 3σ에 해당하는 입력 = 3σ/S.",
+    mem: ["MDL = 3σ/S (단위 = 입력 단위)", "σ = 입력 없을 때 출력 노이즈의 표준편차"],
+    exam: "측정하한치(MDL)는 센서가 배경 잡음과 구별하여 검출할 수 있는 최소 입력값으로, 입력이 없을 때 출력 노이즈의 표준편차 σ와 감도 S를 이용해 MDL = 3σ/S로 구하며 입력량의 단위를 갖는다.",
+    blank: ["잡음 파형 → σ, 교정 그래프 → S를 그리고 MDL = 3σ/S와 예제 0.12 ppm 계산 쓰기"]
+  },
+  quiz: [
+    {t:"mc", q:"노이즈 표준편차 0.01 V, 감도 0.2 V/ppm인 가스 센서의 MDL은?",
+     o:["0.15 ppm","0.05 ppm","0.6 ppm","0.03 ppm"],
+     e:"3 × 0.01 = 0.03 V → 0.03 V ÷ 0.2 V/ppm = 0.15 ppm."},
+    {t:"mc", q:"같은 센서에서 차폐를 개선해 잡음 σ를 절반으로 줄였다. MDL은?",
+     o:["절반이 된다(더 낮은 농도 검출)","2배가 된다","변하지 않는다","3배가 된다"],
+     e:"MDL = 3σ/S이므로 σ가 1/2이면 MDL도 1/2이에요."},
+    {t:"sa", q:"MDL에서 잡음의 '3배'를 기준으로 쓰는 이유를 설명해 보세요.",
+     m:"잡음은 무작위로 흔들리므로 잡음 크기 정도의 출력 변화는 실제 신호인지 우연한 흔들림인지 구분하기 어렵다. 표준편차의 3배 이상이면 잡음만으로 그만큼 변할 가능성이 매우 낮아 확실히 검출되었다고 판단할 수 있다(평가 과정에서 약 3배를 검출한계로 정의).",
+     p:["잡음은 무작위 흔들림","1배 정도는 구분 어려움","3σ 이상이면 확실히 신호"]}
+  ]
+},
+
+21: {
+  one: "선형성은 실측 곡선이 이상적인 기준직선에서 얼마나 벗어나는지로, 최대편차 ÷ 정격 × 100 [%FS]으로 나타내요.",
+  talk: [
+    "예를 들어 0~100 ℃용 온도 센서의 출력이 0~5 V여야 하는데, 중간쯤에서 직선보다 0.1 V 위로 휘어 있다고 해 볼게요. 이 '휘어진 정도'를 숫자로 나타낸 게 선형성이에요.",
+    "그림에서 파란 점선이 이상적인 직선(기준직선), 검은 곡선이 실제로 잰 실측곡선이에요. 둘이 가장 많이 벌어진 곳의 세로 거리가 최대출력편차, 가로 거리가 최대입력편차예요.",
+    "출력 기준이면 최대출력편차 ÷ 정격출력 × 100 %, 입력 기준이면 최대입력편차 ÷ 정격입력 × 100 %예요. 정격출력·정격입력은 센서가 낼 수 있는 최대 출력·입력, 즉 full scale(FS)이에요.",
+    "그래서 단위가 %FS예요. 위 예에서는 0.1 V ÷ 5 V × 100 = 2 %FS. 숫자가 작을수록 직선에 가까운 좋은 센서예요."
+  ],
+  sum: "정리하면: 선형성(linearity) = 최대출력편차/정격출력 × 100 (또는 최대입력편차/정격입력 × 100)이고 단위는 %FS(full scale)이며, 실측곡선이 이상적인 기준직선에서 벗어난 정도예요.",
+  terms: {
+    tip: "\"최대로 벗어난 양 ÷ 꽉 찬 범위(FS)\" — 입력 기준이든 출력 기준이든 모양은 같아요.",
+    rows: [
+      ["Linearity","선형성","출력이 이상적인 직선에서 벗어난 정도"],
+      ["Full Scale (FS)","정격(풀스케일)","센서가 다루는 최대 범위"],
+      ["Maximum deviation","최대편차","실측곡선과 기준직선의 가장 큰 차이"],
+      ["Reference straight line","기준직선","이상적인 입력-출력 직선"]
+    ]
+  },
+  fig: {
+    key: "21",
+    tip: "1번(정격출력) → 2번(실측곡선) → 3번(이상적인 직선) → 4번·5번(편차 화살표) → 6번(정격입력) 순서예요.",
+    items: [
+      "정격출력: 센서가 내는 최대 출력(FS, 세로축 끝).",
+      "실측곡선: 실제로 잰 입력-출력 관계(검은 곡선). 위로 볼록하게 휘어 있어요.",
+      "이상적인 곡선: 파란 점선. 이름은 '곡선'이지만 실제로는 기준직선이에요.",
+      "최대출력편차: 같은 입력에서 실측곡선과 기준직선의 세로 차이(빨간 세로 화살표)가 가장 큰 곳.",
+      "최대입력편차: 같은 출력에서 두 선의 가로 차이(빨간 가로 화살표)가 가장 큰 곳.",
+      "정격입력: 센서가 받는 최대 입력(FS, 가로축 끝)."
+    ]
+  },
+  num: {
+    tip: "① 최대편차 → ② 정격(FS) → ③ 나누고 ×100 → 단위 %FS.",
+    steps: [
+      "[AI 보충·가정한 숫자] ① 최대출력편차 = 0.1 V",
+      "② 정격출력 = 5 V",
+      "③ 선형성 = 0.1 ÷ 5 × 100 = 2 %FS",
+      "④ 입력 기준: 0~100 ℃ 센서, 최대입력편차 1.5 ℃ → 1.5 ÷ 100 × 100 = 1.5 %FS"
+    ]
+  },
+  review: {
+    logic: "실제 센서 곡선은 휘어 있음 → 기준직선과 가장 많이 벌어진 양을 측정 → 범위(FS)로 나눠 %로 비교.",
+    mem: ["선형성 = 최대출력편차/정격출력 × 100 (또는 입력 기준)", "단위 %FS (full scale)"],
+    exam: "선형성은 센서 특성 곡선이 이상적인 기준직선에서 벗어난 정도로, 최대출력편차를 정격출력으로(또는 최대입력편차를 정격입력으로) 나눈 값에 100을 곱해 %FS로 나타낸다.",
+    blank: ["기준직선(점선)과 휘어진 실측곡선을 그리고, 최대출력편차·최대입력편차·정격입력·정격출력을 표시한 뒤 두 식 쓰기"]
+  },
+  quiz: [
+    {t:"mc", q:"정격출력 10 V인 센서의 최대출력편차가 0.05 V이다. 선형성은?",
+     o:["0.5 %FS","5 %FS","0.05 %FS","2 %FS"],
+     e:"0.05 ÷ 10 × 100 = 0.5 %FS."},
+    {t:"mc", q:"선형성이 0.2 %FS인 센서 A와 1 %FS인 센서 B 중 직선에 더 가까운 것은?",
+     o:["A","B","같다","정격을 모르면 비교 불가"],
+     e:"%FS는 범위 대비 벗어난 비율이라 작을수록 직선에 가까워요. 서로 다른 범위의 센서도 %FS로 공정하게 비교해요."},
+    {t:"sa", q:"선형성을 절대 편차(예: 0.1 V)가 아니라 %FS로 나타내는 이유를 설명해 보세요.",
+     m:"같은 0.1 V 편차라도 정격출력이 1 V인 센서에서는 10 %로 크고, 10 V인 센서에서는 1 %로 작다. 전체 범위(FS) 대비 비율로 나타내야 범위가 다른 센서끼리 공정하게 비교할 수 있다.",
+     p:["범위가 다르면 같은 편차의 의미가 다름","FS 대비 비율","공정한 비교"]}
+  ]
+},
+
+22: {
+  one: "결정계수 R²은 데이터로 구한 회귀직선이 y값의 흩어짐을 얼마나 잘 설명하는지로, R² = 1 − SS_res/SS_tot (단위 없음)이에요. (read only)",
+  talk: [
+    "예를 들어 학생 5명의 키가 들쭉날쭉하다고 해 볼게요. '나이'로 키를 예측하는 직선을 그었을 때, 직선이 들쭉날쭉함을 거의 다 설명하면 R²이 1에 가깝고, 거의 못 설명하면 0에 가까워요.",
+    "SS_tot는 y값들이 평균(ȳ, 와이 바)에서 얼마나 흩어져 있는지(전체 변동), SS_res는 직선으로 예측하고도 남은 오차(잔차)의 제곱합이에요.",
+    "R² = 1 − 남은 오차/전체 변동이니, 남은 오차가 0이면 R² = 1(완벽한 직선)이에요. 슬라이드 기준으로 0.999 이상이면 매우 우수한 선형성이에요.",
+    "오른쪽 Excel 예에서 x = 0, 10, 20, 30, 40일 때 y = 5, 108, 202, 297, 401이고, 추세선 y = 9.81x + 6.4, R² = 0.9997이에요."
+  ],
+  sum: "정리하면: 결정계수(R², coefficient of determination) = 1 − SS_res/SS_tot이고 단위가 없으며(no unit), 회귀직선(y_fit = ax + b)이 Y의 변동을 얼마나 잘 설명하는지를 나타내요. 1에 가까울수록 좋아요.",
+  terms: {
+    tip: "SS 두 개만 구분하세요: tot = 평균에서의 흩어짐(전체), res = 직선에서의 흩어짐(남은 것).",
+    rows: [
+      ["Coefficient of Determination (R²)","결정계수","회귀직선의 설명력 (0~1)"],
+      ["SS_tot (total sum of squares)","총제곱합","Σ(yᵢ − ȳ)² — 평균 기준 전체 흩어짐"],
+      ["SS_res (residual sum of squares)","잔차제곱합","Σ(yᵢ − y_fit)² — 직선으로 설명 못 한 오차"],
+      ["ȳ (y-bar)","와이 바","y값들의 평균"],
+      ["Regression line","회귀직선","데이터로 구한 최적 직선 y_fit = ax + b"]
+    ]
+  },
+  fig: {
+    key: "22",
+    tip: "1번(데이터 표) → 2번(점과 추세선) → 3번(식과 R²) 순서예요.",
+    items: [
+      "데이터: x = 0, 10, 20, 30, 40 / y = 5, 108, 202, 297, 401.",
+      "점과 점선 추세선: 다섯 점이 거의 직선 위에 있어요.",
+      "Excel 결과: y = 9.81x + 6.4, R² = 0.9997 → 0.999 이상이라 매우 우수한 linearity."
+    ]
+  },
+  num: {
+    tip: "① 평균 → ② SS_tot → ③ SS_res → ④ R². 자세한 표는 23번이에요.",
+    steps: [
+      "① ȳ = (5 + 108 + 202 + 297 + 401) ÷ 5 = 1013 ÷ 5 = 202.6",
+      "② SS_tot = Σ(yᵢ − 202.6)² ≈ 96269.2",
+      "③ SS_res = Σ(yᵢ − y_fit)² = 33.1",
+      "④ R² = 1 − 33.1 ÷ 96269.2 ≈ 1 − 0.00034 = 0.99966 ≈ 0.9997"
+    ]
+  },
+  review: {
+    logic: "y는 평균 주변에 흩어짐(SS_tot) → 직선으로 대부분 설명 → 남은 오차(SS_res)가 작을수록 R² → 1.",
+    mem: ["R² = 1 − SS_res/SS_tot (단위 없음)", "R² ≥ 0.999 → 매우 우수한 linearity"],
+    exam: "결정계수 R²은 회귀직선이 Y의 변동을 얼마나 잘 설명하는지를 나타내는 무차원 값으로, R² = 1 − SS_res/SS_tot이며 1에 가까울수록 데이터와 회귀직선의 일치도가 높다.",
+    blank: ["SS_res, SS_tot 식과 R² 식을 쓰고 각각의 뜻을 한 줄씩 쓰기"]
+  },
+  quiz: [
+    {t:"mc", q:"SS_res = 2, SS_tot = 200이면 R²은?",
+     o:["0.99","0.01","100","0.98"],
+     e:"R² = 1 − 2/200 = 1 − 0.01 = 0.99."}
+  ]
+}
+
+});
+
+/* Week 1 — 23~33번 */
+Object.assign(window.NOTE.slides, {
+
+23: {
+  one: "22번 데이터로 R²을 손으로 계산한 예예요: 예측 y → SS_res = 33.1, SS_tot ≈ 96269, R² = 0.99966이에요. (read only)",
+  talk: [
+    "예를 들어 시험 점수를 예측했는데 실제 점수와 몇 점씩 차이 났는지 적어 보는 것과 같아요. 여기서는 회귀식 y = 9.81x + 6.4로 각 x의 예측 y를 먼저 구해요(x = 10이면 9.81×10 + 6.4 = 104.5).",
+    "실제 y에서 평균 202.6을 뺀 값을 제곱해 더하면 SS_tot, 실제 y에서 예측 y를 뺀 값(오차)을 제곱해 더하면 SS_res예요.",
+    "R² = 1 − 33.1/96269.36 = 0.99966으로, 22번 Excel의 0.9997을 반올림 전 값으로 확인한 거예요."
+  ],
+  sum: "정리하면: 결정계수(R²) = 1 − SS_res/SS_tot = 1 − 33.1/96269.36 ≈ 0.99966이고, SS_res(잔차제곱합, residual)는 실제 y − 예측 y, SS_tot(총제곱합, total)는 실제 y − 평균에서 나와요.",
+  table: {
+    tip: "왼쪽 표는 '예측 y' 열, 오른쪽 위 표는 '제곱' 열, 오른쪽 아래 표는 '오차²' 열만 보면 돼요.",
+    html: "<table><tr><th>x</th><th>실제 y</th><th>예측 y (9.81x+6.4)</th><th>y − 평균(202.6)</th><th>(y − 평균)²</th><th>오차 y − 예측</th><th>오차²</th></tr><tr><td>0</td><td>5</td><td>6.4</td><td>−197.6</td><td>39045.8</td><td>−1.4</td><td>1.96</td></tr><tr><td>10</td><td>108</td><td>104.5</td><td>−94.6</td><td>8949.2</td><td>3.5</td><td>12.25</td></tr><tr><td>20</td><td>202</td><td>202.6</td><td>−0.6</td><td>0.36</td><td>−0.6</td><td>0.36</td></tr><tr><td>30</td><td>297</td><td>300.7</td><td>94.4</td><td>8911.4</td><td>−3.7</td><td>13.69</td></tr><tr><td>40</td><td>401</td><td>398.8</td><td>198.4</td><td>39362.6</td><td>2.2</td><td>4.84</td></tr><tr><td colspan='4'><b>합</b></td><td><b>SS_tot ≈ 96269</b></td><td></td><td><b>SS_res = 33.1</b></td></tr></table><p class='cap'>[원본 확인] 제곱 열을 정확히 더하면 SS_tot = 96269.2인데 슬라이드는 96269.36으로 적혀 있어요(반올림 차이). R²은 두 값 모두 0.99966으로 같아요. 시험에서는 슬라이드 표현을 따르세요.</p>"
+  },
+  num: {
+    tip: "① 예측 y → ② 오차와 제곱 → ③ 평균과 제곱 → ④ R².",
+    steps: [
+      "① 예측 y(x = 30) = 9.81 × 30 + 6.4 = 294.3 + 6.4 = 300.7",
+      "② 오차 = 297 − 300.7 = −3.7 → 제곱 13.69 ; 다섯 개 합 = 1.96 + 12.25 + 0.36 + 13.69 + 4.84 = 33.1",
+      "③ 평균 = 1013 ÷ 5 = 202.6 ; (5 − 202.6)² = (−197.6)² = 39045.76 … 합 ≈ 96269",
+      "④ R² = 1 − 33.1 ÷ 96269 = 1 − 0.000344 = 0.99966"
+    ]
+  },
+  review: {
+    logic: "예측 y 구하기 → 실제와의 차이 제곱합(SS_res) → 평균과의 차이 제곱합(SS_tot) → 1 − 비율 = R².",
+    mem: ["SS_res = Σ(실제 − 예측)², SS_tot = Σ(실제 − 평균)²"],
+    exam: "회귀식으로 예측값을 구해 잔차제곱합 SS_res와 평균 기준 총제곱합 SS_tot를 계산하면 R² = 1 − SS_res/SS_tot이며, 이 예에서 R² ≈ 0.99966이다.",
+    blank: ["표의 열 7개(x, y, 예측, y−평균, 제곱, 오차, 오차²)를 빈 표로 그리고 채워 보기"]
+  },
+  quiz: [
+    {t:"mc", q:"회귀식 y = 9.81x + 6.4에서 x = 40일 때 예측 y와 실제 y = 401의 오차(실제 − 예측)는?",
+     o:["398.8, +2.2","401, 0","398.8, −2.2","392.4, +8.6"],
+     e:"9.81 × 40 + 6.4 = 392.4 + 6.4 = 398.8 → 401 − 398.8 = +2.2."}
+  ]
+},
+
+24: {
+  one: "선형성은 '이상적인 기준직선'과 비교해 %FS로, R²은 '데이터로 구한 회귀직선'이 데이터를 얼마나 설명하는지를 단위 없이 평가해요.",
+  talk: [
+    "예를 들어 자로 그은 직선(기준직선)을 따라 글씨를 썼다고 해 볼게요. 선형성은 '처음 그어 둔 자 선에서 얼마나 벗어났나'를 보고, R²은 '쓴 글씨들만 보고 새로 그은 가장 잘 맞는 선에 글씨가 얼마나 붙어 있나'를 봐요.",
+    "그래서 기준이 달라요. 선형성의 기준은 참값에서 기대되는 직선적 관계, R²의 기준은 실제 데이터로 얻은 회귀직선이에요.",
+    "단위도 달라요. 선형성은 %FS, R²은 단위가 없고 1에 가까울수록 데이터와 회귀직선의 일치도가 높아요.",
+    "그래서 점들이 한 직선 위에 아주 잘 모여 있어도(R² ≈ 1), 그 직선이 이상적인 직선과 기울기·위치가 다르면 선형성 평가는 나쁠 수 있어요 [AI 보충]."
+  ],
+  sum: "정리하면: 선형성(Linearity)은 이상적인 기준직선(true 값에서 기대되는 직선적 관계)을 기준으로 [%FS], 결정계수(R²)는 실제 데이터의 회귀직선(regression line)을 기준으로 Y 변동의 설명력을 [no unit]으로 평가해요.",
+  table: {
+    tip: "'기준'과 '단위' 두 행만 비교하면 돼요.",
+    html: "<table><tr><th></th><th>선형성 (Linearity)</th><th>결정계수 (R²)</th></tr><tr><td>기준</td><td>이상적인 기준직선 (참값에서 기대되는 직선)</td><td>데이터로 얻은 회귀직선</td></tr><tr><td>무엇을 보나</td><td>실측값이 기준직선을 얼마나 잘 따르나 (최대편차)</td><td>회귀직선이 Y의 변동을 얼마나 설명하나</td></tr><tr><td>단위</td><td>%FS</td><td>없음 (0~1)</td></tr><tr><td>좋을 때</td><td>작을수록 좋음</td><td>1에 가까울수록 좋음 (0.999 이상 매우 우수)</td></tr><tr><td>슬라이드</td><td>21번</td><td>22·23번</td></tr></table>"
+  },
+  fig: {
+    key: "24",
+    tip: "1번(왼쪽, 기준직선 vs 실측곡선) → 2번(오른쪽, 데이터 점 vs 회귀직선)을 나란히 비교하세요.",
+    items: [
+      "Linearity: 파란 점선(이상적인 직선)이 기준. 실측곡선이 거기서 벗어난 최대편차를 정격으로 나눠 %FS로 표시해요.",
+      "R²: 데이터 다섯 점과 Excel 회귀직선 y = 9.81x + 6.4, R² = 0.9997. 기준선 자체를 데이터로 만들어요."
+    ]
+  },
+  review: {
+    logic: "같은 '직선다움'이라도 무엇을 기준선으로 삼느냐가 다름 → 선형성은 이상 직선, R²은 회귀 직선.",
+    mem: ["선형성: 기준직선 기준, %FS / R²: 회귀직선 기준, 단위 없음"],
+    exam: "선형성은 이상적인 기준직선을 기준으로 실측값이 그 관계를 얼마나 잘 따르는지를 %FS로 평가하고, 결정계수 R²은 실제 데이터로 얻은 회귀직선이 Y의 변동을 얼마나 잘 설명하는지를 단위 없는 값으로 평가한다.",
+    blank: ["두 그래프를 나란히 그리고 각각 '기준선'과 '단위'를 적기"]
+  },
+  quiz: [
+    {t:"mc", q:"어떤 센서 데이터의 R²이 0.9999인데, 데이터시트의 이상적인 직선과 비교하니 최대출력편차가 정격의 4 %였다. 맞는 해석은?",
+     o:["데이터는 한 직선에 잘 모였지만, 이상적인 직선과는 어긋나 선형성은 4 %FS다","R²이 높으니 선형성도 반드시 0 %FS다","선형성 4 %FS면 R²은 0.96이어야 한다","두 값은 같은 것을 다른 단위로 쓴 것이다"],
+     e:"R²의 기준은 데이터로 만든 회귀직선, 선형성의 기준은 이상적인 기준직선이라 서로 다를 수 있어요 [AI 보충]."},
+    {t:"sa", q:"선형성과 R²의 차이를 '기준'과 '단위' 중심으로 설명해 보세요.",
+     m:"선형성은 참값에서 기대되는 이상적인 기준직선을 기준으로 실측값의 최대 편차를 정격 대비 %FS로 나타낸다. R²은 실제 데이터로 구한 회귀직선을 기준으로 그 직선이 Y 변동을 얼마나 설명하는지를 0~1의 무차원 값으로 나타내며 1에 가까울수록 좋다.",
+     p:["선형성 기준 = 이상적 기준직선","R² 기준 = 회귀직선","단위 %FS vs 없음"]}
+  ]
+},
+
+25: {
+  one: "반복성은 같은 조건·짧은 기간에 연속 측정한 값들이 서로 얼마나 일치하는지, 재현성은 긴 기간·다른 사람·다른 실험실에서도 일치하는지예요.",
+  talk: [
+    "예를 들어 내가 오늘 아침 체중계에 다섯 번 연속 올라가 값이 거의 같으면 반복성이 좋은 거예요. 한 달 뒤에, 또는 다른 사람이 다른 집에서 같은 방법으로 쟀는데도 같으면 재현성이 좋은 거예요.",
+    "슬라이드 표현으로 반복성 'within ±3 % of the mean value'는 반복 측정한 Y값이 그 평균값 기준 ±3 % 안에서 변동한다는 뜻이에요.",
+    "왼쪽 그래프는 가스를 넣었다 뺐다를 약 16000초 동안 수십 번 반복한 저항 변화예요. 매번 거의 같은 높이로 오르내리니 반복성이 좋아요. 세로축 저항이 10⁴ ~ 10⁵ Ω 로그 눈금이에요.",
+    "오른쪽 그래프는 0, 2, 4, 7, 8개월째에 잰 주파수 변화예요. 몇 달이 지나도 약 140 kHz 근처로 비슷하니 재현성이 좋고, 전체 평균 대비 ±3.7 % 이내예요."
+  ],
+  sum: "정리하면: 반복성(Repeatability)은 동일 조건·단기간 연속 측정값의 일치 정도(예: 평균 대비 ±3 %), 재현성(Reproducibility)은 장기간·다른 측정자·다른 실험실에서의 일치 정도(예: 평균 대비 ±3.7 %)예요.",
+  terms: {
+    tip: "\"반복 = 같은 날 같은 사람, 재현 = 다른 날·다른 사람·다른 곳\"으로 외우세요.",
+    rows: [
+      ["Repeatability","반복성","같은 조건, 짧은 기간 연속 측정값의 일치"],
+      ["Reproducibility","재현성","긴 기간·다른 사람·다른 실험실에서의 일치"],
+      ["Mean value","평균값","측정값들을 더해 개수로 나눈 값"],
+      ["Frequency shift |Δf|","주파수 변화량","센서 신호 주파수가 바뀐 크기 (kHz)"]
+    ]
+  },
+  orig: {
+    tip: "꼭 챙길 숫자: 반복성 ±3 %, 재현성 ±3.7 % (둘 다 평균값 기준).",
+    rows: [
+      ["Repeatability: 동일조건하에서 동일방법으로 단기간에 연속 측정할 때 측정값들이 서로 얼마나 일치하는가","같은 조건·방법·짧은 시간 → 반복성."],
+      ["within ±3% of the mean value → 반복 측정한 Y값이 그 평균값을 기준으로 ±3% 이내에서 변동한다","평균에서 위아래 3 % 안에 다 들어온다는 뜻이에요."],
+      ["Reproducibility: 동일한 같은 방법으로 장기간에 걸쳐 측정하거나 다른 사람에 의해서 측정되거나 또는 다른 실험실에서 측정될 때 측정값 사이에 일치하는 정도","긴 시간·다른 사람·다른 장소 → 재현성."],
+      ["Reproducibility : Within ±3.7% of the mean value → 여러 조건에서 얻은 결과가 전체 평균값 대비 ±3.7% 이내","여러 조건 결과가 전체 평균의 ±3.7 % 안이에요."]
+    ]
+  },
+  fig: {
+    key: "25",
+    tip: "1번(짧은 시간 반복 = 반복성) → 2번(몇 달 = 재현성) → 3번(숫자) 순서예요.",
+    items: [
+      "반복성 그래프: 가로축 Time 0~16000 s(약 4.4시간), 세로축 Resistance(Ω, 로그). 가스 on/off마다 약 10⁴ Ω ↔ 10⁵ Ω로 같은 높이를 반복해요.",
+      "재현성 그래프: 가로축 Time(개월), 세로축 주파수 변화량 |Δf|(kHz). 0·2·4·7·8개월째 측정값이 모두 약 140 kHz 근처예요.",
+      "Reproducibility: Within ±3.7 % of the mean value — 여러 조건 결과가 전체 평균 대비 ±3.7 % 이내."
+    ]
+  },
+  num: {
+    tip: "① 평균 → ② ±% 폭 → ③ 허용 범위. '말 = 식 = 숫자(단위)'로.",
+    steps: [
+      "① [AI 보충·가정] 재현성 그래프 평균 ≈ 140 kHz",
+      "② ±3.7 % 폭 = 140 × 3.7 ÷ 100 = 140 × 0.037 = 5.18 kHz",
+      "③ 허용 범위 = 140 − 5.18 ~ 140 + 5.18 = 134.82 ~ 145.18 kHz",
+      "④ 16000 s = 16000 ÷ 3600 ≈ 4.4시간 (반복성 그래프 길이)"
+    ]
+  },
+  review: {
+    logic: "같은 조건에서 짧게 반복해도 값이 같은가(반복성) → 조건·시간·사람이 바뀌어도 같은가(재현성) → 둘 다 평균 대비 ±%로 표현.",
+    mem: ["Repeatability: 동일 조건·단기간, 예 ±3 % of mean", "Reproducibility: 장기간·다른 사람·다른 실험실, 예 ±3.7 % of mean"],
+    exam: "반복성은 동일 조건·동일 방법으로 단기간 연속 측정한 값들의 일치 정도이고, 재현성은 장기간에 걸쳐 또는 다른 측정자·실험실에서 측정한 값들의 일치 정도로, 둘 다 평균값 대비 ±%로 나타낸다.",
+    blank: ["두 그래프를 대충 그리고 각각 '반복성/재현성', '시간 단위(s/개월)', '±%'를 적기"]
+  },
+  quiz: [
+    {t:"mc", q:"같은 가스 센서를 3개월 뒤 다른 연구실에서 같은 방법으로 측정해 원래 결과와 비교했다. 무엇을 평가한 것일까요?",
+     o:["재현성(Reproducibility)","반복성(Repeatability)","분해능","응답시간"],
+     e:"장기간·다른 실험실 조건이니 재현성이에요."},
+    {t:"mc", q:"반복 측정 평균이 50 mV이고 반복성이 ±3 %라면 측정값이 들어와야 할 범위는?",
+     o:["48.5 ~ 51.5 mV","47 ~ 53 mV","49.7 ~ 50.3 mV","45 ~ 55 mV"],
+     e:"50 × 0.03 = 1.5 mV → 50 ± 1.5 = 48.5 ~ 51.5 mV."},
+    {t:"sa", q:"반복성과 재현성의 차이를 측정 조건 중심으로 설명해 보세요.",
+     m:"반복성은 같은 조건·같은 방법으로 짧은 기간 연속 측정할 때 값들이 얼마나 일치하는지이고, 재현성은 같은 방법이라도 긴 기간에 걸쳐, 또는 다른 사람·다른 실험실에서 측정할 때 값들이 얼마나 일치하는지이다.",
+     p:["반복성 = 동일 조건·단기간","재현성 = 장기간·다른 사람·다른 실험실","평균 대비 ±% 표현"]}
+  ]
+},
+
+26: {
+  one: "정확도는 측정값(xm)이 참값(xt)에 얼마나 가까운지로, 정확도 [%] = 100 − 오차율, 오차율 = (xm − xt)/xt × 100이에요.",
+  talk: [
+    "예를 들어 정답이 10인 문제에 10.5라고 썼다면 0.5만큼 틀렸고, 정답 대비 5 % 틀린 셈이에요. 그러니 '95 % 맞았다'고 말할 수 있어요. 이게 정확도예요.",
+    "슬라이드 예제: 10 ppm 가스를 넣었는데 센서가 10.5 ppm을 표시했어요. 차이 xm − xt = 0.5 ppm, 오차율 = 0.5/10 × 100 = 5 %, 정확도 = 100 − 5 = 95 %예요.",
+    "그림에서는 실제 출력 점에서 교정 직선(y = ax + b)을 따라가 입력축으로 내려오면 10.5 ppm으로 읽히는데, 참값은 10 ppm이라는 걸 빨간 화살표로 보여 줘요.",
+    "참값은 어떻게 알까요? 상업용 최고 성능 센서의 측정값과 비교하거나, 가스 센서라면 믿을 수 있는 기준값(reference value)과 비교해요. 그 기준값은 GC(가스 크로마토그래피) 같은 정밀 분석 장비로 얻을 수도 있어요.",
+    "주의: 이 슬라이드의 오차율 식에는 절댓값이 없지만, 다음 장(27번)의 정확도 식은 |xm − xt|로 절댓값을 써요. 낮게 잰 경우(−)에도 정확도는 100 − |오차율|로 계산해요."
+  ],
+  sum: "정리하면: 정확도(accuracy) [%] = 100 − 오차율(error rate)이고, 오차율 = (xm − xt)/xt × 100 [%]이며, 참값(true value)은 신뢰할 수 있는 reference value(예: GC)로 얻어요.",
+  terms: {
+    tip: "기호 두 개: m = measured(측정), t = true(참). \"측정 − 참, 참으로 나누기\"로 외우세요.",
+    rows: [
+      ["Accuracy","정확도","측정값이 참값에 가까운 정도"],
+      ["xm (measured value)","측정값","센서가 표시한 값"],
+      ["xt (true value)","참값","실제 값 (기준값)"],
+      ["Error rate","오차율","참값 대비 차이의 비율 (%)"],
+      ["Reference value","기준값","믿을 수 있는 장비로 얻은 참값"]
+    ]
+  },
+  orig: {
+    tip: "원인(참값 10 ppm) → 중간(표시 10.5 ppm, 차이 0.5) → 결과(오차율 5 %, 정확도 95 %) 순서예요.",
+    rows: [
+      ["센서 측정값(xm)이 참값(xt)에 얼마나 가까운가를 나타내는 척도","정확도의 정의예요."],
+      ["상업용 최고의 센서 측정값과 비교한다 → 가스센서의 경우 → 신뢰할 수 있는 reference value와 비교, 그리고 그 reference value를 GC로 얻을 수도 있다","참값을 정하는 방법이에요."],
+      ["10ppm 가스농도 인가 시 센서가 10.5ppm 값을 디스플레이하고 있다 (Calibration plot을 참값으로 사용중)","교정 그래프로 환산한 표시값이 10.5 ppm이에요."]
+    ]
+  },
+  fig: {
+    key: "26",
+    tip: "1번(참값 10 ppm) → 2번(교정 직선을 따라가는 빨간 화살표) → 3번(표시값 10.5 ppm) 순서예요.",
+    items: [
+      "실제 true 값 (10 ppm): 실제로 넣은 가스 농도. 입력축 위 화살표 위치예요.",
+      "빨간 화살표: 측정된 출력 점에서 가로로 교정 직선까지, 다시 아래로 입력축까지 내려와 '센서가 표시하는 농도'를 읽는 과정이에요.",
+      "센서로부터 표기값 (10.5 ppm): 그렇게 읽은 값이 참값보다 0.5 ppm 커요."
+    ]
+  },
+  num: {
+    tip: "① 차이 → ② 오차율 → ③ 정확도. '말 = 식 = 숫자(단위)'로.",
+    steps: [
+      "① xm − xt = 10.5 ppm − 10 ppm = 0.5 ppm",
+      "② 오차율 = 0.5 ppm ÷ 10 ppm × 100 = 0.05 × 100 = 5 %",
+      "③ 정확도 = 100 − 5 = 95 %",
+      "④ 낮게 잰 경우: 9.8 ppm 표시 → (9.8 − 10)/10 × 100 = −2 % → 정확도 = 100 − |−2| = 98 %"
+    ]
+  },
+  review: {
+    logic: "참값을 신뢰할 수 있는 기준으로 정함 → 측정값과의 차이를 참값으로 나눠 오차율 → 100에서 빼면 정확도.",
+    mem: ["오차율 = (xm − xt)/xt × 100 [%]", "정확도 = 100 − 오차율 (절댓값)", "10 ppm → 10.5 ppm: 오차율 5 %, 정확도 95 %"],
+    exam: "정확도는 측정값 xm이 참값 xt에 얼마나 가까운지를 나타내며, 오차율 = (xm − xt)/xt × 100 [%]로부터 정확도 = 100 − 오차율로 구한다. 참값은 신뢰할 수 있는 reference(예: GC)로 얻는다.",
+    blank: ["교정 직선 그림에 참값·표시값 화살표를 그리고 10 ppm/10.5 ppm 계산 3줄 쓰기"]
+  },
+  quiz: [
+    {t:"mc", q:"50 ppm 표준가스에 센서가 52 ppm을 표시했다. 정확도는?",
+     o:["96 %","98 %","104 %","2 %"],
+     e:"오차율 = (52 − 50)/50 × 100 = 4 % → 정확도 = 100 − 4 = 96 %."},
+    {t:"mc", q:"가스 센서의 참값(reference value)을 얻는 방법으로 슬라이드가 든 것은?",
+     o:["GC(가스 크로마토그래피) 같은 신뢰할 수 있는 장비로 측정","같은 센서로 여러 번 측정한 평균","센서 데이터시트의 감도","측정하한치"],
+     e:"같은 센서의 평균은 반복성일 뿐 참값이 아니에요. 참값은 더 믿을 수 있는 기준 장비로 얻어요."},
+    {t:"sa", q:"정확도를 계산하려면 왜 '참값'이 꼭 필요한지, 그리고 가스 센서에서 참값을 어떻게 얻는지 설명해 보세요.",
+     m:"정확도는 측정값이 참값에 얼마나 가까운지이므로 기준인 참값이 있어야 오차(xm − xt)와 오차율을 계산할 수 있다. 가스 센서에서는 상업용 최고 성능 센서의 측정값이나 GC 같은 정밀 분석 장비로 얻은 신뢰할 수 있는 reference value를 참값으로 쓴다.",
+     p:["정확도 = 참값과의 근접도","오차 계산에 참값 필요","reference value / GC"]}
+  ]
+},
+
+27: {
+  one: "정확도 계산 예제 — 100 ppm CO에 97 ppm이면 오차 −3 %, 정확도 97 %이고, 여러 농도의 정확도를 평균하면 97.4 %예요.",
+  talk: [
+    "예를 들어 100 ppm 일산화탄소(CO) 표준가스를 넣었더니 센서가 97 ppm을 보였어요. (97 − 100)/100 × 100 = −3 %, 즉 실제보다 3 % 낮게 잰 거예요. 정확도는 (1 − |97 − 100|/100) × 100 = 97 %예요.",
+    "실제 성능 평가는 한 점만 재지 않고 20, 50, 100, 200 ppm처럼 여러 농도에서 재요. 각 농도의 정확도는 95, 98, 98, 98.5 %이고, 평균하면 97.4 %예요.",
+    "이렇게 평균 정확도를 내거나, 농도마다 허용오차 안에 드는지 확인해요."
+  ],
+  sum: "정리하면: 정확도(accuracy) = (1 − |xm − xt|/xt) × 100 [%]이고, 실제 성능평가는 여러 농도(concentration)에서 정확도를 구해 평균 정확도(average accuracy)를 내거나 허용오차(tolerance) 이내인지 평가해요.",
+  table: {
+    tip: "오차(%)와 정확도(%) 두 열만 보세요. 정확도 = 100 − |오차|예요.",
+    html: "<table><tr><th>표준가스 (ppm)</th><th>측정값 (ppm)</th><th>오차 (%)</th><th>정확도 (%)</th></tr><tr><td>20</td><td>19</td><td>−5.0</td><td>95.0</td></tr><tr><td>50</td><td>51</td><td>+2.0</td><td>98.0</td></tr><tr><td>100</td><td>98</td><td>−2.0</td><td>98.0</td></tr><tr><td>200</td><td>203</td><td>+1.5</td><td>98.5</td></tr><tr><td colspan='3'><b>평균 정확도</b></td><td><b>97.4</b></td></tr></table>"
+  },
+  num: {
+    tip: "① 오차 → ② 정확도 → ③ 평균. 한 줄씩 계산기로 확인하세요.",
+    steps: [
+      "① 100 ppm CO, 97 ppm 측정: 오차 = (97 − 100)/100 × 100 = −3 %",
+      "② 정확도 = (1 − |−3|/100) × 100 = (1 − 0.03) × 100 = 97 %",
+      "③ 20 ppm, 19 ppm: (19 − 20)/20 × 100 = −5 % → 정확도 95 %",
+      "④ 평균 = (95 + 98 + 98 + 98.5) ÷ 4 = 389.5 ÷ 4 = 97.375 ≈ 97.4 %"
+    ]
+  },
+  review: {
+    logic: "한 농도: 오차율 → 정확도 / 여러 농도: 각각 정확도 → 평균 또는 허용오차 확인.",
+    mem: ["정확도 = (1 − |xm − xt|/xt) × 100", "여러 농도 → 평균 정확도"],
+    exam: "정확도는 (1 − |측정값 − 참값|/참값) × 100으로 구하며, 실제 성능평가에서는 여러 농도에서 각각 정확도를 계산해 평균 정확도를 구하거나 농도별 허용오차 이내인지 평가한다.",
+    blank: ["표 4줄을 빈칸으로 그려 오차·정확도를 직접 계산하고 평균 내기"]
+  },
+  quiz: [
+    {t:"mc", q:"200 ppm 표준가스에 194 ppm이 측정됐다. 오차와 정확도는?",
+     o:["−3 %, 97 %","+3 %, 97 %","−6 %, 94 %","−3 %, 103 %"],
+     e:"(194 − 200)/200 × 100 = −3 % → 정확도 = 100 − 3 = 97 %."},
+    {t:"mc", q:"네 농도의 정확도가 96, 98, 99, 99 %일 때 평균 정확도는?",
+     o:["98 %","97 %","99 %","98.5 %"],
+     e:"(96 + 98 + 99 + 99) ÷ 4 = 392 ÷ 4 = 98 %."}
+  ]
+},
+
+28: {
+  one: "10번과 같은 '센서의 특성' 요약 장으로, 이제부터 동특성(응답시간·주파수 특성)으로 넘어간다는 표시예요.",
+  talk: [
+    "예를 들어 교과서 단원이 바뀔 때 목차를 한 번 더 보여 주는 것과 같아요. 지금까지 배운 교정·감도·선형성·정확도가 정특성이었고, 지금부터는 시간에 따라 변하는 입력에 대한 동특성을 봐요.",
+    "히스테리시스는 정특성 목록에 있지만 슬라이드에는 따로 설명한 장이 없어요. 교재 1.3.7에 정의와 식 (y₂ − y₁)/FSO × 100 %FS가 있어요(10번 📖 교재 보충) [교재 p.21]."
+  ],
+  sum: "정리하면: 정특성(static characteristics)을 마치고 동특성(dynamic characteristics) — 응답시간(Response Time)·주파수 특성(Frequency Response)·장기 안정성(Long-term Stability) — 으로 넘어가요."
+},
+
+29: {
+  one: "응답시간은 입력이 바뀐 뒤 출력이 포화값(최종값)의 90 %에 도달하는 시간이고, 입력을 없앤 뒤 원래로 돌아오는 시간이 회복시간이에요.",
+  talk: [
+    "예를 들어 체온계를 겨드랑이에 꽂으면 숫자가 빠르게 오르다가 점점 천천히 오르며 최종값에 가까워지죠. 최종값에 '완전히' 닿는 순간은 애매하니까, 최종값의 90 %에 닿은 시간을 응답시간으로 약속해요.",
+    "왼쪽 그래프에서 t_on에 입력을 켜면 출력이 50 %(t₀.₅), 63 %(τ), 90 %(t_r) 순서로 올라가요. 이 강의는 90 % 지점(t_r)을 응답시간으로 정의해요.",
+    "오른쪽은 실제 가스 센서 데이터예요. 20 ppm(검은 선)은 응답시간 9 s, 회복시간 25 s, 0.5 ppm(빨간 선)은 응답시간 21 s, 회복시간 10 s예요.",
+    "회복시간은 가스를 뺀 뒤 출력이 원래(기준) 값 쪽으로 돌아오는 데 걸리는 시간이에요. 슬라이드에는 기준(%)이 없고, 교재는 비슷한 개념인 감쇠(하강)시간 t_d를 '출력이 포화값의 10 % 또는 37 %로 떨어지는 시간'으로 정의해요 [교재 p.23]. 10 %까지 떨어지면 변화의 90 %가 돌아온 셈이에요."
+  ],
+  sum: "정리하면: 응답시간(response time)은 포화값(saturation)의 90 %에 도달하는 시간(t_r)이고, 회복시간(recovery time)은 입력 제거 후 출력이 기준값으로 돌아오는 시간이에요.",
+  terms: {
+    tip: "\"켜고 90 % = 응답, 끄고 돌아옴 = 회복\" 두 쌍으로 외우세요.",
+    rows: [
+      ["Response time","응답시간","입력 인가 후 포화값의 90 %에 도달하는 시간"],
+      ["Recovery time","회복시간","입력 제거 후 기준값으로 돌아오는 시간"],
+      ["Saturation","포화","출력이 더 이상 변하지 않는 최종 상태"],
+      ["Time constant (τ)","시정수","63 % 도달 시간"]
+    ]
+  },
+  fig: {
+    key: "29",
+    tip: "1번(정의 그래프) → 2번·3번(20 ppm) → 4번·5번(0.5 ppm) 순서로 응답/회복 숫자를 짝지어 보세요.",
+    items: [
+      "응답 곡선: t_on에 입력 인가 → 50 %(t₀.₅) → 63 %(τ) → 90 %(t_r). t_r이 응답시간이에요.",
+      "20 ppm response time 9 s: 가스 투입 후 출력이 약 4.5 V 포화값의 90 %까지 오르는 데 9초.",
+      "20 ppm recovery time 25 s: 가스 제거 후 출력이 기준으로 돌아오는 데 25초.",
+      "0.5 ppm response time 21 s: 낮은 농도에서는 약 2.1 V까지 오르는 데 21초로 더 느려요.",
+      "0.5 ppm recovery time 10 s: 0.5 ppm은 회복이 10초로 더 빨라요."
+    ]
+  },
+  num: {
+    tip: "① 포화값 → ② 90 % 값 → ③ 그 값에 닿는 시간 읽기.",
+    steps: [
+      "① 20 ppm 포화 출력 ≈ 4.5 V, 기준 ≈ 0.4 V [추정: 그래프 읽기] → 변화량 ≈ 4.1 V",
+      "② 90 % 지점 = 0.4 + 0.9 × 4.1 = 0.4 + 3.69 ≈ 4.1 V",
+      "③ 출력이 약 4.1 V에 닿는 시간 − 가스 투입 시간 = 응답시간 9 s (그래프 표기)",
+      "④ [AI 보충] 1차 응답이면 t_r ≈ 2.3τ → 응답시간 9 s면 τ ≈ 9 ÷ 2.3 ≈ 3.9 s"
+    ]
+  },
+  review: {
+    logic: "출력은 점점 느려지며 최종값에 접근 → '완전히 도달' 대신 90 %를 기준으로 약속 → 입력 제거 후 돌아오는 시간은 회복시간.",
+    mem: ["응답시간 = 포화값 90 % 도달 시간 (t_r)", "그래프: 50 % t₀.₅ / 63 % τ / 90 % t_r", "회복시간 = 입력 제거 후 기준 복귀 시간"],
+    exam: "응답시간은 입력 인가 후 센서 출력이 포화값의 90 %에 도달하는 데 걸리는 시간이며, 회복시간은 입력 제거 후 출력이 원래 기준값으로 돌아오는 데 걸리는 시간이다.",
+    blank: ["응답 곡선을 그려 50·63·90 % 점을 찍고, 가스 on/off 계단 응답에 응답·회복시간 화살표 그리기"]
+  },
+  quiz: [
+    {t:"mc", q:"출력 기준 0 V, 포화 5 V인 센서에서 응답시간을 재려면 출력이 몇 V에 닿는 순간을 봐야 할까요?",
+     o:["4.5 V","3.15 V","2.5 V","5 V"],
+     e:"포화값의 90 % = 5 × 0.9 = 4.5 V. 3.15 V는 63 %(τ), 2.5 V는 50 %예요."},
+    {t:"mc", q:"오른쪽 그래프에서 20 ppm과 0.5 ppm의 응답시간을 비교하면?",
+     o:["20 ppm 9 s가 0.5 ppm 21 s보다 빠르다","0.5 ppm이 더 빠르다","둘 다 9 s다","응답시간은 농도와 관계없다"],
+     e:"그래프 표기: 20 ppm 9 s, 0.5 ppm 21 s. 이 센서에서는 농도에 따라 응답시간이 달라요."},
+    {t:"sa", q:"응답시간을 '최종값에 도달한 시간'이 아니라 '90 %에 도달한 시간'으로 정의하는 이유를 설명해 보세요.",
+     m:"센서 출력은 최종값에 가까워질수록 점점 천천히 변해 정확히 언제 최종값에 닿았는지 정하기 어렵고(이론적으로는 매우 오래 걸림), 잡음 때문에 판단도 흔들린다. 90 %처럼 기준을 정해 두면 측정 시점이 명확해지고 센서끼리 공정하게 비교할 수 있다.",
+     p:["최종값 근처에서 변화가 매우 느림","도달 시점이 애매함","명확·공정한 비교 기준"]}
+  ]
+},
+
+30: {
+  one: "같은 센서도 구동 주파수에 따라 출력 변화량이 달라지므로, 절대 변화량이 아니라 초기값 대비 상대 변화량 Δf/f₀ × 100 (%)으로 비교해야 해요.",
+  talk: [
+    "예를 들어 월급 100만 원인 사람이 10만 원 오른 것과 월급 1000만 원인 사람이 10만 원 오른 것은 의미가 다르죠. 앞은 10 %, 뒤는 1 %예요. 그래서 '몇 % 변했나'로 비교해요.",
+    "왼쪽 그래프는 같은 센서를 380, 445, 475 MHz로 구동하며 온도를 올렸을 때의 주파수 변화 Δf(MHz)예요. 475 MHz가 가장 크게 변해 보여요.",
+    "하지만 원래 주파수(f₀)가 높으면 변화량도 커지는 게 당연해요. 그래서 높은 주파수에서 변화가 크다고 무조건 좋은 센서라고 할 수 없어요.",
+    "오른쪽처럼 Δf/f₀ (%)로 바꾸면 세 채널이 거의 겹쳐요. 즉 상대적으로는 비슷한 성능이에요.",
+    "왼쪽 아래 'A/cm², C/cm²'도 같은 이유예요. 전류(A)나 전하(C)를 면적으로 나눠 크기가 다른 소자끼리 공정하게 비교해요."
+  ],
+  sum: "정리하면: 주파수 특성(frequency response)에서 출력은 구동 주파수(operating frequency)에 따라 달라지므로, 상대 변화량(relative change) Δf/f₀ × 100 %로 정규화(normalization)해 서로 다른 센서·조건을 공정하게 비교해요.",
+  terms: {
+    tip: "\"Δf는 변화, f₀는 처음 값, 나누면 %\" — 정규화 = 기준으로 나누기라고 기억하세요.",
+    rows: [
+      ["Operating frequency","구동 주파수","센서를 동작시키는 신호의 주파수"],
+      ["Δf","주파수 변화량","f − f₀"],
+      ["f₀","초기 주파수","변화 전 기준 주파수"],
+      ["Relative change","상대 변화량","초기값 대비 변화 비율 (%)"],
+      ["Normalization","정규화","기준값으로 나눠 크기 차이를 없애는 것 [AI 보충]"]
+    ]
+  },
+  fig: {
+    key: "30",
+    tip: "1번(절대 변화량) → 2번(상대 변화량)으로 넘어가며 세 선이 어떻게 모이는지 보고, 3번 메모를 읽으세요.",
+    items: [
+      "왼쪽: 가로축 온도(℃), 세로축 ΔFrequency(MHz). 475 MHz(파랑) > 445 MHz(빨강) > 380 MHz(검정) 순으로 크게 변해요.",
+      "오른쪽: 세로축 Δf/f₀ (%). 세 선이 거의 겹쳐요 — 상대적으로는 비슷한 감도예요. [원본 확인] 왼쪽은 +로 증가, 오른쪽은 −로 감소하고 온도축 범위(0~75 ℃ vs 25~100 ℃)도 달라요. 같은 데이터를 변환한 것인지는 확인 어려워요 [추정]. 시험에서는 '상대 변화량으로 비교한다'는 핵심만 따르세요.",
+      "A/cm², C/cm² 등도 동일한 이유: 면적으로 나눠(단위 면적당) 크기가 다른 소자를 공정하게 비교해요."
+    ]
+  },
+  num: {
+    tip: "① Δf → ② ÷ f₀ → ③ × 100 %. 단위 MHz끼리 지워져요.",
+    steps: [
+      "① [그래프 읽기·추정] 475 MHz 채널 Δf ≈ 2.4 MHz, 380 MHz 채널 Δf ≈ 1.4 MHz",
+      "② 상대 변화 = 2.4 ÷ 475 × 100 ≈ 0.51 %,  1.4 ÷ 380 × 100 ≈ 0.37 %",
+      "③ 절대값 차이는 2.4 ÷ 1.4 ≈ 1.7배지만, 상대값 차이는 0.51 ÷ 0.37 ≈ 1.4배로 줄어요",
+      "④ 단위: 1 MHz = 10⁶ Hz → MHz ÷ MHz = 단위 없음 → ×100으로 %"
+    ]
+  },
+  review: {
+    logic: "기준값(f₀)이 크면 변화량도 커 보임 → 절대값 비교는 불공정 → 기준으로 나눈 상대 변화량(%)으로 비교.",
+    mem: ["상대 변화량 = Δf/f₀ × 100 %", "높은 주파수에서 변화가 크다고 무조건 좋은 센서 아님", "A/cm², C/cm²도 같은 이유(정규화)"],
+    exam: "센서 출력은 구동 주파수에 따라 달라지므로 절대 변화량만 비교하면 안 되고, 초기값 대비 상대 변화량(Δf/f₀ × 100 %)으로 비교해야 서로 다른 센서나 측정 조건에서도 성능을 공정하게 비교할 수 있다.",
+    blank: ["왼쪽(벌어진 세 선)과 오른쪽(겹친 세 선) 그래프를 그리고 Δf/f₀ × 100 % 식 쓰기"]
+  },
+  quiz: [
+    {t:"mc", q:"센서 A는 100 MHz에서 1 MHz, 센서 B는 1000 MHz에서 5 MHz 변했다. 상대 변화량이 더 큰 것은?",
+     o:["A (1 %)","B (0.5 %)","같다","비교할 수 없다"],
+     e:"A: 1/100 × 100 = 1 %, B: 5/1000 × 100 = 0.5 %. 절대값은 B가 크지만 상대값은 A가 커요."},
+    {t:"sa", q:"주파수 특성 비교에서 절대 변화량 대신 상대 변화량(%)을 쓰는 이유를 설명해 보세요.",
+     m:"구동 주파수(초기값 f₀)가 높으면 같은 물리적 변화에도 Δf가 크게 나와 절대값만 보면 높은 주파수 센서가 좋아 보인다. 초기값으로 나눈 Δf/f₀ × 100 %로 비교해야 서로 다른 센서나 측정 조건에서도 성능을 공정하게 비교할 수 있다.",
+     p:["초기값이 크면 Δf도 커짐","절대값 비교는 불공정","Δf/f₀ × 100 %로 정규화"]}
+  ]
+},
+
+31: {
+  one: "신호원에서 부하로 전력을 최대로 보내려면 부하 저항 R_L을 신호원 내부저항 R_S와 같게 맞춰야(임피던스 매칭) 해요.",
+  talk: [
+    "예를 들어 수도관(신호원)에 호스(부하)를 연결해 물을 뿜는다고 해 볼게요. 호스가 너무 굵으면 물살이 약하고, 너무 가늘면 물이 잘 안 나와요. 가장 센 힘(전력)은 그 중간, 딱 맞는 굵기에서 나와요.",
+    "회로에서 V_S는 신호원 전압, R_S는 신호원 안에 숨어 있는 내부저항, R_L은 전력을 받는 부하예요. 전류 I = V/(R_S + R_L)이 흐르고, 부하가 받는 전력은 P_L = I²R_L이에요.",
+    "R_L이 0이면 전류는 크지만 R_L에 걸리는 전압이 0이라 전력이 0이고, R_L이 아주 크면 전류가 거의 0이라 또 전력이 작아요. 그 사이에 최대가 있어요.",
+    "오른쪽 그래프의 빨간 선(P_L/P_max)이 R_L/R_S = 1, 즉 R_L = R_S에서 최대(1.0)예요. 파란 선 η(에타)는 효율인데, 매칭 지점에서는 0.5(50 %)예요 [AI 보충: η = R_L/(R_S + R_L)].",
+    "비유의 한계: 물 비유는 직관용이고, 실제로는 전압·전류·저항의 관계(옴의 법칙)로 계산돼요."
+  ],
+  sum: "정리하면: 최대 전력 전달(maximum power transfer)을 위해 임피던스 매칭(impedance matching)이 필요하고, 저항 회로에서는 부하저항 R_L = 신호원 저항 R_S일 때 P_L = I²R_L = V²R_L/(R_S + R_L)²이 최대예요.",
+  terms: {
+    tip: "\"S = Source(보내는 쪽), L = Load(받는 쪽)\" — 매칭은 L을 S에 맞추는 것이에요.",
+    rows: [
+      ["Impedance matching","임피던스 매칭","부하 임피던스를 신호원에 맞춰 전력 전달을 최대로 하는 것"],
+      ["Source resistance (R_S)","신호원(내부) 저항","보내는 쪽 안에 있는 저항"],
+      ["Load resistance (R_L)","부하 저항","전력을 받는 쪽 저항"],
+      ["Efficiency (η)","효율","공급 전력 중 부하가 받는 비율 [AI 보충]"]
+    ]
+  },
+  fig: {
+    key: "31",
+    tip: "1번(전원) → 2번(내부저항) → 3번(부하) 회로를 먼저 보고, 4번 그래프에서 x = 1의 빨간 선 꼭대기를 확인하세요.",
+    items: [
+      "V_S: 신호원 전압(+, −).",
+      "R_S와 전류 I: 신호원 내부저항을 지나 전류 I가 흘러요.",
+      "R_L과 V_L: 부하 저항과 그 양 끝 전압. 이 부하가 받는 전력이 P_L이에요.",
+      "그래프: 가로축 R_L/R_S, 빨간 선 P_L/P_max는 1에서 최대(1.0), 파란 선 η(효율)는 1에서 0.5이고 R_L이 커질수록 1에 가까워져요."
+    ]
+  },
+  num: {
+    tip: "① 전류 → ② 전력 → ③ R_L을 바꿔 비교. '말 = 식 = 숫자(단위)'로.",
+    steps: [
+      "[AI 보충·가정] V = 10 V, R_S = 50 Ω",
+      "① R_L = 50 Ω: I = 10 ÷ (50 + 50) = 0.1 A → P_L = 0.1² × 50 = 0.5 W",
+      "② R_L = 25 Ω: I = 10 ÷ 75 ≈ 0.133 A → P_L = 0.133² × 25 ≈ 0.44 W",
+      "③ R_L = 100 Ω: I = 10 ÷ 150 ≈ 0.0667 A → P_L = 0.0667² × 100 ≈ 0.44 W → R_L = R_S(50 Ω)일 때 최대"
+    ]
+  },
+  review: {
+    logic: "R_L이 너무 작으면 전압이, 너무 크면 전류가 작음 → 곱(전력)은 중간에서 최대 → R_L = R_S.",
+    mem: ["P_L = I²R_L = (V/(R_S + R_L))²R_L", "최대 전력: R_L = R_S (임피던스 매칭)"],
+    exam: "부하에 전달되는 전력 P_L = V²R_L/(R_S + R_L)²은 부하저항 R_L이 신호원 저항 R_S와 같을 때 최대가 되며, 이를 위해 임피던스 매칭이 필요하다.",
+    blank: ["V_S–R_S–R_L 회로를 그리고 P_L 식과 R_L/R_S 그래프(1에서 최대)를 그리기"]
+  },
+  quiz: [
+    {t:"mc", q:"내부저항 R_S = 8 Ω인 앰프에 스피커를 연결한다. 전력을 최대로 받으려면 스피커 저항은?",
+     o:["8 Ω","4 Ω","16 Ω","0 Ω"],
+     e:"최대 전력 전달 조건 R_L = R_S = 8 Ω."},
+    {t:"mc", q:"V = 10 V, R_S = 50 Ω, R_L = 50 Ω일 때 부하 전력 P_L은?",
+     o:["0.5 W","1 W","2 W","0.1 W"],
+     e:"I = 10/100 = 0.1 A → P_L = 0.1² × 50 = 0.01 × 50 = 0.5 W."},
+    {t:"sa", q:"R_L이 아주 작을 때와 아주 클 때 모두 부하 전력이 작아지는 이유를 설명해 보세요.",
+     m:"P_L = I²R_L에서 R_L이 아주 작으면 전류는 커도 R_L에 걸리는 전압과 R_L 자체가 작아 전력이 0에 가깝고, R_L이 아주 크면 전류 I = V/(R_S + R_L)가 0에 가까워져 전력이 작아진다. 그래서 그 사이(R_L = R_S)에서 최대가 된다.",
+     p:["R_L 작음 → 부하 전압·전력 작음","R_L 큼 → 전류 작음","중간 R_L = R_S에서 최대"]}
+  ]
+},
+
+32: {
+  one: "P_L 식을 R_L로 미분해 0으로 놓으면 R_S²/R_L² = 1 → R_L = R_S가 나오고, 이것이 임피던스 매칭(최대 전력 전달) 조건이에요.",
+  talk: [
+    "예를 들어 언덕 꼭대기에서는 오르막도 내리막도 아닌 평평한 곳이죠. 기울기 = 0인 곳이 꼭대기예요. 전력 P_L의 꼭대기도 같은 방법으로 찾아요.",
+    "P_L = V²/(R_S²/R_L + 2R_S + R_L)로 바꿔 쓰면 분자 V²는 고정이니까 분모가 가장 작을 때 P_L이 가장 커요.",
+    "분모를 R_L로 미분하면 −R_S²/R_L² + 1이에요. 이게 0이 되려면 R_S²/R_L² = 1, 즉 R_L = ±R_S예요. 저항은 양수니까 R_L = R_S예요.",
+    "오른쪽 상자는 고주파 회로에서의 목표예요. 부하가 Z_L = R_e + jX(실수부 + 허수부)일 때, 매칭 회로를 붙여 기준 포트에서 보이는 임피던스를 Z_in = 50 + j0 Ω, 즉 허수부가 없는 50 Ω으로 만들어요.",
+    "j는 허수 단위로, 임피던스의 허수부(리액턴스)는 코일·커패시터 때문에 생기는 '교류에서만 나타나는 저항 같은 성분'이에요 [AI 보충]."
+  ],
+  sum: "정리하면: d/dR_L(R_S²/R_L + 2R_S + R_L) = −R_S²/R_L² + 1 = 0에서 R_S = R_L이 임피던스 매칭(impedance matching), 최대 전력 전달(maximum power transfer) 조건이고, 고주파에서는 Z_in = 50 + j0 Ω처럼 허수부(imaginary part)를 없애는 것이 목표예요.",
+  terms: {
+    tip: "\"분모 최소 → 미분 0 → R_L = R_S\" 세 단계, 그리고 Z = 실수부 + j허수부를 기억하세요.",
+    rows: [
+      ["Derivative (d/dR_L)","미분","R_L이 조금 변할 때 식이 얼마나 변하는지(기울기)"],
+      ["Impedance (Z)","임피던스","교류 회로의 '저항' = R + jX"],
+      ["Reactance (X)","리액턴스","임피던스의 허수부 (코일·커패시터) [AI 보충]"],
+      ["j","허수 단위","j² = −1 (전기공학에서 i 대신 j)"]
+    ]
+  },
+  fig: {
+    key: "32",
+    tip: "식을 1번 → 2번 → 3번 순서로 따라가고, 4번 상자로 고주파 버전을 확인하세요.",
+    items: [
+      "P_L = I²R_L = (V/(R_S + R_L))²R_L = V²/(R_S²/R_L + 2R_S + R_L): 분자와 분모를 R_L로 나눠 '분모가 작을수록 P_L이 크다'는 꼴로 만들었어요.",
+      "d/dR_L(R_S²/R_L + 2R_S + R_L) = −R_S²/R_L² + 1: 분모를 R_L로 미분한 결과예요. 이게 0인 곳이 최소예요.",
+      "R_S = R_L (빨간 상자): 미분 = 0에서 R_S²/R_L² = 1 → R_L = ±R_S → 둘 다 양수이므로 R_S = R_L. 임피던스 매칭, maximum power transfer.",
+      "부하 Z_L = R_e + jX일 때 매칭 후 기준 포트에서 보이는 임피던스를 Z_in = 50 + j0 Ω로 만드는 것이 목표 — 허수부 0, 실수부 50 Ω."
+    ]
+  },
+  num: {
+    tip: "① 분모 식 → ② 미분 → ③ 0으로 놓고 풀기. 미분 규칙은 아래 한 줄만 쓰면 돼요.",
+    steps: [
+      "[AI 보충] 미분 규칙: d/dx(c/x) = −c/x²,  d/dx(x) = 1,  d/dx(상수) = 0",
+      "① 분모 D = R_S²/R_L + 2R_S + R_L",
+      "② dD/dR_L = −R_S²/R_L² + 0 + 1",
+      "③ = 0 → R_S²/R_L² = 1 → R_L² = R_S² → R_L = R_S (양수)",
+      "④ 확인: R_S = 50 Ω이면 D(50) = 50 + 100 + 50 = 200, D(25) = 100 + 100 + 25 = 225, D(100) = 25 + 100 + 100 = 225 → 50 Ω에서 분모 최소"
+    ]
+  },
+  review: {
+    logic: "P_L = V²/분모 → 분모 최소일 때 P_L 최대 → 분모를 R_L로 미분해 0 → R_L = R_S.",
+    mem: ["d/dR_L(R_S²/R_L + 2R_S + R_L) = −R_S²/R_L² + 1 = 0", "→ R_S = R_L", "고주파 목표: Z_in = 50 + j0 Ω"],
+    exam: "P_L = V²/(R_S²/R_L + 2R_S + R_L)에서 분모를 R_L로 미분해 0으로 놓으면 R_S²/R_L² = 1이 되어 R_L = R_S일 때 부하 전력이 최대가 되며, 이를 임피던스 매칭(최대 전력 전달)이라 한다.",
+    blank: ["P_L 식 → 분모 → 미분 → R_S = R_L까지 4줄을 보지 않고 유도하기"]
+  },
+  quiz: [
+    {t:"mc", q:"P_L = V²/(R_S²/R_L + 2R_S + R_L)에서 P_L이 최대가 되는 조건을 찾는 방법은?",
+     o:["분모를 R_L로 미분해 0이 되는 R_L을 찾는다","분자를 0으로 만든다","R_L을 무한대로 만든다","R_S를 0으로 만든다"],
+     e:"분자 V²는 고정이니 분모가 최소일 때 P_L이 최대예요. 최소는 미분 = 0인 곳이에요."},
+    {t:"mc", q:"매칭 목표 Z_in = 50 + j0 Ω의 의미로 맞는 것은?",
+     o:["실수부 50 Ω, 허수부(리액턴스) 0","실수부 0, 허수부 50 Ω","50 Ω에서 j만큼 뺀 값","전력이 50 W"],
+     e:"Z = 실수부 + j허수부. j0이므로 허수부가 없는 순수한 50 Ω처럼 보이게 만드는 것이 목표예요."},
+    {t:"sa", q:"R_L = R_S가 최대 전력 전달 조건임을 미분을 이용해 유도해 보세요.",
+     m:"P_L = I²R_L = V²R_L/(R_S + R_L)² = V²/(R_S²/R_L + 2R_S + R_L). 분자가 일정하므로 분모 D가 최소일 때 P_L이 최대다. dD/dR_L = −R_S²/R_L² + 1 = 0 → R_S²/R_L² = 1 → R_L = ±R_S이고 저항은 양수이므로 R_L = R_S.",
+     p:["P_L을 분모 형태로 변형","분모 최소 = P_L 최대","dD/dR_L = −R_S²/R_L² + 1 = 0","R_L = R_S (양수 조건)"]}
+  ]
+},
+
+33: {
+  one: "Z_L = 50 + j20 Ω의 허수부 +j20을 없애려면 −j20 Ω에 해당하는 커패시터(1 GHz에서 약 7.96 pF)를 직렬로 연결해요.",
+  talk: [
+    "예를 들어 저울에 20 g이 더 올라가 있으면 −20 g을 빼 주면 0이 되죠. 임피던스도 같아요. 부하 50 + j20 Ω의 +j20 부분만 −j20으로 상쇄하면 50 Ω만 남아요.",
+    "허수부가 +면 코일 성질, −면 커패시터 성질이에요 [AI 보충]. 그래서 −j20 Ω을 만드는 커패시터를 부하와 직렬로 연결해요. 직렬이면 임피던스가 그냥 더해져요: (50 + j20) + (−j20) = 50 Ω.",
+    "커패시터의 임피던스는 1/(jωC) = −j·1/(ωC)예요. ω(오메가) = 2πf로, 주파수 f = 1 GHz일 때 ω ≈ 6.28 × 10⁹ rad/s예요.",
+    "1/(ωC) = 20이 되어야 하니 ωC = 0.05, C = 0.05/(2πf) = 0.05 ÷ (6.28 × 10⁹) ≈ 7.96 × 10⁻¹² F = 7.96 pF예요.",
+    "신호원 R_S = 50 Ω과 부하 실수부 50 Ω이 같아지니 31·32번의 R_S = R_L 조건도 만족해요."
+  ],
+  sum: "정리하면: 최대 전력 전달(maximum power transfer)을 위해 부하 임피던스 Z_L = 50 + j20 Ω의 허수부(imaginary part)를 −j20 Ω 직렬 커패시터(series capacitor, C = 1/(ωX) ≈ 7.96 pF @ 1 GHz)로 제거해 Z = 50 Ω으로 매칭(matching)해요.",
+  terms: {
+    tip: "\"+j = 코일, −j = 커패시터, 직렬이면 더하기\" 세 개만 묶어 외우세요 [AI 보충].",
+    rows: [
+      ["Matching element","매칭 소자","임피던스를 맞추려고 덧붙이는 소자"],
+      ["Capacitor (C)","커패시터","임피던스 1/(jωC) = −j/(ωC), 허수부가 음수"],
+      ["Series connection","직렬 연결","한 줄로 이어 임피던스가 그대로 더해지는 연결"],
+      ["ω (omega)","각주파수","ω = 2πf (rad/s)"]
+    ]
+  },
+  fig: {
+    key: "33",
+    tip: "1번(커패시터 값 계산) → 2번(회로에서 매칭 소자 위치) → 3번(결과 확인) 순서예요.",
+    items: [
+      "손계산: −j20 = 1/(jωC) = −j·1/(ωC) → 1/(ωC) = 20 → ωC = 0.05 → C = 0.05/(2πf) = 7.96 × 10⁻¹² F.",
+      "회로: 1 GHz 신호원과 R_S = 50 Ω 뒤, 부하 Z_L 앞의 점선 상자 자리에 매칭 소자(직렬 커패시터)를 넣어요.",
+      "결과: Z_L + Z_C = (50 + j20) + (−j20) = 50 Ω → 허수 성분 제거. 따라서 직렬 커패시터를 연결하면 돼요."
+    ]
+  },
+  num: {
+    tip: "① ω 구하기 → ② ωC = 1/20 → ③ C = 0.05/ω → ④ pF로 바꾸기. 지수 계산을 특히 조심하세요.",
+    steps: [
+      "① ω = 2πf = 2 × 3.1416 × 1 × 10⁹ = 6.2832 × 10⁹ rad/s  (1 GHz = 10⁹ Hz)",
+      "② 1/(ωC) = 20 Ω → ωC = 1/20 = 0.05",
+      "③ C = 0.05 ÷ (6.2832 × 10⁹) = 0.007958 × 10⁻⁹ = 7.96 × 10⁻¹² F",
+      "④ 10⁻¹² F = 1 pF → C ≈ 7.96 pF",
+      "⑤ 검산: 1/(ωC) = 1 ÷ (6.2832 × 10⁹ × 7.96 × 10⁻¹²) = 1 ÷ 0.0500 = 20 Ω ✓"
+    ]
+  },
+  review: {
+    logic: "허수부 +j20 존재 → 반대 부호 −j20을 직렬로 더해 상쇄 → −j는 커패시터 → C = 1/(ωX)로 값 계산.",
+    mem: ["Z_C = 1/(jωC) = −j/(ωC)", "C = 1/(2πf·X), 1 GHz·20 Ω → 7.96 pF", "직렬 연결 → 임피던스 덧셈"],
+    exam: "Z_L = 50 + j20 Ω의 허수부를 제거하려면 −j20 Ω의 리액턴스를 갖는 커패시터를 직렬로 연결하며, 1/(ωC) = 20에서 C = 0.05/(2π × 10⁹) ≈ 7.96 pF이다. 그러면 Z = 50 Ω이 되어 최대 전력 전달 조건을 만족한다.",
+    blank: ["회로를 그리고 (50 + j20) + (−j20) = 50, C 계산 ①~④를 보지 않고 쓰기"]
+  },
+  quiz: [
+    {t:"mc", q:"Z_L = 50 + j30 Ω의 허수부를 제거하려면 어떤 소자를 직렬로 연결해야 할까요?",
+     o:["−j30 Ω의 커패시터","+j30 Ω의 코일","30 Ω 저항","−j50 Ω의 커패시터"],
+     e:"+j30을 상쇄하려면 −j30이 필요하고, 허수부가 음수인 소자는 커패시터예요."},
+    {t:"mc", q:"f = 1 GHz에서 리액턴스 10 Ω(−j10)을 만드는 커패시터 값은?",
+     o:["약 15.9 pF","약 7.96 pF","약 3.98 pF","약 159 pF"],
+     e:"C = 1/(ωX) = 1 ÷ (6.283 × 10⁹ × 10) = 1.59 × 10⁻¹¹ F = 15.9 pF. X가 절반이면 C는 2배예요."},
+    {t:"sa", q:"이 예제에서 왜 '직렬 커패시터'를 쓰는지, 그 값이 어떻게 정해지는지 설명해 보세요.",
+     m:"부하 Z_L = 50 + j20 Ω의 허수부 +j20을 없애려면 −j20을 더해야 한다. 직렬 연결이면 임피던스가 더해지고, 커패시터의 임피던스는 −j/(ωC)로 허수부가 음수이므로 적합하다. 1/(ωC) = 20에서 C = 1/(2πf × 20) = 0.05/(2π × 10⁹) ≈ 7.96 pF이다.",
+     p:["허수부 상쇄(−j20)","직렬 → 덧셈","커패시터 = 음의 허수부","C ≈ 7.96 pF 계산"]}
+  ]
+}
+
+});
+
+/* Week 1 — 교재(『센서공학입문』 제1장 센서의 기초, pp.11–30) 보충 */
+(function(){
+const S = window.NOTE.slides;
+const add = (n, book, quiz) => { S[n].book = book; if (quiz) S[n].quiz = (S[n].quiz||[]).concat(quiz); };
+
+add(2, { pages:"pp.30–31 (1.5)", items:[
+ {h:"1.5 센서화 시대 (p.30)", b:"<p>센서와 통신 기술을 바탕으로 한 사물인터넷(IoT)이 스마트 홈·스마트 자동차를 가능하게 하고, 스마트 공장에서는 모든 기계가 생산라인을 효율적으로 운영하도록 정보를 제공해요. 지역별로 흩어진 사물인터넷을 하나로 이어 전 세계 사물을 하나의 대형 IoT로 묶으려는 시도도 진행 중이에요.</p><p class='cap'>슬라이드의 'Physical AI·초연결'과 같은 흐름을 교재는 '센서화(sensorization)'로 표현해요. 1장 첫 그림도 Sensorization 가운데에 IoT·Mobile·Wearable·Health care를 놓고 있어요.</p>"},
+ {h:"그림 1.15 사물 인터넷의 아키텍처 (p.31)", b:"<div class='flow'><span class='hl'>센서를 장착한 사물<br><small>에너지·산업·헬스케어·교통·국방·스마트 홈·스마트 카·웨어러블</small></span>→<span>유선 / 무선</span>→<span>네트워킹<br><small>게이트웨이·라우터, 모바일</small></span>→<span>통신 서비스</span>→<span class='hl'>데이터 센터·클라우드<br><small>서버 저장, 데이터 분석</small></span></div><ul><li>센서 기술의 발전 없이는 사물 인터넷이나 스마트 시스템을 실현할 수 없어요. IoT에서는 <b>센서와 액추에이터가 내장된 사물</b>이 유무선 네트워크로 서로 연결돼요.</li><li>모바일·가전 센서, 스마트 카, 웨어러블 센서 분야가 크게 성장할 것으로 보고, 4차 산업에서도 센서 기술이 핵심 역할을 한다고 해요.</li><li>센서화(sensorlization) 시대에는 분야별 요구(needs)에 맞는 최적의 센서를 개발하는 것이 센서 연구자·기술자의 의무라고 맺어요.</li></ul><p>[현업] 공장에 대입하면: 설비 센서 → PLC·게이트웨이 → 사내 네트워크 → SCADA·MES·Historian 서버 → 데이터 분석·AI. 슬라이드 2번의 '상황 인식 → 판단 지원 → 피드백' 중 '판단'이 데이터 센터·클라우드 쪽에서 일어나요.</p><p class='cap'>[원본 확인] 교재 본문은 'sensorlization'으로 적혀 있어요. 일반적인 철자는 sensorization이에요(1장 첫 그림도 Sensorization).</p>"}
+]},[
+ {t:"mc", q:"[교재 p.31] 그림 1.15에서 센서 데이터가 마지막으로 모여 저장·분석되는 곳은?",
+  o:["데이터 센터/클라우드","게이트웨이/라우터","센서를 장착한 사물","통신 서비스"],
+  e:"사물 → 유·무선 → 네트워킹(게이트웨이·라우터·모바일) → 통신 서비스 → 데이터 센터·클라우드(서버 저장, 데이터 분석) 순서예요."}
+]);
+
+add(3, { pages:"p.31 (1.5)", items:[
+ {h:"'1조'의 단위가 달라요 (p.31)", b:"<ul><li>교재: 시장 조사 전문가들은 <b>네트워크된 센서가 2020년까지 1조 '달러'</b>가 될 것으로 예측했다고 해요 — <b>시장 규모(금액)</b>예요.</li><li>슬라이드 3번: <b>Trillion Sensor = 센서 수요 1조(10¹²) '개'</b> — <b>개수</b>예요.</li></ul><div class='warnbox'>[원본 확인] 같은 '1조'라도 교재는 금액(달러), 슬라이드는 개수(개)예요. 교재 예측은 2020년 기준의 오래된 전망이에요. 시험에서는 슬라이드 표현(1조 개, 10¹²)을 따르세요.</div>"}
+]},[
+ {t:"mc", q:"[교재 p.31·슬라이드 3] 슬라이드의 'Trillion Sensor(10¹²)'가 가리키는 것은?",
+  o:["센서 수요 개수 1조 개","센서 시장 1조 달러","센서 시장 1조 원","센서 종류 1조 가지"],
+  e:"슬라이드는 개수(10¹²개)예요. 교재의 '2020년까지 1조 달러'는 네트워크 센서 시장 '금액' 전망이라 단위가 달라요."}
+]);
+
+add(6, { pages:"p.12, p.22 (1.1·1.3.8)", items:[
+ {h:"1.3.8 선택성 (p.22)", b:"<ul><li>센서는 원하는 물리현상만 검출하고 다른 현상의 영향은 받지 않아야 해요. 그래서 <b>선택성은 다른 모든 특성보다 우선</b>하고, 선택성이 없는 센서는 센서라고 할 수 없다고 해요.</li><li>대부분 센서는 온도·습도의 영향을 받으므로 ① 센서 구조를 바꾸거나 ② 전자회로로 보상해 그 영향을 없애요.</li><li>습도·가스 센서처럼 특정 화학물질을 첨가해 선택성을 만들기도 해요.</li></ul>"},
+ {h:"선택성을 만드는 방법 (p.12)", b:"<p>보통 센서 재료의 특성, 구조, 신호처리 방법 중 <b>2개 이상을 조합</b>해 선택성을 만들어요. 바이오센서는 원리상 화학센서의 일종이지만, 생체의 뛰어난 식별 능력으로 화학센서의 낮은 선택성을 보완한 센서예요.</p>"}
+]},[
+ {t:"mc", q:"[교재 p.22] 교재가 '다른 모든 특성에 우선한다'고 한 센서 특성은?",
+  o:["선택성","감도","응답시간","분해능"],
+  e:"원하는 현상만 골라 재지 못하면 감도가 아무리 커도 엉뚱한 것을 재게 되니, 선택성이 가장 먼저예요."}
+]);
+
+add(8, { pages:"pp.11–13 (1.1)", items:[
+ {h:"센서 기술과 원리별 분류 (p.12)", b:"<ul><li>측정대상에서 정보를 뽑아내는 데 관련된 소프트웨어·하드웨어 기술을 <b>센서 기술(sensor technology)</b>이라 해요.</li><li>변환 원리로 나누면 물리효과를 쓰는 <b>물리센서</b>, 화학효과를 쓰는 <b>화학센서</b>, 생체의 인식 능력을 쓰는 <b>바이오센서(biosensor)</b>가 있어요.</li><li>정보를 전기신호로 바꾸는 이유: <b>증폭, 귀환(feedback), 필터링(filtering), 미분, 저장</b> 같은 신호처리가 간단하고, <b>멀리 떨어진 곳까지 전송</b>할 수 있기 때문이에요.</li></ul>"},
+ {h:"표 1.1 입력 에너지 6가지와 사람의 오감 (p.13)", b:"<table><tr><th>에너지 형태</th><th>센서가 이용하는 특성 예</th><th>대응하는 오감</th></tr><tr><td>역학적 (mechanical)</td><td>위치, 속도, 가속도, 힘, 토크, 압력, 변형, 유량, 질량, 밀도, 모멘트, 변위, 형상, 방위, 점도</td><td>청각, 촉각</td></tr><tr><td>복사 (radiant)</td><td>복사강도, 에너지, 파장, 진폭, 위상, 투과율, 편광</td><td>시각, 촉각</td></tr><tr><td>열 (thermal)</td><td>열, 온도, 열속(flux)</td><td>촉각</td></tr><tr><td>자기 (magnetic)</td><td>자계세기, 자기 모멘트, 투자율, 자속밀도</td><td>—</td></tr><tr><td>화학 (chemical)</td><td>농도, 반응율, 산화환원전위, 생물학적 특성</td><td>후각, 미각</td></tr><tr><td>전기 (electrical)</td><td>전압, 전류, 저항, 정전용량, 주파수</td><td>—</td></tr></table><p class='cap'>비전기적 에너지 5개 중 4개(역학·복사·열·화학)는 오감과 짝지을 수 있어요. 냄새·맛은 사람마다 차이가 있어 화학센서는 절대량 검출이 매우 어렵다고 해요. 슬라이드 그림의 '광'은 교재의 '복사(radiant)'에 해당해요.</p>"},
+ {h:"트랜스듀서 vs 센서 vs 액추에이터 (p.13, 그림 1.2)", b:"<div class='flow'><span>입력신호</span>→<span class='hl'>입력 트랜스듀서<br><small>= 센서</small></span>→<span>신호처리기</span>→<span class='hl'>출력 트랜스듀서<br><small>= 액추에이터</small></span>→<span>출력신호</span></div><p>트랜스듀서는 한 에너지 형태를 다른 형태로 바꾸는 소자를 통틀어 부르는 말이에요. 비전기량을 전기신호로 바꾸는 입력 쪽이 <b>센서</b>, 전기신호를 다른 에너지로 바꾸는 출력 쪽이 <b>액추에이터(actuator)</b>예요. 둘의 차이는 '출력이 전기신호인가'로 정해지지만, 실제로는 두 용어를 같은 뜻으로 자주 써요.</p>"}
+]},[
+ {t:"mc", q:"[교재 p.13] 표 1.1에서 사람의 오감에 대응하는 감각이 '없는' 에너지 형태 두 가지는?",
+  o:["자기 에너지, 전기 에너지","열 에너지, 화학 에너지","복사 에너지, 역학 에너지","역학 에너지, 자기 에너지"],
+  e:"사람은 자기장이나 전압을 직접 느끼는 감각이 없어요. 그래서 자기센서·전기 측정이 특히 필요해요."},
+ {t:"mc", q:"[교재 p.13] 그림 1.2의 계측 시스템에서 전기신호를 받아 모터를 돌리는 출력 쪽 트랜스듀서를 무엇이라 부르나요?",
+  o:["액추에이터","센서","신호처리기","트랜스미터"],
+  e:"입력 트랜스듀서 = 센서(비전기 → 전기), 출력 트랜스듀서 = 액추에이터(전기 → 다른 에너지)예요."}
+]);
+
+add(9, { pages:"pp.14–15 (1.2)", items:[
+ {h:"센서 시스템과 신호조정 (p.14)", b:"<ul><li>센서는 혼자 동작하지 않고, 신호 조정기(signal conditioner)와 아날로그·디지털 신호처리 회로로 이루어진 큰 시스템의 일부예요. 이 시스템은 계측 시스템, 데이터 획득 시스템(data acquisition system), 공정 제어 시스템(process control system)일 수 있어요.</li><li>대부분 센서 출력은 <b>작은 전압·전류·저항 변화</b>라서 처리 전에 조정해야 해요. 기본 신호조정 기능: <b>증폭, 신호변환, 임피던스 변환, 선형화(linearization), 필터링</b>.</li><li>ADC로 디지털화한 뒤 마이크로컨트롤러/프로세서에서 <b>교정(calibration), 비직선성 수정(non-linearity correction), 오프셋 제거(offset elimination)</b>를 해요.</li></ul><p class='cap'>그림 1.3은 슬라이드 9번 그림과 같은 구조예요. 슬라이드 '보정(Correction)'을 교재는 '수정'으로, '외부 간섭요소'를 '외부교란인자'로 적었어요.</p>"},
+ {h:"스마트(인텔리전트) 센서의 기능 (p.15)", b:"<ul><li>새로운 데이터의 취득·처리·저장: 측정하고 연산·통계 처리해 메모리에 저장</li><li>자동보상: 외부 파라미터 변화를 자동으로 보상</li><li>자기진단(self-diagnostics): 스스로 고장 여부 진단</li><li>의사결정(decision-making): 어떤 데이터를 보낼지 스스로 선택</li><li>통신(communications capability): 다른 센서와 정보 교환</li></ul>"},
+ {h:"트랜스미터와 4–20 mA (p.15)", b:"<p>산업체의 <b>트랜스미터(transmitter)</b>는 4–20 mA 출력전류를 내는 센서 시스템이에요. 정보를 확도 손실 없이 먼 거리로 보내고, EMI/RFI 같은 전기적 잡음에 강해요. 다만 출력이 전류라 배터리 수명이 짧아질 수 있어요.</p><p>[현업] 공장 압력·온도 트랜스미터의 4–20 mA가 PLC 아날로그 입력 카드로 들어가 숫자가 되고, 그 값이 SCADA·Historian·MES로 올라가요.</p>"}
+], num:[
+ "[AI 보충] 0~100 ℃ 트랜스미터의 4–20 mA 환산: 스팬 = 20 − 4 = 16 mA",
+ "50 ℃ → 4 + 16 × (50/100) = 4 + 8 = 12 mA,  75 ℃ → 4 + 16 × 0.75 = 16 mA",
+ "거꾸로 읽기: 10 mA → (10 − 4) ÷ 16 × 100 = 37.5 ℃",
+ "[AI 보충] 0 mA가 아니라 4 mA에서 시작하므로, 0 mA가 읽히면 '0 ℃'가 아니라 단선(고장)으로 판단할 수 있어요"
+]},[
+ {t:"mc", q:"[교재 p.15] 0~100 ℃ 범위의 4–20 mA 온도 트랜스미터가 75 ℃를 잴 때 출력 전류는?",
+  o:["16 mA","15 mA","12 mA","18.75 mA"],
+  e:"4 + 16 × 0.75 = 4 + 12 = 16 mA. 0 mA가 아니라 4 mA에서 시작한다는 점이 함정이에요(15 mA는 20 × 0.75)."},
+ {t:"mc", q:"[교재 p.15] 센서가 스스로 고장 여부를 판단하는 스마트 센서 기능은?",
+  o:["자기진단(self-diagnostics)","자동보상","의사결정","통신"],
+  e:"자동보상은 외부 파라미터(온도 등) 변화를 보상하는 기능, 의사결정은 보낼 데이터를 고르는 기능이에요."}
+]);
+
+add(10, { pages:"p.15, p.21 (1.3·1.3.7)", items:[
+ {h:"1.3 센서의 기본 특성 (p.15)", b:"<ul><li>센서 사양·특성에는 <b>국제 표준이 없고</b> 센서마다 형식이 달라서, 데이터 시트를 정확히 이해하는 것이 중요해요.</li><li>정특성: 입력이 시간적으로 변하지 않을 때 — 감도, 직선성, 히스테리시스, 선택성 등. 동특성: 시간에 따라 변할 때 — 응답시간, 주파수 특성.</li></ul><p class='cap'>슬라이드 목록(교정·감도·선형성·정확도·히스테리시스)과 조금 달라요. 교재는 선택성을 정특성에 넣고, 교정·정확도는 따로 다뤄요. 시험에서는 슬라이드 표현을 따르세요.</p>"},
+ {h:"1.3.7 히스테리시스 (p.21, 그림 1.8)", b:"<ul><li>입력 x를 <b>늘려 가며</b> 잴 때와 <b>줄여 가며</b> 잴 때, 같은 입력 x₁에서 출력이 다른 현상이에요. 두 출력의 차 y₂ − y₁을 <b>히스테리시스 차</b>라고 해요.</li><li>히스테리시스 차는 입력 변화의 진폭과 입력 크기에 따라 달라져요.</li><li>FSO 대비 백분율로 나타내요: <span class='math'>히스테리시스 = (y₂ − y₁)/FSO × 100 %FS</span></li><li>원인은 센서 재료의 물리적 성질이에요. 특히 탄성재료, 강자성체, 강유전체를 쓰는 센서에서 중요해요.</li></ul><p class='cap'>그림 1.8: 아래쪽 곡선(→)이 입력을 올릴 때, 위쪽 곡선(←)이 내릴 때이고, 가운데 점선이 이상적인 직선이에요.</p>"}
+], num:[
+ "① FSO = 5 V,  같은 x₁에서 올릴 때 y₁ = 2.00 V, 내릴 때 y₂ = 2.05 V  [AI 보충·가정한 숫자]",
+ "② 히스테리시스 차 = y₂ − y₁ = 2.05 − 2.00 = 0.05 V",
+ "③ 히스테리시스 = 0.05 ÷ 5 × 100 = 1 %FS"
+]},[
+ {t:"mc", q:"[교재 p.21] FSO가 10 V인 압력 센서에서, 같은 압력에서 올릴 때 4.00 V, 내릴 때 4.20 V가 나왔다. 히스테리시스는?",
+  o:["2 %FS","0.2 %FS","5 %FS","20 %FS"],
+  e:"(4.20 − 4.00) ÷ 10 × 100 = 0.2 ÷ 10 × 100 = 2 %FS."},
+ {t:"mc", q:"[교재 p.21] 히스테리시스가 특히 중요해지는 센서 재료가 아닌 것은?",
+  o:["순수 저항 금속선(이상적인 경우)","탄성재료","강자성체","강유전체"],
+  e:"교재는 탄성재료·강자성체·강유전체를 쓰는 센서에서 재료 자체 때문에 생기는 히스테리시스가 중요하다고 했어요."}
+]);
+
+add(11, { pages:"p.16 (1.3.1)", items:[
+ {h:"1.3.1 전달함수와 감도 (p.16, 그림 1.4)", b:"<ul><li><b>전달함수(transfer function)</b>: 센서의 물리적 입력신호와 출력신호 사이의 함수 관계. 방정식, 테이블, 그래프로 나타내요.</li><li>이상적인 센서는 입출력이 원점을 지나는 직선이라 <span class='math'>y = Sx</span>이고, 그 기울기 S가 감도예요: <span class='math'>S = 출력량/입력량 = Δy/Δx</span>.</li><li>'감도가 높다' = 작은 입력 변화에 큰 출력 변화가 얻어진다는 뜻이에요.</li></ul><p class='cap'>슬라이드의 교정 직선 y = ax + b에서 b = 0인 이상적인 경우가 교재의 y = Sx예요. 그림 1.4의 동작범위는 −x_min ~ +x_max예요(21번 FS와 연결).</p>"}
+]});
+
+add(12, { pages:"pp.16–17, p.19 (1.3.1·1.3.5)", items:[
+ {h:"비선형 전달함수 (pp.16–17)", b:"<ul><li>입출력 관계가 비선형이면 기울기가 입력값에 따라 변하므로, <b>특정 입력값 x₀에 대해서만</b> 감도를 정의할 수 있어요: <span class='math'>S = dy(x₀)/dx</span> (슬라이드의 순간 감도).</li><li>실제로 많은 센서는 비선형이에요. 그래서 ① 제한된 동작범위 안에서 선형으로 보거나, ② 비선형 전달함수를 <b>몇 개의 직선으로 모델링</b>해요. 비선형 센서의 직선화 기술은 센서 개발에서 매우 중요해요.</li></ul>"},
+ {h:"비선형 센서의 교정 (p.19)", b:"<p>비선형 센서는 수학적 모델에 따라 2점 이상의 측정치가 필요해요. 또 다른 방법은 교정곡선을 여러 작은 <b>섹션으로 나누고 각 섹션을 직선으로 보아 섹션마다 a, b를 구한 뒤</b>, 교정곡선을 여러 직선의 묶음(직선군)으로 나타내는 거예요.</p><p class='cap'>슬라이드 오른쪽 '매듭' 그림이 바로 이 방법(구간별 직선)과 일치해요.</p>"}
+]});
+
+add(13, { pages:"pp.25–26 (1.3.12)", items:[
+ {h:"1.3.12 환경의 영향과 드리프트 (p.25, 그림 1.12)", b:"<ul><li>온도·습도처럼 성능에 영향을 주는 외부 변수를 <b>환경 파라미터(environmental parameter)</b>라고 해요.</li><li>시간·온도 등 때문에 감도나 출력 레벨이 변하는 것을 센서 특성의 <b>불안정성 또는 드리프트(drift)</b>라고 해요.</li><li>(a) 특성곡선이 a → b로 기울기가 바뀌는 것 = <b>감도 오차(감도 드리프트)</b>. 정격입력(100 %FS)에서 온도 때문에 생긴 출력 변화 = <b>온도 스팬 오차(span error)</b>.</li><li>(b) 입력이 0인데 출력이 0이 아닌 것 = <b>오프셋 또는 영점 드리프트(zero drift)</b>. 기울기는 같고 c만큼 위로 평행이동해요.</li><li>(c) 두 드리프트가 함께 생기면 <b>총오차</b>가 더 커져요.</li></ul>"},
+ {h:"그 밖의 환경 요인 (pp.25–26)", b:"<ul><li>반도체 센서는 온도 의존성이 매우 커서 온도 보상이 꼭 필요해요. 광센서는 온도에 따른 굴절율 변화, 정전용량형 센서는 유전율 변화가 문제예요.</li><li>상대 변위를 쓰는 센서는 진동의 영향을 받아요(출력 변동, 지지부 탈락, 영구 변형, 리드선 단선).</li><li>전원전압 변동 → 감도 변화·드리프트, 소자 자체의 주울 열 → 열적 드리프트.</li></ul>"}
+]},[
+ {t:"mc", q:"[교재 p.25] 압력을 전혀 가하지 않았는데 센서 출력이 0.2 V로 나오고, 기울기는 원래와 같다. 어떤 드리프트일까요?",
+  o:["오프셋(영점) 드리프트","감도 드리프트","온도 스팬 오차만","히스테리시스"],
+  e:"입력 0에서 출력이 0이 아니고 기울기는 같으니 직선이 평행이동한 영점 드리프트(그림 1.12 b)예요."}
+]);
+
+add(14, { pages:"p.17, p.24 (1.3.3·1.3.10)", items:[
+ {h:"1.3.3 분해능 (p.17)", b:"<ul><li>Δx가 작아지면 Δy도 작아져서, 결국 입력이 변해도 출력 변화를 식별할 수 없게 돼요(Δy = 0). 이때의 입력 크기 Δx가 분해능(resolution), 즉 검출 가능한 최소입력증분이에요.</li><li>원인은 두 가지: ① 입력 변화분이 센서 내부에서 <b>흡수</b>되어 출력에 나타나지 않는 경우, ② 센서 내부의 <b>잡음(noise)</b>.</li><li>분해능은 작을수록 좋아요. 아날로그 센서는 0.1 %/FS 정도이고, 디지털 센서는 <b>비트(bit)</b>로 정해져요: 12 bit → <span class='math'>1/2¹² = 1/4096 = 0.024 %/FS</span>.</li></ul>"},
+ {h:"1.3.10 잡음 (p.24)", b:"<ul><li>잡음은 원하지 않는 불규칙한 신호예요. 원리적으로 없앨 수 없는 것도 있고, 전원 리플(ripple)·진동 같은 환경 변동 때문인 것도 있어요.</li><li>입력 변화(Δx)에 대한 응답(Δy)이 잡음레벨 이하가 되면 오차가 생겨요.</li><li>감도가 높으면 작은 신호도 잡을 수 있지만, 잡음이 커지면 감도가 높아도 <b>측정 하한(lower limit)</b>이 나빠져요. 그래서 <b>신호대 잡음비(S/N ratio)</b>를 높여(필터 등) 검출 하한을 개선해요.</li></ul>"}
+], num:[
+ "① 12 bit: 2¹² = 4096칸 → 1/4096 = 0.000244 = 0.0244 %FS",
+ "② 0~100 ℃ 센서라면 한 칸 = 100 ℃ × 0.000244 ≈ 0.0244 ℃",
+ "③ 10 bit: 2¹⁰ = 1024칸 → 1/1024 ≈ 0.000977 ≈ 0.098 %FS (12 bit보다 4배 거칢)"
+]},[
+ {t:"mc", q:"[교재 p.17] 10 bit 디지털 센서의 분해능(%FS)은 대략?",
+  o:["0.098 %FS","0.024 %FS","1 %FS","0.01 %FS"],
+  e:"1/2¹⁰ = 1/1024 ≈ 0.000977 = 0.098 %FS. 0.024 %FS는 12 bit예요."},
+ {t:"mc", q:"[교재 p.24] 감도는 그대로인데 잡음이 커졌다. 측정 하한은?",
+  o:["나빠진다(더 큰 입력부터 검출)","좋아진다","변하지 않는다","감도가 커진다"],
+  e:"잡음레벨 아래의 응답은 구분이 안 되니, 잡음이 크면 검출 가능한 최소 입력이 커져요. S/N비를 높이는 필터가 대책이에요."}
+]);
+
+add(15, { pages:"p.19 (1.3.5)", items:[
+ {h:"1.3.5 교정 (p.19, 그림 1.6)", b:"<ul><li>교정(calibration) = 센서에 <b>기지의 입력 값(known value)</b>을 넣어 출력을 측정하는 과정. 이때 쓰는 기지의 입력 값을 <b>표준(standard)</b>이라고 해요.</li><li>교정으로 입력-출력 관계가 수립되고, 그 곡선이 교정 곡선(calibration curve)이에요.</li><li>교정은 시간이 오래 걸려서, 제조비용을 줄이려면 <b>교정점을 가능한 한 최소화</b>하는 것이 매우 중요해요.</li><li>그래서 센서 특성의 <b>직선성</b>이 교정을 쉽게 하는 가장 중요한 요소예요(직선이면 적은 점으로도 관계를 정할 수 있으니까요).</li></ul>"}
+]},[
+ {t:"mc", q:"[교재 p.19] 교재가 '센서 교정을 쉽게 하는 데 가장 중요한 요소'로 든 특성은?",
+  o:["직선성","응답시간","히스테리시스","선택성"],
+  e:"직선이면 두세 점만으로 교정 관계를 정할 수 있어 교정점을 줄일 수 있어요."}
+]);
+
+add(21, { pages:"p.17, pp.20–21 (1.3.2·1.3.6)", items:[
+ {h:"1.3.2 동작범위와 풀 스케일 (p.17)", b:"<ul><li>의미 있는 출력을 내는 최대입력과 최소입력 사이 범위 = <b>동작범위(operating range)</b> 또는 <b>스팬(span)</b>. 이것을 <b>입력 풀 스케일(input full scale, FS)</b> 또는 full-scale range라고도 해요.</li><li>출력 쪽은 <b>풀 스케일 출력(FSO)</b> = 최대 입력 시 출력 y_max와 최소 입력 시 출력 −y_min 사이의 대수적 차이예요.</li><li>(+)범위와 (−)범위가 다른 경우가 많고, x_min이 0이면 스팬은 0 ~ +x_max예요. 정격입력·정격출력이라는 말도 함께 써요.</li></ul>"},
+ {h:"1.3.6 비직선성 (pp.20–21, 그림 1.7)", b:"<ul><li>교재는 이 양을 <b>비직선성(nonlinearity)</b>이라고 부르고, 식은 슬라이드 21번과 같아요: 최대출력편차/정격출력 × 100 %FS (또는 입력 기준).</li><li>가장 간단한 방법은 <b>두 종점을 연결한 직선</b>을 기준으로 삼는 것이고, 널리 쓰는 또 하나는 <b>최소자승법으로 구한 BFSL(best fit straight line)</b>에서 실측곡선이 벗어난 정도를 계산하는 거예요(그림 1.7 b: 비직선성 ±0.2 %FS).</li><li>입력이 허용한계를 넘으면 출력이 포화되어 직선성을 잃으므로 동작범위의 상한(정격)을 정해요.</li><li>센서소자가 직선이 아니면 변환회로로 전체 직선성을 맞추고, 반대로 소자가 좋아도 변환회로·증폭기가 나쁘면 전체 직선성이 나빠져요.</li></ul><p class='cap'>용어 차이: 교재 '직선성/비직선성' = 슬라이드 '선형성'. 시험에서는 슬라이드 표현을 따르세요.</p>"}
+], num:[
+ "① [AI 보충·가정] 최소 입력에서 출력 −2 V, 최대 입력에서 +8 V",
+ "② FSO = 8 − (−2) = 10 V (대수적 차이 → 빼기)",
+ "③ 최대출력편차 0.02 V → 비직선성 = 0.02 ÷ 10 × 100 = 0.2 %FS (그림 1.7 b의 ±0.2 %FS 수준)"
+]},[
+ {t:"mc", q:"[교재 p.17] 최소 입력에서 출력 −1 V, 최대 입력에서 +4 V인 센서의 FSO는?",
+  o:["5 V","4 V","3 V","−5 V"],
+  e:"FSO는 y_max와 −y_min의 대수적 차이: 4 − (−1) = 5 V."}
+]);
+
+add(24, { pages:"pp.20–21 (1.3.6)", items:[
+ {h:"기준직선을 무엇으로 잡나 (pp.20–21)", b:"<p>교재는 비직선성의 기준직선으로 ① 두 종점을 잇는 직선, ② 최소자승법 BFSL 두 가지를 소개해요. 슬라이드 24번은 선형성을 '이상적인 기준직선(참값에서 기대되는 직선)', R²을 '데이터로 구한 회귀직선'에 대해 평가한다고 구분해요.</p><p class='cap'>그래서 BFSL을 기준으로 비직선성을 계산하면 R²과 같은 회귀직선을 쓰지만, 여전히 단위(%FS vs 없음)와 보는 값(최대편차 vs 설명력)은 달라요 [AI 보충].</p>"}
+]});
+
+add(25, { pages:"pp.18–19 (1.3.4)", items:[
+ {h:"반복성·재현성과 정도 (p.18)", b:"<ul><li>반복성·재현성 정의는 슬라이드와 같아요(동일조건·단기간 / 장기간·다른 사람·다른 실험실).</li><li><b>정도(精度, precision)</b>는 측정의 반복성이나 재현성의 척도예요.</li><li>재현성을 좋게 유지하려면 센서를 정기적으로 <b>검사·교정·보수</b>해야 해요.</li></ul>"},
+ {h:"그림 1.5 확도와 정도의 차이 (p.19)", b:"<table><tr><th></th><th>측정값(×) 분포</th><th>평균 vs 참값</th><th>판정</th></tr><tr><td>(a)</td><td>넓게 퍼짐</td><td>평균 = 참값</td><td>확도 높음, 정도 나쁨</td></tr><tr><td>(b)</td><td>좁게 모임</td><td>평균이 참값과 멂</td><td>정도 좋음, 확도 나쁨</td></tr></table><p class='cap'>쉽게: 확도 = '평균이 정답에 가까운가', 정도 = '값들끼리 서로 가까운가'.</p>"}
+]},[
+ {t:"mc", q:"[교재 p.19] 10번 측정한 값이 서로 매우 비슷한데, 평균이 참값보다 5 % 높다. 맞는 판정은?",
+  o:["정도는 좋고 확도는 나쁘다","확도는 높고 정도는 나쁘다","둘 다 좋다","둘 다 나쁘다"],
+  e:"값끼리 가까우니 정도(precision) 좋음, 평균이 참값에서 머니 확도(accuracy) 나쁨 — 그림 1.5 (b) 경우예요."},
+ {t:"sa", q:"[교재 p.19] 확도(정확도)와 정도의 차이를 그림 1.5를 예로 설명해 보세요.",
+  m:"확도는 측정값의 평균이 참값에 얼마나 가까운지, 정도는 측정값들이 서로 얼마나 가깝게 모이는지(반복성·재현성)이다. (a)는 평균이 참값과 일치하지만 넓게 퍼져 확도는 높고 정도는 나쁘며, (b)는 좁게 모였지만 평균이 참값에서 멀어 정도는 좋고 확도는 나쁘다.",
+  p:["확도 = 평균과 참값의 근접","정도 = 값들끼리의 근접(반복성·재현성)","(a)·(b) 사례 구분"]}
+]);
+
+add(26, { pages:"p.18 (1.3.4)", items:[
+ {h:"교재의 오차 정의 (p.18)", b:"<ul><li>확도(確度, accuracy)는 출력이 참값에 얼마나 가까운지의 척도이고, 실제로는 <b>부정확도(inaccuracy), 즉 오차(error)</b>로 나타내요.</li><li>절대 오차: 참값과 측정값 사이 최대 편차 <span class='math'>|xₘ − xₜ|</span></li><li>상대(백분율) 오차: <span class='math'>ε = (xₘ − xₜ)/xₘ × 100 %</span> … (1.4a)</li><li>정격출력(FSO) 기준: <span class='math'>ε = (xₘ − xₜ)/FSO × 100 %</span> … (1.4b)</li><li>예: 입력 FS 100 kPa, FSO 10 Ω 압력 센서의 오차를 ±0.5 %, ±500 Pa, ±0.05 Ω 등으로 표현해요.</li></ul><div class='warnbox'>[원본 확인] <b>기호가 슬라이드와 반대예요.</b> 교재: xₘ = 참값(실제 입력), xₜ = 측정값 / 슬라이드 26번: xm = 측정값, xt = 참값. 두 식 모두 '참값으로 나눈다'는 뜻은 같아요. 시험에서는 슬라이드 기호(xm = 측정, xt = 참)를 따르세요. 교재는 '확도', 슬라이드는 '정확도'라고 불러요.</div>"}
+], num:[
+ "① 교재 예: 입력 FS 100 kPa의 ±0.5 % = 100 kPa × 0.005 = 0.5 kPa = ±500 Pa (1 kPa = 1000 Pa)",
+ "② 같은 센서 FSO 10 Ω의 ±0.5 % = 10 Ω × 0.005 = ±0.05 Ω",
+ "③ FSO 기준 오차: FSO 10 V, 측정 오차 0.05 V → 0.05 ÷ 10 × 100 = 0.5 %FSO"
+]},[
+ {t:"mc", q:"[교재 p.18] 입력 풀 스케일 200 kPa인 압력 센서의 오차가 ±0.25 %FS이다. Pa로 바꾸면?",
+  o:["±500 Pa","±50 Pa","±5000 Pa","±0.5 Pa"],
+  e:"200 kPa × 0.0025 = 0.5 kPa = 500 Pa."}
+]);
+
+add(28, { pages:"p.15 (1.3)", items:[
+ {h:"정특성 ↔ 동특성 정리 (p.15)", b:"<p>교재 분류: 정특성 = 감도·직선성·히스테리시스·선택성, 동특성 = 응답시간·주파수 특성. 히스테리시스의 정의와 식은 10번의 📖 교재 보충에 있어요.</p>"}
+]});
+
+add(29, { pages:"pp.22–23 (1.3.9)", items:[
+ {h:"1.3.9 동특성과 시간응답 (pp.22–23, 그림 1.9)", b:"<ul><li>동특성 = 입력을 갑자기 바꿀 때의 <b>시간응답(과도) 특성</b> + 입력을 정현적으로 바꿀 때의 <b>주파수 응답 특성</b>.</li><li>출력은 즉시 변하지 못하고 시간 지연이 생겨요. 응답시간은 보통 입력으로 <b>계단함수(step function)</b>를 넣어 측정해요.</li><li>상승시간 t_r: 포화값의 <b>90 %</b>에 도달하는 시간.</li><li>시정수 τ: 포화값의 <b>63 %</b>에 도달하는 시간. 시간응답이 <b>순수한 지수함수일 때만</b> 정의할 수 있어요.</li><li>감쇠(하강)시간 t_d: 출력이 포화값의 <b>10 % 또는 37 %</b>로 떨어지는 데 걸리는 시간(그림 1.9 b).</li><li>실제 계단응답은 지수함수가 아닌 경우가 많아 센서 종류·제조사마다 응답시간 정의가 달라요. 예: <b>t₀.₅</b>를 응답시간으로 쓰는 회사도 있어요 → 데이터시트 확인 필요.</li></ul><p class='cap'>용어 차이: 슬라이드는 90 % 도달 시간을 '응답시간', 교재는 '상승시간 t_r'이라고 불러요. 슬라이드의 회복시간(recovery time)은 교재의 감쇠시간 t_d에 해당하는 개념으로 보여요 [추정]. 시험에서는 슬라이드 표현을 따르세요.</p>"}
+], num:[
+ "① 포화 출력 4.0 V, 기준 0 V [AI 보충·가정]",
+ "② 감쇠시간 기준 10 % = 0.1 × 4.0 = 0.4 V → 입력 제거 후 출력이 0.4 V로 떨어지는 시간 = t_d",
+ "③ 37 % 기준이면 0.37 × 4.0 = 1.48 V (37 % ≈ e⁻¹ = 0.368, 시정수와 같은 지점)"
+]},[
+ {t:"mc", q:"[교재 p.23] 시정수 τ를 '정의할 수 있는' 조건은?",
+  o:["시간응답이 순수한 지수함수일 때","입력이 정현파일 때","출력이 포화되지 않을 때","히스테리시스가 있을 때"],
+  e:"63 % 지점이 의미를 갖는 건 1 − e⁻¹ 꼴의 순수 지수 응답일 때뿐이에요. 그래서 실제 센서는 회사마다 응답시간 정의가 달라요."}
+]);
+
+add(30, { pages:"p.23 (1.3.9, 그림 1.10)", items:[
+ {h:"주파수 응답특성과 차단주파수 (p.23)", b:"<ul><li>입력을 정현적(sin·cos)으로 바꾸며 입력 주파수에 따른 출력 변화를 보는 것이 주파수 응답특성이에요.</li><li>입력 주파수가 어느 이상 높아지면 출력이 입력 변화를 따라가지 못하고 줄어들기 시작해요.</li><li>출력이 <b>−3 dB</b>(진폭비 <b>0.707</b>)만큼 떨어지는 주파수를 <b>응답 주파수(흔히 차단 주파수)</b>라고 해요.</li><li>특정 주파수에서 입력 저하 때문에 생기는 오차를 <b>동적 오차(dynamic error) δ(ω)</b>라고 해요 — 그 주파수에서 입력 진폭을 얼마나 잘 재현하는지의 척도예요.</li></ul><p class='cap'>[AI 보충] 슬라이드 30번은 '구동 주파수가 다른 센서끼리 상대 변화량(Δf/f₀)으로 비교하라'는 내용이고, 교재의 주파수 응답은 '입력 신호가 빨리 변할 때 출력이 따라오는 정도'예요. 같은 '주파수 특성'이라는 이름 아래 서로 다른 관점이에요.</p>"}
+], num:[
+ "① dB(데시벨) 진폭비: 20 × log₁₀(진폭비)",
+ "② 20 × log₁₀(0.707) = 20 × (−0.1505) ≈ −3.0 dB",
+ "③ 입력 진폭 1 V → 차단주파수에서 출력 진폭 ≈ 0.707 V,  [AI 보충] 전력으로는 0.707² ≈ 0.5 (절반)"
+]},[
+ {t:"mc", q:"[교재 p.23] 차단 주파수에서 출력 진폭은 저주파 때의 약 몇 배인가요?",
+  o:["0.707배 (−3 dB)","0.5배 (−3 dB)","0.63배","0.9배"],
+  e:"−3 dB = 진폭비 0.707이에요. 0.5는 전력비(0.707²)이고, 0.63은 시정수, 0.9는 상승시간 기준이에요."}
+]);
+
+add(31, { pages:"p.24 (1.3.11)", items:[
+ {h:"1.3.11 출력 임피던스 (p.24, 그림 1.11)", b:"<ul><li>센서와 전자회로를 연결할 때 센서 출력이 입력회로에 잘 전달되려면 센서의 <b>출력 임피던스(output impedance) Z_o</b>를 알아야 해요.</li><li>(a) <b>전압 출력</b> 센서: Z_o가 회로 입력 임피던스 Z_i와 <b>직렬</b> → V = V_s가 되려면 <b>Z_o는 작고 Z_i는 가능한 한 커야</b> 해요.</li><li>(b) <b>전류 출력</b> 센서: Z_o가 회로에 <b>병렬</b> → I = I_s가 되려면 <b>Z_o는 가능한 한 크고 Z_i는 작아야</b> 해요.</li></ul><table><tr><th>목적</th><th>조건</th><th>근거</th></tr><tr><td>신호(전압) 왜곡 최소</td><td>Z_o ≪ Z_i (전압 출력)</td><td>교재 1.3.11</td></tr><tr><td>부하 전력 최대</td><td>R_L = R_S (임피던스 매칭)</td><td>슬라이드 31·32</td></tr></table><p class='cap'>[AI 보충] 측정 회로에서는 보통 '전압을 정확히 읽는 것'이 목적이라 Z_i를 크게, 고주파 신호 전달·안테나처럼 '전력을 최대로 보내는 것'이 목적이면 매칭을 써요. 목적에 따라 조건이 달라요.</p>"}
+], num:[
+ "[AI 보충] 전압 분배: V = V_s × Z_i/(Z_o + Z_i)",
+ "① Z_o = 1 kΩ, Z_i = 1 MΩ → V = V_s × 1,000,000/1,001,000 ≈ 0.999 V_s (전압 99.9 % 전달)",
+ "② Z_o = 1 kΩ, Z_i = 1 kΩ(매칭) → V = V_s × 1000/2000 = 0.5 V_s (전압은 절반, 대신 부하 전력이 최대)"
+]},[
+ {t:"mc", q:"[교재 p.24] 출력 임피던스가 작은 전압 출력 센서를 측정 회로에 연결할 때, 측정 회로 입력 임피던스 Z_i는?",
+  o:["가능한 한 크게","센서 Z_o와 같게","가능한 한 작게","0으로"],
+  e:"직렬로 나뉘는 전압 분배에서 Z_i가 클수록 V가 V_s에 가까워져요. Z_o와 같게(매칭) 하면 전압은 절반이 돼요."},
+ {t:"sa", q:"[교재 p.24·슬라이드 31] '전압 출력 센서는 Z_i를 크게'와 '최대 전력 전달은 R_L = R_S'가 서로 모순이 아닌 이유를 설명해 보세요.",
+  m:"목적이 다르기 때문이다. 센서 측정에서는 센서 전압을 왜곡 없이 읽는 것이 목적이므로 Z_o ≪ Z_i로 해서 V ≈ V_s가 되게 한다. 임피던스 매칭(R_L = R_S)은 부하에 전달되는 전력을 최대로 하려는 조건이며, 이때 부하 전압은 V_s의 절반이 된다.",
+  p:["목적 차이(전압 정확도 vs 전력 최대)","Z_o ≪ Z_i → V ≈ V_s","매칭 시 전압은 절반, 전력 최대"]}
+]);
+
+/* ---------- 부록: 교재 1.4 센서의 분류 ---------- */
+window.NOTE.titles[34] = "교재 부록 — 1.4 센서의 분류";
+S[34] = {
+  appendix: true,
+  one: "슬라이드에는 없는 교재 1.4절 내용이에요 — 센서를 전원 공급 유무, 출력 형식, 검출대상, 재료, 변환현상, 용도로 나눠 봐요.",
+  talk: [
+    "예를 들어 도서관 책을 '저자별', '주제별', '출판연도별'로 각각 정리할 수 있듯이, 센서도 보는 관점에 따라 여러 방식으로 나눠요. 표준화된 하나의 분류법은 없어요.",
+    "가장 헷갈리는 건 전원 공급 유무에 따른 분류예요. 외부 전원을 받아 동작하는 변조형(능동형)과, 측정 대상에서 에너지를 얻어 스스로 신호를 만드는 자기발전형(수동형)이 있어요. 책마다 능동·수동을 반대로 부르기도 해서 교재도 주의를 줘요.",
+    "출력 형식으로는 아날로그·디지털, 변환현상으로는 역학·전자기·광·온도·화학 센서로 나눠요. 이 과목의 주차별 센서(가스, 자기, 속도, 가속도, 자이로, 초음파, 바이오)를 이 표에 대입해 보면 전체 지도가 생겨요 [AI 보충]."
+  ],
+  sum: "정리하면: 센서는 동작 에너지 공급 유무(변조형 modulating/능동형 active vs 자기발전형 self-generating/수동형 passive), 출력신호(아날로그 analog vs 디지털 digital), 검출대상, 센서재료, 변환현상(역학·전자기·광·온도·화학), 용도에 따라 분류해요.",
+  book: { pages:"pp.26–30 (1.4)", items:[
+   {h:"1.4.1 동작 에너지 공급 유무 (pp.26–27, 그림 1.13)", b:"<table><tr><th></th><th>변조형 센서 (능동형)</th><th>자기발전형 센서 (수동형)</th></tr><tr><td>영문</td><td>modulating / active sensor</td><td>self-generating / passive sensor</td></tr><tr><td>전원</td><td>외부에서 보조전원 공급</td><td>외부 전원 불필요</td></tr><tr><td>출력 전력</td><td>대부분 외부 전원에서 얻음. 입력은 출력을 '제어'만 함</td><td>입력(측정대상)에서 얻음</td></tr><tr><td>특징</td><td>공급전원전압으로 전체 감도를 바꿀 수 있음. 전선이 더 많음. 폭발성 분위기에서 보조전원은 폭발 위험 증가</td><td>배선 간단</td></tr><tr><td>예</td><td>포토트랜지스터, 서미스터</td><td>포토다이오드, 열전대</td></tr></table><div class='warnbox'>[원본 확인] 저자에 따라 변조형을 '수동형', 자기발전형을 '능동형'으로 반대로 부르기도 해요. 교재는 혼동을 피하려고 능동·수동이라는 말을 쓰지 않는다고 밝혀요. 시험에서는 슬라이드·교수님 표현을 따르세요.</div>"},
+   {h:"1.4.2 출력신호 형식 (p.27)", b:"<ul><li><b>아날로그 센서</b>: 출력이 연속적으로 변하는 신호이고, 보통 정보는 출력의 진폭에 들어 있어요. 대부분의 센서가 아날로그예요. 출력이 가변주파수인 센서는 디지털 변환이 쉬워 <b>준 디지털 센서(quasi-digital sensor)</b>라고도 해요.</li><li><b>디지털 센서</b>: 전송이 쉽고 재현성·신뢰성이 높고 더 정확한 경우가 많아요. 예: 로터리 인코더. 소자 자체가 디지털인 경우는 드물고 대부분 ADC를 조합해요.</li><li>여기까지는 학술적 분류이고, 산업계는 아래의 특수성에 따른 분류를 더 선호해요.</li></ul>"},
+   {h:"1.4.3 검출대상 (pp.27–28, 표 1.2)", b:"<p>검출대상은 '수(number)'부터 '혈당'까지 물리·화학·생물학적 양이고, 1차원부터 3차원까지 있어서 한 양을 재려고 여러 센서를 쓰기도 해요.</p><table class='wide'><tr><th>수</th><th>위치</th><th>변형</th><th>유속</th><th>성분조성</th><th>입자</th><th>열량</th><th>유해·유독가스</th></tr><tr><td>길이</td><td>레벨</td><td>압력</td><td>속도·가속도</td><td>수분</td><td>비중밀도</td><td>온도</td><td>맛</td></tr><tr><td>면</td><td>직선변위</td><td>토크</td><td>음파</td><td>이온농도</td><td>탐상</td><td>화재</td><td>냄새</td></tr><tr><td>입체</td><td>회전변위</td><td>유량</td><td>진동</td><td>탁도</td><td>습도</td><td>연기</td><td>혈당</td></tr></table><p class='cap'>[추정] 표 1.2는 열 제목과 아래 항목이 꼭 같은 분류로 묶여 있지는 않아 보여요(예: '유해·유독가스' 아래 맛·냄새·혈당). 검지 대상 32개를 격자로 나열한 표로 보면 돼요.</p>"},
+   {h:"1.4.4 센서재료 (p.28, 표 1.3)", b:"<table><tr><th>재료</th><th>대표 센서 예</th></tr><tr><td>금속</td><td>RTD, 스트레인 게이지, 로드셀, 열전대</td></tr><tr><td>반도체</td><td>홀 소자, 반도체 압력센서, 가속도센서, 포토다이오드, CCD</td></tr><tr><td>세라믹</td><td>습도센서, 서미스터, 가스센서, 압전센서, 산소센서</td></tr><tr><td>광섬유</td><td>온도·레벨·압력·변형센서</td></tr><tr><td>유전체</td><td>초전형 센서, 온도센서</td></tr><tr><td>고분자</td><td>습도센서, 압전 센서, 초음파 센서</td></tr><tr><td>생체 물질</td><td>혈당센서, 면역센서, DNA센서, 기타 바이오센서</td></tr><tr><td>복합 재료</td><td>PZT 압전 센서, 고분자-나노 복합 센서</td></tr></table><ul><li>반도체는 가장 많이 쓰여 왔고, 반도체 기술 + 마이크로머시닝(micromachining)을 합친 <b>MEMS</b> 센서(실리콘 압력, 가속도, 자이로스코프, 유량, 마이크로 가스 센서)가 개발되고 있어요.</li><li>세라믹은 내식성·내열성·내마모성이 뛰어나고, 광섬유 센서는 전자유도 외란 같은 전기신호 센서의 문제를 피하려고 연구되기 시작했어요.</li></ul>"},
+   {h:"1.4.5 변환현상 (p.29, 표 1.4)", b:"<table><tr><th>분류</th><th>대표 센서</th><th>이 과목 주차 [AI 보충]</th></tr><tr><td>역학센서</td><td>근접, 회전각, 레벨, 속도, 가속도, 진동, 하중, 압력, 유량</td><td>Week 5 속도, Week 6 가속도·진동, Week 7 자이로, Week 9 초음파</td></tr><tr><td>전자기센서</td><td>홀 센서, 자기저항(MR), GMR, TMR</td><td>Week 3·4 자기센서</td></tr><tr><td>광센서</td><td>포토다이오드, 포토트랜지스터, 적외선, 자외선, 광전관, 이미지센서(CCD·CMOS)</td><td>—</td></tr><tr><td>온도센서</td><td>열전대, RTD, NTC/PTC 서미스터, IC온도센서, 광 고온계</td><td>—</td></tr><tr><td>화학센서</td><td>가스, 습도, 이온, 바이오센서(효소, 면역)</td><td>Week 2 가스, Week 13 바이오</td></tr></table><ul><li>역학센서는 공장 자동화의 핵심으로 <b>기계량</b>(거리·위치·회전각·근접·속도·가속도·하중·토크)과 <b>유체량</b>(압력·유량·유속·점도·밀도) 센서로 나뉘어요.</li><li>온도센서는 가장 많이 쓰이는 센서 중 하나예요. 자기센서는 홀 효과·자기저항효과가 주류이고, 비접촉으로 유속·유량·변위·전류·온도·두께·레벨을 재요. 최근엔 GMR·TMR 고감도 자기센서가 자동차 등에 쓰여요.</li><li>광센서는 검출파장에 따라 가시광선·적외선·자외선·방사선 센서로 나뉘고, 화학센서 중 혈당 센서가 대표적인 바이오센서이며 가장 큰 시장을 이루고 있어요.</li></ul>"},
+   {h:"1.4.6 용도 (p.30)", b:"<p>산업용, 민생용, 연구용, 의료용, 군사용 등으로 나누고, 더 구체적으로는 자동차용, 로봇용, 방재용으로도 나눠요. <b>산업용</b>은 더 높은 확도를, <b>자동차용</b>은 혹독한 환경 때문에 훨씬 넓은 동작온도 범위와 내구성을 요구해요.</p><p>[현업] 공장 설비용 센서를 고를 때 데이터시트에서 '확도(정확도)'와 '동작온도 범위·보호등급'을 먼저 보는 이유예요.</p>"}
+  ]},
+  review: {
+    logic: "분류 기준(전원·출력·대상·재료·변환현상·용도)을 먼저 정하고 → 센서 하나를 여러 기준으로 동시에 분류해 본다(예: 열전대 = 자기발전형·아날로그·온도·금속).",
+    mem: ["변조형(외부 전원, 예 서미스터) vs 자기발전형(입력에서 전력, 예 열전대·포토다이오드)", "변환현상 5분류: 역학·전자기·광·온도·화학", "능동/수동 명칭은 책마다 반대일 수 있음"],
+    exam: "센서는 외부 전원이 필요한 변조형과 측정대상에서 에너지를 얻는 자기발전형, 아날로그와 디지털, 검출대상·재료·변환현상(역학·전자기·광·온도·화학)·용도 등 여러 관점으로 분류한다.",
+    blank: ["열전대·서미스터·홀 센서·포토다이오드 4개를 '전원 / 출력 / 변환현상 / 재료' 4칸 표로 분류해 보기"]
+  },
+  quiz: [
+    {t:"mc", q:"[교재 p.27] 열전대는 전원 공급 유무로 보면 어떤 센서인가요?",
+     o:["자기발전형","변조형","디지털형","준 디지털형"],
+     e:"열전대는 온도차에서 스스로 전압을 만들어 외부 전원이 필요 없어요(자기발전형). 서미스터는 전류를 흘려야 저항을 읽을 수 있어 변조형이에요."},
+    {t:"mc", q:"[교재 p.29] 홀 센서·GMR 센서는 변환현상 분류에서 어디에 속하나요?",
+     o:["전자기센서","역학센서","광센서","화학센서"],
+     e:"자기장을 이용하는 홀 효과·자기저항효과 센서는 전자기센서예요(Week 3·4)."},
+    {t:"mc", q:"[교재 p.28] 표 1.3에서 서미스터·가스센서·산소센서의 공통 재료는?",
+     o:["세라믹","금속","고분자","광섬유"],
+     e:"세라믹은 내식성·내열성·내마모성이 좋아 이런 센서에 쓰여요."},
+    {t:"mc", q:"[교재 p.26] 폭발성 가스가 있는 공장에서 보조전원이 필요한 센서를 쓸 때 교재가 경고한 점은?",
+     o:["보조전원이 폭발 위험을 높인다","출력이 디지털이 된다","감도를 바꿀 수 없다","전선이 줄어든다"],
+     e:"변조형은 보조전원이 필요하고 전선도 많아서, 폭발성 분위기에서는 폭발 위험이 커진다고 했어요."}
+  ]
+};
+})();
+
+/* Week 1 — 최신 보충 (2026-11 기준 웹 자료) */
+(function(){
+const S = window.NOTE.slides;
+const L = (n, o) => { S[n].latest = o; };
+const a = (u,t) => `<a href="${u}" target="_blank" rel="noopener">${t}</a>`;
+
+L(3, { asof:"2026-11", items:[
+ {h:"'2020년 1조 달러' 전망은 어떻게 됐나", b:"<ul><li>교재(p.31)의 '네트워크된 센서가 2020년까지 1조 달러' 전망과 달리, 최근 조사기관들은 <b>전 세계 센서 시장을 2025년 약 2,100억~2,700억 달러</b>로 추정해요(기관마다 센서 범위 정의가 달라 차이가 커요).</li><li>즉 금액으로는 1조 달러의 4분의 1 수준이에요. 그 예측은 실현되지 않은 것으로 보여요 [추정: 교재 전망의 '네트워크된 센서'가 어디까지를 포함하는지 확인 어려움].</li></ul>"}
+], src:[
+ a("https://www.fortunebusinessinsights.com/index.php/sensormarkt-109899","Fortune Business Insights — 2025년 2,410.6억 달러"),
+ a("https://straitsresearch.com/report/sensor-market","Straits Research — 2025년 2,536억 달러"),
+ a("https://blog.bccresearch.com/top-10-companies-shaping-the-global-sensor-technologies-market","BCC Research — 2024년 1,951억, 2025년 2,125억 달러")
+]});
+
+L(4, { asof:"2026-11", items:[
+ {h:"표의 2019년 숫자 → 지금은?", b:"<table><tr><th>항목</th><th>슬라이드 (2019)</th><th>최신</th></tr><tr><td>전체 센서 시장</td><td>116,100 십억원 (≈116조 원)</td><td>2025년 약 2,100억~2,700억 달러 (조사기관별 차이)</td></tr><tr><td>이미지 센서(CIS)</td><td>22,900 십억원, 1위</td><td>2024년 232억 달러(+6.4%), 2025년 253억 달러(+9%) — 여전히 최대 품목군</td></tr><tr><td>전망</td><td>—</td><td>CIS 2031년 약 303억 달러 (Yole)</td></tr></table><p class='cap'>슬라이드 표는 원화(십억원), 최신 자료는 달러라서 직접 빼거나 나누어 비교하면 안 돼요. 또 조사기관마다 '센서'에 넣는 범위가 달라 같은 해에도 숫자가 크게 달라요. 시험에서는 슬라이드 숫자를 따르세요.</p>"},
+ {h:"흐름은 그대로", b:"<p>이미지 센서가 가장 큰 시장이라는 점, 자동차·헬스케어·IoT가 성장을 이끈다는 슬라이드의 흐름은 최신 자료에서도 같아요. 조사기관들은 스마트홈·IoT를 가장 빠르게 크는 분야로 꼽아요.</p>"}
+], src:[
+ a("https://www.yolegroup.com/product/report/status-of-the-cmos-image-sensor-industry-2026/","Yole Group — Status of the CMOS Image Sensor Industry 2026"),
+ a("https://optics.org/news/16/7/48","optics.org — CIS 2024년 232억 달러(+6.4%)"),
+ a("https://straitsresearch.com/report/sensor-market","Straits Research — 센서 시장 2025")
+]});
+
+L(5, { asof:"2026-11", items:[
+ {h:"이미지 센서 점유율 (2025년)", b:"<ul><li><b>Sony</b>: 매출 기준 약 <b>50%</b>로 1위를 더 굳혔어요. 스마트폰용만 보면 약 57%예요.</li><li><b>Samsung</b>: 2위는 유지했지만 매출이 정체예요. 고급형은 Sony, 중저가는 중국 업체에 밀리는 구도예요.</li><li><b>OmniVision</b>: 자동차용 이미지 센서 1위예요. 보안 카메라용은 OmniVision·SmartSens가 강해요.</li><li>국가별로는 <b>중국 업체들이 한국을 넘어 일본 다음 2위</b>가 됐어요(Yole 2025년 분석).</li></ul><p class='cap'>슬라이드의 'Sony ~50%, OmniVision ~10%, 삼성 ~15%' 가운데 Sony 50%는 지금도 맞아요. 삼성·OmniVision의 정확한 최신 %는 무료 공개 자료에서 확인하지 못했어요.</p>"},
+ {h:"연속혈당측정(CGM) 점유율", b:"<ul><li>미국 2025년: <b>Abbott 48.5%, Dexcom 44.7%</b> (GlobalData 시장 모델). 유럽·아시아태평양에서는 Abbott가 훨씬 앞서요.</li><li>Dexcom 2025년 매출 46.6억 달러(전년 대비 +16%). CGM 시장은 2035년 약 157억 달러까지 커질 것으로 전망돼요.</li></ul>"}
+], src:[
+ a("https://www.elektroniknet.de/international/sony-extends-its-leading-position-as-china-overtakes-south-korea.7f7ce0b3-8e38-4ede-be10-66d88cbefc0f.html","Elektroniknet (2026-08) — Sony ~50%, 중국이 한국 추월"),
+ a("https://anysilicon.com/news/cis-industry-sony-extends-its-lead-as-china-overtakes-south-korea/","AnySilicon — 모바일 Sony 57%"),
+ a("https://www.medicaldevice-network.com/news/dexcom-reports-2025-revenue-of-4-bn-yet-2026-outlook-lags-analyst-expectations/","Medical Device Network — CGM 점유율·Dexcom 매출")
+]});
+
+L(6, { asof:"2026-11", items:[
+ {h:"슬라이드의 '국내 약점'이 숫자로 보이는 예", b:"<p>이미지 센서 분야에서 2025년 중국 업체들이 매출 기준으로 한국을 앞질러 일본 다음 2위 공급국이 됐어요. 삼성은 2위 기업 자리는 지켰지만 매출이 정체됐다고 분석돼요. 슬라이드가 말한 '제조 인프라는 강하지만 경쟁이 치열하다'는 상황이 최근 숫자로 드러난 사례예요.</p>"}
+], src:[
+ a("https://www.yolegroup.com/product/report/status-of-the-cmos-image-sensor-industry-2026/","Yole Group — CIS 2026 보고서 요약")
+]});
+
+L(7, { asof:"2026-11", items:[
+ {h:"IF는 매년 바뀌어요", b:"<ul><li>표의 IF는 2023년 값이에요. Clarivate JCR은 <b>매년 6월</b> 새 IF를 발표해요. 가장 최근은 <b>2026년 6월 발표(2025년 인용 기준)</b>예요.</li><li>예: Sensors and Actuators B-Chemical 2026년 6월 발표 IF 8.3 (표의 8.0보다 상승), Q1 유지.</li><li>IF 정리 사이트마다 연도 표기와 값이 조금씩 달라요(예: Biosensors & Bioelectronics는 10.5~11.8로 제각각). 논문 인용이나 투고 저널 선택에는 <b>Clarivate JCR 또는 저널 홈페이지의 공식 값</b>을 쓰세요.</li></ul>"}
+], src:[
+ a("https://www.journalmetrics.org/journal/sensors-and-actuators-b-chemical","Journal Metrics — Sens. Actuators B IF 8.3 (2026-06 발표)"),
+ a("https://www.bioxbio.com/journal/BIOSENS-BIOELECTRON","BioxBio — Biosensors & Bioelectronics IF 연도별")
+]});
+})();
+
+</script>
+<script>(function(){
+"use strict";
+const N = window.NOTE, FIGS = window.FIGS, W = N.week;
+const PW = 1287, PH = 910;
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+const pad = n => String(n).padStart(2,"0");
+// tags: [AI 보충] [추정] [원본 확인] [현업]
+const tagify = h => String(h)
+  .replace(/\[교재([^\]]*)\]/g,'<span class="tag bk">교재$1</span>')
+  .replace(/\[AI 보충([^\]]*)\]/g,'<span class="tag ai">AI 보충$1</span>')
+  .replace(/\[추정([^\]]*)\]/g,'<span class="tag gs">추정$1</span>')
+  .replace(/\[원본 확인\]/g,'<span class="tag wn">원본 확인</span>')
+  .replace(/\[현업\]/g,'<span class="tag wk">현업</span>');
+const T = s => tagify(esc(s));
+const sref = n => `<button class="sref" data-go="${n}">${n}</button>`;
+const srefs = a => a.map(sref).join("");
+
+/* ---------- storage (account → browser fallback) ---------- */
+const LAST = N.total + (N.slides[N.total+1] ? 1 : 0);
+const LSP = "sensorNote:"+W+":";          // localStorage key prefix (keep stable)
+const state = {};                          // key "s07" -> {star,q,memo,t}
+const lsGet = k => { try { return JSON.parse(localStorage.getItem(k)||"null"); } catch(e){ return null; } };
+const lsSet = (k,v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e){ return false; } };
+for (let n=1;n<=LAST;n++){ const k="s"+pad(n); state[k] = lsGet(LSP+k) || {star:false,q:false,memo:"",t:0}; }
+let col = null; const timers = {}, chains = {};
+function setStatus(t){ const e=$("#save"); const cls = t.startsWith("☁")?"db":(t.startsWith("💾")?"local":"");
+  e.className = "savest "+cls;
+  e.textContent = cls==="db" ? "저장: 계정(db) ✓" : cls==="local" ? (t.includes("실패")?"저장: 브라우저 (계정 실패)":"저장: 브라우저") : "저장: 확인 중";
+  e.title = t; }
+function save(k){
+  state[k].t = Date.now();
+  lsSet(LSP+k, state[k]);
+  if (!col) return;
+  clearTimeout(timers[k]);
+  timers[k] = setTimeout(()=>{
+    const body = Object.assign({}, state[k]);
+    chains[k] = (chains[k]||Promise.resolve()).then(()=>col.doc(W+"-"+k).set(body))
+      .then(()=>setStatus("☁ 계정에 저장됨"))
+      .catch(()=>setStatus("💾 브라우저에만 저장 (계정 저장 실패)"));
+  }, 700);
+}
+async function initCloud(){
+  setStatus("… 확인 중");
+  if (!(window.claude && typeof window.claude.use === "function")) { setStatus("💾 브라우저에만 저장 (계정 연결 안 됨)"); return; }
+  try {
+    const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+    const uid = user && await user.id();
+    if (!db || !uid) { setStatus("💾 브라우저에만 저장 (계정 연결 안 됨)"); return; }
+    const c = db.collection("data/users/"+uid);   // private per-user path
+    const snap = await Promise.race([c.get(), new Promise((_,rej)=>setTimeout(()=>rej("timeout"),10000))]);
+    snap.docs.forEach(d=>{
+      if (!d.id.startsWith(W+"-")) return;
+      const k = d.id.slice(W.length+1), v = d.data();
+      if (state[k] && v && (v.t||0) > (state[k].t||0)) { state[k] = Object.assign({star:false,q:false,memo:""}, v); lsSet(LSP+k, state[k]); }
+    });
+    col = c;
+    // push local entries newer than cloud
+    const cloud = {}; snap.docs.forEach(d=>cloud[d.id]=d.data());
+    for (const k in state){ const cv = cloud[W+"-"+k]; if ((state[k].t||0) > ((cv&&cv.t)||0)) { save(k); } }
+    applyMarks();
+    setStatus("☁ 계정에 저장됨");
+  } catch(e){ col = null; setStatus("💾 브라우저에만 저장 (계정 연결 안 됨)"); }
+}
+
+/* ---------- render ---------- */
+function renderMap(){
+  const m = N.map, br = m.branches;
+  const side = (b,i)=>`<div class="br" style="grid-column:${i<3?1:3};grid-row:${i%3+1}"><b>${esc(b.name)}</b><ul>${b.kw.map(k=>`<li>${T(k)}</li>`).join("")}</ul>${srefs(b.s)}</div>`;
+  return `<section class="card" id="map"><h2 style="margin:0 0 10px;font-size:18px">🗺 전체 지도</h2>
+  <div class="map"><div class="center">${esc(m.center)}</div>${br.map(side).join("")}</div>
+  <div class="links"><b>가지끼리 이어지는 관계</b><ul>${m.links.map(l=>`<li><b>${esc(l.a)}</b> ⇢ <b>${esc(l.b)}</b>: ${T(l.t)} ${srefs(l.s)}</li>`).join("")}</ul></div></section>`;
+}
+function renderGuide(){
+  const g = N.guide;
+  return `<section class="card" id="guide"><h2 style="margin:0 0 10px;font-size:18px">🧭 학습 가이드</h2><div class="guide">
+  <div><h3>공부 방법</h3><ul>${g.how.map(x=>`<li>${T(x)}</li>`).join("")}</ul></div>
+  <div><h3>순서</h3><ol>${g.order.map(o=>{const [a,b]=o.s.split("–").map(Number);return `<li>${esc(o.t)} ${sref(a)}–${sref(b)}</li>`}).join("")}</ol></div>
+  <div><h3>핵심</h3><ol>${g.core.map(c=>`<li>${T(c.t)} ${srefs(c.s)}</li>`).join("")}</ol></div>
+  <div><h3>점검</h3><ol>${g.check.map(c=>`<li>${T(c.q)} ${srefs(c.s)}<details><summary>답 보기</summary>${T(c.a)}</details></li>`).join("")}</ol></div>
+  </div></section>`;
+}
+function sec(title, inner, cls=""){ return `<details class="sec ${cls}"><summary>${title}</summary><div class="sbody">${inner}</div></details>`; }
+function tipH(t){ return t ? `<div class="tip">${T(t)}</div>` : ""; }
+function renderFig(n, f){
+  const fg = FIGS[f.key]; const [x0,y0,x1,y1] = fg.crop, cw=x1-x0, ch=y1-y0;
+  const boxes = fg.boxes.map((b,i)=>`<button class="box" data-i="${i}" aria-label="영역 ${i+1}" style="left:${(b[0]-x0)/cw*100}%;top:${(b[1]-y0)/ch*100}%;width:${(b[2]-b[0])/cw*100}%;height:${(b[3]-b[1])/ch*100}%"><span>${i+1}</span></button>`).join("");
+  const nav = `<button data-mv="-1" aria-label="이전">‹</button>${fg.boxes.map((_,i)=>`<button data-i="${i}">${i+1}</button>`).join("")}<button data-mv="1" aria-label="다음">›</button>`;
+  return `<div class="fig" data-cur="0">
+    <div class="figwrap" style="aspect-ratio:${cw}/${ch}"><img src="img/p${pad(n)}.jpg" alt="Slide ${n} 그림 부분" width="${PW}" height="${PH}" style="width:${PW/cw*100}%;height:auto;left:${-x0/cw*100}%;top:${-y0/ch*100}%">${boxes}</div>
+    <div class="fignav">${nav}</div><div class="figdesc"></div>
+    <script type="application/json">${JSON.stringify(f.items).replace(/</g,"\\u003c")}<\/script></div>`
+    + (f.redraw ? `<details class="sec" style="margin-top:8px"><summary>한글로 다시 그린 도표</summary><div class="sbody">${tagify(f.redraw)}</div></details>` : "");
+}
+function renderQuiz(qs){
+  return `<div class="quiz" data-q="${esc(JSON.stringify(qs))}"></div>`;
+}
+function renderSlide(n){
+  const d = N.slides[n], k="s"+pad(n), title = N.titles[n] || "";
+  const isApx = n > N.total;
+  let h = `<section class="slide${isApx?" apx":""}" id="s${n}" data-n="${n}"><div class="shead"><h2><span class="no">${isApx?"📖 부록":"Slide "+pad(n)}</span>${esc(title)}</h2>
+  <div class="marks"><button class="bs" data-k="${k}" aria-pressed="false">★ 시험 강조</button><button class="bq" data-k="${k}" aria-pressed="false">? 질문</button></div></div>
+  ${isApx?"":`<img class="thumb" src="img/p${pad(n)}.jpg" width="${PW}" height="${PH}" loading="lazy" alt="Slide ${n} 원본" data-zoom="${n}">`}`;
+  if (!d){ h += `<p class="pending">이 장의 해설은 다음 묶음에서 추가돼요. ★/? 표시와 메모는 지금도 쓸 수 있어요.</p>`; }
+  else {
+    h += `<div class="one"><b>한 줄</b>${T(d.one)}</div>`;
+    h += `<div class="talk"><div class="lab">🎙 강사 설명</div>${d.talk.map(p=>`<p>${T(p)}</p>`).join("")}<p class="sum">${T(d.sum)}</p></div>`;
+    let lec = "";
+    if (d.terms) lec += sec("용어", tipH(d.terms.tip)+`<table><tr><th>영문</th><th>한글</th><th>쉬운 뜻</th></tr>${d.terms.rows.map(r=>`<tr><td>${T(r[0])}</td><td>${T(r[1])}</td><td>${T(r[2])}</td></tr>`).join("")}</table>`);
+    if (d.orig) lec += sec("원문 풀어 읽기", tipH(d.orig.tip)+`<table class="pair"><tr><th>원문</th><th>풀이</th></tr>${d.orig.rows.map(r=>`<tr><td>${T(r[0])}</td><td>${T(r[1])}</td></tr>`).join("")}</table>`);
+    if (d.fig) lec += sec("그림 읽기", tipH(d.fig.tip)+renderFig(n,d.fig), "figsec");
+    if (d.table) lec += sec("표", tipH(d.table.tip)+tagify(d.table.html));
+    if (d.num) lec += sec("숫자 예제", tipH(d.num.tip)+`<ol class="steps">${d.num.steps.map(s=>`<li>${T(s)}</li>`).join("")}</ol>`);
+    if (lec) h += `<div class="grp">강의 중</div>`+lec;
+    if (d.book){ const b=d.book;
+      const inner = b.items.map(i=>`<h4 class="bkh">${esc(i.h)}</h4>${tagify(i.b)}`).join("")
+        + (b.num ? `<h4 class="bkh">숫자 예제</h4><ol class="steps">${b.num.map(x=>`<li>${T(x)}</li>`).join("")}</ol>` : "");
+      h += `<div class="grp">교재 보충</div>`+sec(`📖 교재 보충 — 『센서공학입문』 ${esc(b.pages)}`, inner, "booksec"); }
+    if (d.latest){ const l=d.latest;
+      const inner = l.items.map(i=>`<h4 class="bkh">${esc(i.h)}</h4>${tagify(i.b)}`).join("")
+        + `<p class="src"><b>출처</b><br>${l.src.join("<br>")}</p><p class="cap">조사 시점: ${esc(l.asof)}. 시장·점유율 숫자는 해마다 바뀌어요. 시험에서는 슬라이드 숫자를 따르세요.</p>`;
+      h += `<div class="grp">최신 보충</div>`+sec(`🆕 최신 보충 — ${esc(l.asof)} 기준 웹 자료`, inner, "latestsec"); }
+    if (d.review){ const r=d.review;
+      h += `<div class="grp">복습</div>`+sec("핵심 논리 · 외울 것 · 시험 답안 · 백지 복원", `<div class="rv"><h4>핵심 논리</h4><p>${T(r.logic)}</p><h4>외울 것</h4><ul class="mem">${r.mem.map(x=>`<li>${T(x)}</li>`).join("")}</ul><h4>시험 대비 한 줄 답안</h4><p>${T(r.exam)}</p><h4>백지 복원 과제</h4><ul class="mem">${r.blank.map(x=>`<li>${T(x)}</li>`).join("")}</ul></div>`); }
+    if (d.quiz && d.quiz.length) h += `<div class="grp">퀴즈</div>`+sec(`퀴즈 (${d.quiz.length}문제)`, renderQuiz(d.quiz), "qsec");
+  }
+  h += `<div class="memo"><div class="lab">📝 메모</div><textarea data-k="${k}" placeholder="강의 중 들은 말, 궁금한 점…"></textarea></div></section>`;
+  return h;
+}
+
+/* ---------- quiz ---------- */
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function buildQuiz(el){
+  const qs = JSON.parse(el.dataset.q); const mcN = qs.filter(q=>q.t==="mc").length;
+  let html = "";
+  qs.forEach((q,qi)=>{
+    if (q.t==="mc"){
+      const opts = shuffle(q.o.map((t,i)=>({t,ok:i===0})));
+      html += `<div class="qz mc"><div class="qq">Q${qi+1}. ${T(q.q)}</div>${opts.map(o=>`<button class="opt" data-ok="${o.ok?1:0}">${T(o.t)}</button>`).join("")}<div class="exp" hidden>${T(q.e)}</div></div>`;
+    } else {
+      html += `<div class="qz sa"><div class="qq">Q${qi+1}. (서술형) ${T(q.q)}</div><textarea placeholder="내 답을 먼저 써 보세요"></textarea><div class="qbar"><button class="show">모범 답안 보기</button></div><div class="model" hidden><b>모범 답안</b><p>${T(q.m)}</p><b>채점 포인트</b>${q.p.map(p=>`<label><input type="checkbox"> ${T(p)}</label>`).join("")}</div></div>`;
+    }
+  });
+  if (mcN) html += `<div class="qbar"><span class="score">객관식 점수 0 / ${mcN}</span><button class="retry">다시 풀기 (보기 섞기)</button></div>`;
+  el.innerHTML = html; el.dataset.score = "0"; el.dataset.mcn = mcN;
+}
+
+/* ---------- glossary tooltips ---------- */
+const GL = N.glossary.slice().sort((a,b)=>b[0].length-a[0].length);
+const isAscii = s => /^[\x00-\x7F%]+$/.test(s);
+const reSrc = GL.map(g=>{
+  const e = g[0].replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+  return isAscii(g[0]) ? `(?<![A-Za-z])${e}(?![A-Za-z])` : e;
+}).join("|");
+const RE = new RegExp(reSrc, "g");
+const SKIP = "a,button,.quiz,.fig,.math,summary,.tt,.tag,.sref,textarea,script,.shead";
+function tipify(root, used){
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {acceptNode(n){
+    if (!n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+    if (n.parentElement.closest(SKIP)) return NodeFilter.FILTER_REJECT;
+    return NodeFilter.FILTER_ACCEPT; }});
+  const nodes=[]; while(walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(node=>{
+    const s = node.nodeValue; RE.lastIndex = 0; let m, last=0, frag=null;
+    while((m = RE.exec(s))){
+      const term = m[0]; if (used.has(term)) continue;
+      used.add(term); frag = frag || document.createDocumentFragment();
+      frag.appendChild(document.createTextNode(s.slice(last, m.index)));
+      const sp = document.createElement("span"); sp.className="tt"; sp.tabIndex=0; sp.dataset.g=term; sp.textContent=term;
+      frag.appendChild(sp); last = m.index+term.length;
+    }
+    if (frag){ frag.appendChild(document.createTextNode(s.slice(last))); node.parentNode.replaceChild(frag, node); }
+  });
+}
+const tipEl = () => $("#tip");
+let tipFor = null;
+function showTip(el){
+  const g = N.glossary.find(x=>x[0]===el.dataset.g); if(!g) return;
+  const t = tipEl();
+  t.innerHTML = `<div class="n">${esc(g[0])} — ${esc(g[1])}</div><div class="r">읽는 법: ${esc(g[2])}</div><div>${esc(g[3])}</div><div class="r">${tagify(esc(g[4]))}</div>`;
+  t.style.display="block"; t.style.left="0px"; t.style.top="0px";
+  const r = el.getBoundingClientRect(), tw = t.offsetWidth, th = t.offsetHeight, vw = document.documentElement.clientWidth;
+  let left = r.left + window.scrollX; left = Math.max(window.scrollX+8, Math.min(left, window.scrollX+vw-tw-8));
+  let top = r.bottom + window.scrollY + 6;
+  if (r.bottom + th + 10 > window.innerHeight && r.top - th - 6 > 0) top = r.top + window.scrollY - th - 6;
+  t.style.left = left+"px"; t.style.top = top+"px"; tipFor = el;
+}
+function hideTip(){ tipEl().style.display="none"; tipFor=null; }
+
+/* ---------- navigation ---------- */
+const isWide = () => window.matchMedia("(min-width:1024px)").matches;
+function barH(){ const tb=$("#topbar"); const h = (tb && getComputedStyle(tb).display!=="none") ? tb.offsetHeight : 0;
+  document.documentElement.style.setProperty("--barH", h+"px"); return h; }
+function goEl(el, extra){ if(!el) return; const y = el.getBoundingClientRect().top + window.scrollY - barH() - (extra||8); window.scrollTo({top:Math.max(0,y), behavior:"smooth"}); }
+function go(n){ closeDrawer(); goEl(document.getElementById(n==="map"?"map":n==="guide"?"guide":"s"+n)); }
+function visibleSlides(){ return $$(".slide").filter(s=>s.offsetParent!==null).map(s=>+s.dataset.n); }
+let cur = 0;
+function curLabel(){ return cur ? (cur>N.total ? "부록" : "Slide "+pad(cur)) : "지도"; }
+function updCur(){
+  const lim = barH() + 30; let c = 0;
+  for (const s of $$(".slide")){ if (s.offsetParent===null) continue; if (s.getBoundingClientRect().top <= lim) c = +s.dataset.n; else break; }
+  const changed = c!==cur; cur=c;
+  $$("#nums .nv").forEach(b=>b.classList.toggle("cur", b.dataset.go===(cur?String(cur):"map")));
+  $("#tbCur").textContent = curLabel() + (cur ? " · " + (N.titles[cur]||"") : "");
+  $("#rlCur").textContent = cur ? (cur>N.total?"부록":cur) : "지도";
+  if (changed){ const b = $(`#nums .nv[data-go="${cur||"map"}"]`), nav = $("#nums");
+    if (b && (b.offsetTop < nav.scrollTop || b.offsetTop + b.offsetHeight > nav.scrollTop + nav.clientHeight)) nav.scrollTop = b.offsetTop - nav.clientHeight/2; }
+}
+/* sidebar / drawer */
+function setCollapsed(on){ document.body.classList.toggle("side-collapsed", on); try{localStorage.setItem("sensorNote:side", on?"0":"1");}catch(e){}
+  $("#bSide").setAttribute("aria-expanded", String(!on)); setTimeout(()=>{barH();updCur();},50); }
+function openDrawer(){ document.body.classList.add("drawer-open"); }
+function closeDrawer(){ document.body.classList.remove("drawer-open"); }
+function openSearch(){ if (isWide()) setCollapsed(false); else openDrawer(); setTimeout(()=>{ $("#q").focus(); $("#q").select(); }, 60); }
+
+/* ---------- search ---------- */
+let IDX = [], PAIRS = [], qCat = "all", hits = [], hitSel = -1;
+const CATS = [["all","전체"],["body","본문"],["term","용어"],["book","교재"],["latest","최신"],["quiz","퀴즈"],["memo","내 메모"]];
+const norm = t => String(t).toLowerCase();
+const nospace = t => t.replace(/\s+/g,"");
+function textOf(el){ const c = el.cloneNode(true); c.querySelectorAll("script,button.box").forEach(x=>x.remove()); return c.textContent.replace(/\s+/g," ").trim(); }
+function addIdx(o){ o.L = norm(o.text); o.NS = nospace(o.L); IDX.push(o); }
+function buildIndex(){
+  IDX = [];
+  addIdx({n:"map", cat:"body", label:"전체 지도", el:$("#map"), text:textOf($("#map"))});
+  addIdx({n:"guide", cat:"body", label:"학습 가이드", el:$("#guide"), text:textOf($("#guide"))});
+  for (const sec of $$(".slide")){
+    const n = +sec.dataset.n;
+    addIdx({n, cat:"title", label:"제목", el:sec, text:(N.titles[n]||"")});
+    const one=$(".one",sec); if (one) addIdx({n, cat:"body", label:"한 줄", el:one, text:textOf(one)});
+    const talk=$(".talk",sec); if (talk) addIdx({n, cat:"body", label:"강사 설명", el:talk, text:textOf(talk)});
+    for (const d of $$("details.sec",sec)){
+      if (d.parentElement.closest("details.sec")) continue;
+      const lab = $("summary",d).textContent.replace(/\s+/g," ").trim();
+      let text = textOf($(".sbody",d));
+      const js = $(".fig script",d); if (js){ try{ text += " " + JSON.parse(js.textContent).join(" "); }catch(e){} }
+      const cat = d.classList.contains("booksec")?"book": d.classList.contains("latestsec")?"latest": d.classList.contains("qsec")?"quiz": lab.startsWith("용어")?"term":"body";
+      addIdx({n, cat, label:lab.replace(/^📖 |^🆕 /,""), el:d, text});
+    }
+  }
+  for (const g of N.glossary){
+    const first = $(`main .tt[data-g="${CSS.escape(g[0])}"]`);
+    const sl = first ? first.closest(".slide, #map, #guide") : null;
+    addIdx({n: sl ? (sl.dataset.n ? +sl.dataset.n : sl.id) : null, cat:"term", label:"용어 사전", gl:g[0], el:first, text:`${g[0]} — ${g[1]} (${g[2]}): ${g[3]}. ${g[4]}`});
+  }
+  // 한·영 짝 (동의어 확장용)
+  PAIRS = N.glossary.map(g=>[g[0], g[1], g[2]]);
+  for (let n=1;n<=LAST;n++){ const d=N.slides[n]; if (d && d.terms) d.terms.rows.forEach(r=>PAIRS.push([r[0], r[1]])); }
+  PAIRS = PAIRS.map(p=>p.map(x=>norm(String(x).replace(/\[[^\]]*\]/g,"").split(/ \(|\(|\/| — /)[0].trim())).filter(x=>x.length>=2));
+}
+function expand(q){
+  const out = [q]; if (q.length < 2) return out;
+  for (const p of PAIRS){ if (p.some(f=>f===q || (q.length>=3 && f.includes(q)) || (f.length>=3 && q.includes(f)))) for (const f of p) if (!out.includes(f) && out.length<5) out.push(f); }
+  return out;
+}
+function snip(text, L, idx, len){
+  if (idx < 0) return esc(text.slice(0, 90)) + (text.length>90?"…":"");
+  const a = Math.max(0, idx-34), b = Math.min(text.length, idx+len+50);
+  return (a>0?"…":"") + esc(text.slice(a, idx)) + "<mark>" + esc(text.slice(idx, idx+len)) + "</mark>" + esc(text.slice(idx+len, b)) + (b<text.length?"…":"");
+}
+const W8 = {title:100, term:60, body:30, book:25, latest:25, quiz:15, memo:50};
+function runSearch(){
+  const raw = $("#q").value.trim(), box = $("#qres");
+  clearMarks();
+  if (!raw){ box.hidden = true; box.innerHTML=""; hits=[]; return; }
+  const q = norm(raw), terms = expand(q);
+  hits = [];
+  for (const e of IDX){
+    if (qCat!=="all" && !(qCat===e.cat || (qCat==="body" && e.cat==="title"))) continue;
+    let best=null, cnt=0;
+    for (const t of terms){
+      let i = e.L.indexOf(t);
+      if (i>=0){ cnt += e.L.split(t).length-1; if (!best) best={i, t}; }
+      else if (e.NS.includes(nospace(t))){ cnt++; if (!best) best={i:-1, t}; }
+    }
+    if (!best) continue;
+    hits.push({e, t:best.t, i:best.i, score:(W8[e.cat]||20) + Math.min(cnt,5)*3 + (best.t===q?5:0)});
+  }
+  if (qCat==="all" || qCat==="memo"){
+    for (const k in state){ const m = state[k].memo||""; if (!m) continue; const L = norm(m);
+      const t = terms.find(t=>L.includes(t)); if (!t) continue;
+      const n = +k.slice(1); hits.push({e:{n, cat:"memo", label:"내 메모", text:m, L, el:$(`#s${n} .memo`)}, t, i:L.indexOf(t), score:W8.memo}); }
+  }
+  hits.sort((a,b)=> b.score-a.score || (numOf(a.e.n)-numOf(b.e.n)));
+  const total = hits.length; hits = hits.slice(0, 60); hitSel = hits.length ? 0 : -1;
+  const also = terms.slice(1);
+  let h = `<div class="qmeta">${total ? (total>60 ? total+"곳 중 상위 60" : total+"곳") : "결과 없음"}${also.length?` · 함께 찾음: ${also.map(esc).join(", ")}`:""}</div>`;
+  h += hits.map((x,i)=>{ const n=x.e.n; const tag = n==="map"?"지도":n==="guide"?"가이드":n==null?"—":(n>N.total?"부록":n);
+    return `<button class="hit${i===hitSel?" sel":""}" data-hit="${i}"><span class="hn">${tag}</span><span class="hb"><span class="hl">${esc(x.e.label)}${typeof n==="number"&&x.e.cat!=="title"?` · ${esc(N.titles[n]||"")}`:""}</span><span class="hs">${snip(x.e.text, x.e.L, x.i, x.t.length)}</span></span></button>`; }).join("");
+  box.innerHTML = h; box.hidden = false;
+}
+const numOf = n => typeof n==="number" ? n : (n==="map"?-2:n==="guide"?-1:999);
+function clearMarks(){ $$("mark.hit").forEach(m=>{ const p=m.parentNode; p.replaceChild(document.createTextNode(m.textContent), m); p.normalize(); }); }
+function markIn(el, t){
+  if (!el || !t) return null;
+  const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {acceptNode(n){ return n.parentElement.closest("script,.tt,textarea") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT; }});
+  while (w.nextNode()){ const n = w.currentNode, i = norm(n.nodeValue).indexOf(t); if (i<0) continue;
+    const r = document.createRange(); r.setStart(n,i); r.setEnd(n,i+t.length); const m = document.createElement("mark"); m.className="hit"; r.surroundContents(m); return m; }
+  return null;
+}
+function openHit(i){
+  const x = hits[i]; if (!x) return; const e = x.e;
+  closeDrawer(); clearMarks();
+  if (e.gl && e.el){ goEl(e.el, 120); setTimeout(()=>showTip(e.el), 650); return; }
+  let el = e.el; if (!el){ if (e.n!=null) go(e.n); return; }
+  for (let d = el.closest("details"); d; d = d.parentElement && d.parentElement.closest("details")) d.open = true;
+  if (el.tagName==="DETAILS") el.open = true;
+  if (e.cat==="memo"){ goEl(el, 120); return; }
+  const m = markIn(el, x.t);
+  goEl(m || el, m ? Math.round(window.innerHeight*0.3) : 8);
+}
+function selHit(d){ if (!hits.length) return; hitSel = (hitSel + d + hits.length) % hits.length;
+  $$("#qres .hit").forEach((b,i)=>b.classList.toggle("sel", i===hitSel)); const b=$(`#qres .hit[data-hit="${hitSel}"]`); if (b) b.scrollIntoView({block:"nearest"}); }
+
+/* ---------- marks ---------- */
+function applyMarks(){
+  for (const k in state){
+    const n = +k.slice(1), s = state[k], sec = document.getElementById("s"+n); if(!sec) continue;
+    sec.classList.toggle("st", !!s.star);
+    const bs=$(".bs",sec), bq=$(".bq",sec), ta=$(".memo textarea",sec);
+    bs.classList.toggle("on",!!s.star); bs.setAttribute("aria-pressed", !!s.star);
+    bq.classList.toggle("on",!!s.q); bq.setAttribute("aria-pressed", !!s.q);
+    if (document.activeElement!==ta) ta.value = s.memo||"";
+    const nb = $(`#nums .nv[data-go="${n}"]`); if (nb){ nb.classList.toggle("st", !!s.star); nb.classList.toggle("qm", !!s.q); }
+  }
+  $("#empty").classList.toggle("show", !Object.values(state).some(s=>s.star));
+}
+
+/* ---------- figures ---------- */
+function setFig(fig, i){
+  const items = JSON.parse($("script",fig).textContent), n = items.length;
+  i = (i+n)%n; fig.dataset.cur = i;
+  $$(".box",fig).forEach(b=>b.classList.toggle("act", +b.dataset.i===i));
+  $$(".fignav button[data-i]",fig).forEach(b=>b.classList.toggle("act", +b.dataset.i===i));
+  $(".figdesc",fig).innerHTML = `<b>${i+1}</b> ${T(items[i])}`;
+}
+
+/* ---------- boot ---------- */
+function boot(){
+  document.title = N.pageTitle;
+  let nums = `<button class="nv" data-go="map"><span class="nn">🗺</span><span class="nt">전체 지도</span></button><button class="nv" data-go="guide"><span class="nn">🧭</span><span class="nt">학습 가이드</span></button>`;
+  for(let n=1;n<=N.total;n++){ const p=(N.parts||[]).find(p=>p.from===n); if(p) nums += `<div class="partsep">${esc(p.label)}</div>`;
+    nums += `<button class="nv${N.slides[n]?"":" pend"}" data-go="${n}"><span class="nn">${pad(n)}</span><span class="nt">${esc(N.titles[n]||"")}</span><span class="mk"></span></button>`; }
+  if (LAST > N.total) nums += `<div class="partsep">교재</div><button class="nv" data-go="${LAST}"><span class="nn">📖</span><span class="nt">부록 · 센서의 분류</span><span class="mk"></span></button>`;
+  $("#nums").innerHTML = nums;
+  $("#qf").innerHTML = CATS.map(([k,l])=>`<button class="qc${k==="all"?" on":""}" data-cat="${k}">${l}</button>`).join("");
+  let body = renderMap() + renderGuide() + `<p id="empty" class="card">아직 ★ 표시한 슬라이드가 없어요.</p>`;
+  for(let n=1;n<=LAST;n++) body += renderSlide(n);
+  $("main").innerHTML = body;
+  $$(".quiz").forEach(buildQuiz);
+  $$(".fig").forEach(f=>setFig(f,0));
+  $$(".slide").forEach(s=>tipify(s, new Set()));
+  tipify($("#map"), new Set()); tipify($("#guide"), new Set());
+  // easy toggle
+  let easy = true; try { easy = localStorage.getItem("sensorNote:easy") !== "0"; } catch(e){}
+  document.body.classList.toggle("noeasy", !easy); $$("#bEasy,#rlEasy").forEach(b=>b.classList.toggle("on", easy));
+  let sideOpen = true; try { sideOpen = localStorage.getItem("sensorNote:side") !== "0"; } catch(e){}
+  document.body.classList.toggle("side-collapsed", !sideOpen);
+  buildIndex();
+  applyMarks(); barH(); updCur();
+  if ("ResizeObserver" in window) new ResizeObserver(barH).observe($("#topbar"));
+  initCloud();
+}
+
+document.addEventListener("click", e=>{
+  const t = e.target;
+  const tt = t.closest(".tt");
+  if (tt){ e.preventDefault(); if (tipFor===tt) hideTip(); else showTip(tt); return; }
+  if (!t.closest("#tip")) hideTip();
+  const g = t.closest("[data-go]"); if (g){ const v=g.dataset.go; go(v==="map"||v==="guide"?v:+v); return; }
+  const hb = t.closest("[data-hit]"); if (hb){ openHit(+hb.dataset.hit); return; }
+  const qc = t.closest(".qc"); if (qc){ qCat = qc.dataset.cat; $$("#qf .qc").forEach(b=>b.classList.toggle("on", b===qc)); runSearch(); return; }
+  if (t.closest("#bSide")){ if (isWide()) setCollapsed(!document.body.classList.contains("side-collapsed")); else closeDrawer(); return; }
+  if (t.closest("#rlOpen")){ setCollapsed(false); return; }
+  if (t.closest("#rlSearch,#tbSearch")){ openSearch(); return; }
+  if (t.closest("#tbMenu")){ openDrawer(); return; }
+  if (t.closest("#scrim")){ closeDrawer(); return; }
+  if (t.closest("#rlPrev,#rlNext")){ step(t.closest("#rlNext")?1:-1); return; }
+  if (t.closest("[data-zoom]")){ const n = t.closest("[data-zoom]").dataset.zoom; $("#lb img").src = `img/p${pad(n)}.jpg`; $("#lb").style.display="flex"; return; }
+  if (t.closest("#lb")){ $("#lb").style.display="none"; return; }
+  const bs = t.closest(".bs,.bq");
+  if (bs){ const k=bs.dataset.k, f = bs.classList.contains("bs")?"star":"q"; state[k][f]=!state[k][f]; save(k); applyMarks(); return; }
+  const fig = t.closest(".fig");
+  if (fig){ const b = t.closest("[data-i],[data-mv]"); if (b){ if (b.dataset.mv) setFig(fig, +fig.dataset.cur + +b.dataset.mv); else setFig(fig, +b.dataset.i); } return; }
+  const opt = t.closest(".opt");
+  if (opt){ const qz = opt.closest(".qz"); if (qz.dataset.done) return; qz.dataset.done="1";
+    $$(".opt",qz).forEach(o=>{ if (o.dataset.ok==="1") o.classList.add("ok"); });
+    const right = opt.dataset.ok==="1"; if(!right) opt.classList.add("ng");
+    const ex = $(".exp",qz); ex.hidden=false; ex.insertAdjacentHTML("afterbegin", `<b style="color:var(--${right?"ok":"ng"})">${right?"정답!":"오답 —"}</b> `);
+    const qu = qz.closest(".quiz"); if (right) qu.dataset.score = +qu.dataset.score+1;
+    $(".score",qu).textContent = `객관식 점수 ${qu.dataset.score} / ${qu.dataset.mcn}`; return; }
+  if (t.closest(".retry")){ const qu=t.closest(".quiz"); buildQuiz(qu); return; }
+  if (t.closest(".show")){ const m = $(".model", t.closest(".qz")); m.hidden = !m.hidden; t.textContent = m.hidden?"모범 답안 보기":"모범 답안 접기"; return; }
+  if (t.closest("#bStar,#rlStar")){ const on = document.body.classList.toggle("staronly"); $$("#bStar,#rlStar").forEach(b=>b.classList.toggle("on", on)); applyMarks(); updCur(); return; }
+  if (t.closest("#bAll")){ const b=t.closest("button"), open=!b.classList.contains("on"); b.classList.toggle("on",open); b.textContent = open?"전체 접기":"전체 펼치기"; $$("main details").forEach(d=>d.open=open); return; }
+  if (t.closest("#bEasy,#rlEasy")){ const on = document.body.classList.contains("noeasy"); $$("#bEasy,#rlEasy").forEach(b=>b.classList.toggle("on",on)); document.body.classList.toggle("noeasy",!on); try{localStorage.setItem("sensorNote:easy", on?"1":"0");}catch(e){} return; }
+});
+document.addEventListener("pointerover", e=>{ const tt=e.target.closest&&e.target.closest(".tt"); if (tt && e.pointerType==="mouse") showTip(tt); });
+document.addEventListener("pointerout", e=>{ const tt=e.target.closest&&e.target.closest(".tt"); if (tt && e.pointerType==="mouse" && !(e.relatedTarget&&e.relatedTarget.closest&&e.relatedTarget.closest("#tip"))) hideTip(); });
+let lastPtr=0; document.addEventListener("pointerdown", ()=>{ lastPtr=Date.now(); }, true);
+document.addEventListener("focusin", e=>{ if (Date.now()-lastPtr<800) return; if (e.target.classList&&e.target.classList.contains("tt")) showTip(e.target); });
+let qT=0; document.addEventListener("input", e=>{ if (e.target.id==="q"){ clearTimeout(qT); qT=setTimeout(runSearch,140); return; } const ta=e.target.closest(".memo textarea"); if(ta){ const k=ta.dataset.k; state[k].memo=ta.value; save(k); } });
+function step(d){ const vs = visibleSlides(); const i = vs.indexOf(cur);
+  if (i<0){ if (d>0 && vs.length) go(vs[0]); return; }
+  const j = i + d; if (j<0) go("map"); else go(vs[Math.min(vs.length-1, j)]); }
+document.addEventListener("keydown", e=>{
+  const a = document.activeElement;
+  if (a && a.id==="q"){
+    if (e.key==="ArrowDown"){ e.preventDefault(); selHit(1); } else if (e.key==="ArrowUp"){ e.preventDefault(); selHit(-1); }
+    else if (e.key==="Enter"){ e.preventDefault(); if (hitSel>=0) openHit(hitSel); }
+    else if (e.key==="Escape"){ const had = a.value; a.value=""; runSearch(); a.blur(); if (!had) closeDrawer(); }
+    return; }
+  if (e.key==="Escape"){ hideTip(); $("#lb").style.display="none"; closeDrawer(); clearMarks(); return; }
+  if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="k"){ e.preventDefault(); openSearch(); return; }
+  if (a && (a.tagName==="TEXTAREA"||a.tagName==="INPUT"||a.isContentEditable)) return;
+  if (e.key==="/"){ e.preventDefault(); openSearch(); return; }
+  if (e.key==="["){ if (isWide()) setCollapsed(!document.body.classList.contains("side-collapsed")); return; }
+  if (e.key!=="ArrowLeft" && e.key!=="ArrowRight") return;
+  if (e.altKey||e.ctrlKey||e.metaKey) return;
+  e.preventDefault(); step(e.key==="ArrowRight"?1:-1);
+});
+let raf=0; window.addEventListener("scroll", ()=>{ if(!raf) raf=requestAnimationFrame(()=>{raf=0;updCur();}); }, {passive:true});
+window.addEventListener("resize", ()=>{ barH(); hideTip(); if (isWide()) closeDrawer(); });
+boot();
+})();
+</script>
+</body></html>
